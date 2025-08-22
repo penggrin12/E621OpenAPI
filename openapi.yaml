@@ -2653,6 +2653,8 @@ components:
         avatar_id:
           type: integer
           nullable: true
+        is_verified:
+          type: boolean
     UserFeedback:
       type: object
       required:
@@ -4665,18 +4667,9 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      $ref: '#/components/schemas/DMail'
-                  - type: object
-                    description: No Results
-                    required:
-                      - dmails
-                    properties:
-                      dmails:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  $ref: '#/components/schemas/DMail'
   '/dmails/{id}.json':
     get:
       summary: Get DMail
@@ -9890,32 +9883,32 @@ paths:
         - $ref: '#/components/parameters/id'
         - in: query
           name: 'search[creator_name]'
-          description: You must be Moderator+.
+          description: You must be Janitor+.
           schema:
             type: string
         - in: query
           name: 'search[creator_id]'
-          description: You must be Moderator+ unless providing your own id.
+          description: You must be Janitor+ unless providing your own id.
           schema:
             type: integer
         - in: query
           name: 'search[claimant_name]'
-          description: You must be Moderator+.
+          description: You must be Janitor+.
           schema:
             type: string
         - in: query
           name: 'search[claimant_id]'
-          description: You must be Moderator+.
+          description: You must be Janitor+.
           schema:
             type: integer
         - in: query
           name: 'search[accused_name]'
-          description: You must be Moderator+.
+          description: You must be Janitor+.
           schema:
             type: string
         - in: query
           name: 'search[accused_id]'
-          description: You must be Moderator+.
+          description: You must be Janitor+.
           schema:
             type: integer
         - in: query
@@ -9924,7 +9917,7 @@ paths:
             $ref: '#/components/schemas/TicketTypes'
         - in: query
           name: 'search[reason]'
-          description: You must be Moderator+.
+          description: You must be Janitor+.
           schema:
             type: string
         - in: query
