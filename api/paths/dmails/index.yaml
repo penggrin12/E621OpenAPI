@@ -49,15 +49,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/dMail.yaml"
-            - type: object
-              description: No Results
-              required:
-                - dmails
-              properties:
-                dmails:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/dMail.yaml"
