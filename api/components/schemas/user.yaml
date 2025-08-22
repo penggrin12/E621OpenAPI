@@ -42,3 +42,5 @@ properties:
   avatar_id:
     type: integer
     nullable: true
+  is_verified:
+    type: boolean
