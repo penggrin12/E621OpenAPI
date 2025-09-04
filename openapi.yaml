@@ -12,7 +12,7 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: 07704f4
+  version: 1acda4e
 servers:
   - url: 'https://e621.net'
     description: E621 (production)
@@ -2365,26 +2365,24 @@ components:
     TagPreview:
       type: object
       required:
-        - a
-        - type
-        - tagTypeA
+        - name
       properties:
-        a:
+        id:
+          type: integer
+        name:
           type: string
-          description: 'The name if type=tag, else the antecedent.'
-        b:
+        resolved:
           type: string
-          description: 'The consequent, only present if type=alias or type=implication.'
-        type:
-          type: string
-          enum:
-            - tag
-            - implication
-            - alias
-        tagTypeA:
+        category:
           $ref: '#/components/schemas/TagCategories'
-        tagTypeB:
-          $ref: '#/components/schemas/TagCategories'
+        post_count:
+          type: integer
+        alias:
+          type: string
+        implies:
+          type: array
+          items:
+            type: string
     TagTypeVersion:
       type: object
       required:
@@ -8701,21 +8699,24 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
   /tags/preview.json:
-    get:
+    post:
       summary: Preview Tags
       operationId: previewTags
       tags:
         - Tags
-      description: 'Note while this route does not require auth, without auth it requires a CSRF token. For that reason it has been marked as requiring auth.'
       security:
         - basicAuth: []
-      parameters:
-        - name: tags
-          in: query
-          required: true
-          description: 'The tags to preview, space separated.'
-          schema:
-            type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - tags
+              properties:
+                tags:
+                  type: string
+                  description: 'The tags to preview, space separated.'
       responses:
         '200':
           description: Success
@@ -8727,8 +8728,6 @@ paths:
                   $ref: '#/components/schemas/TagPreview'
         '403':
           $ref: '#/components/responses/AccessDenied'
-        '404':
-          $ref: '#/components/responses/NotFound'
   /tag_type_versions.json:
     get:
       summary: Search Tag Versions
