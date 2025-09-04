@@ -2,16 +2,19 @@ summary: Preview Tags
 operationId: previewTags
 tags:
   - Tags
-description: Note while this route does not require auth, without auth it requires a CSRF token. For that reason it has been marked as requiring auth.
 security:
   - basicAuth: []
-parameters:
-  - name: tags
-    in: query
-    required: true
-    description: The tags to preview, space separated.
-    schema:
-      type: string
+requestBody:
+  content:
+    application/x-www-form-urlencoded:
+      schema:
+        type: object
+        required:
+          - tags
+        properties:
+          tags:
+            type: string
+            description: The tags to preview, space separated.
 responses:
   200:
     description: Success
@@ -23,5 +26,3 @@ responses:
             $ref: "../../components/schemas/tagPreview.yaml"
   403:
     $ref: "../../components/responses/accessDenied.yaml"
-  404:
-    $ref: "../../components/responses/notFound.yaml"

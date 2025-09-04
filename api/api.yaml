@@ -649,7 +649,7 @@ paths:
     post:
       $ref: "./paths/tag_corrections/create.yaml"
   /tags/preview.json:
-    get:
+    post:
       $ref: "./paths/tags/preview.yaml"
 
   /tag_type_versions.json:
