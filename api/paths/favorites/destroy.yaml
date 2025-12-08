@@ -11,8 +11,20 @@ parameters:
     schema:
       type: integer
 responses:
-  204:
+  200:
     description: Success
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - post_id
+            - favorite_count
+          properties:
+            post_id:
+              type: number
+            favorite_count:
+              type: number
   403:
     $ref: "../../components/responses/accessDenied.yaml"
   404:
