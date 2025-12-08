@@ -2,7 +2,7 @@ summary: Search Post Replacements
 operationId: searchPostReplacements
 tags:
   - Post Replacements
-description: When no results are found, an object with an `post_replacements` key is returned.
+description: Rejected replacements can only be seen by staff.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -71,15 +71,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/postReplacement.yaml"
-            - type: object
-              description: No Results
-              required:
-                - post_replacements
-              properties:
-                post_replacements:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/postReplacement.yaml"

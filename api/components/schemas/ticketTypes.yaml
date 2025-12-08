@@ -9,3 +9,4 @@ enum:
   - set
   - user
   - wiki
+  - replacement
