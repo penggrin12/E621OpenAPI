@@ -23,6 +23,7 @@ required:
   - is_favorited
   - has_notes
   - duration
+  - uploader_name
 properties:
   id:
     type: integer
@@ -249,3 +250,5 @@ properties:
   duration:
     type: number
     nullable: true
+  uploader_name:
+    type: string
