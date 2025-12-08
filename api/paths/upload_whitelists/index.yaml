@@ -14,15 +14,24 @@ parameters:
       enum:
         - id_asc
         - id_desc
-        - pattern
+        - domain
+        - path
         - updated_at
         - created_at
   - in: query
-    name: search[pattern]
+    name: search[domain]
+    schema:
+      type: string
+  - in: query
+    name: search[path]
     schema:
       type: string
   - in: query
     name: search[note]
+    schema:
+      type: string
+  - in: query
+    name: search[reason]
     schema:
       type: string
 responses:

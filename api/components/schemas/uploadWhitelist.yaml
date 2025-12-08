@@ -8,6 +8,8 @@ required:
   - hidden
   - allowed
   - reason
+  - domain
+  - path
 properties:
   id:
     type: integer
@@ -26,4 +28,8 @@ properties:
   allowed:
     type: boolean
   reason:
+    type: string
+  domain:
+    type: string
+  path:
     type: string

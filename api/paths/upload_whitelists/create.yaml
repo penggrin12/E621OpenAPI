@@ -12,11 +12,14 @@ requestBody:
         type: object
         required:
           - upload_whitelist[allowed]
-          - upload_whitelist[pattern]
+          - upload_whitelist[domain]
+          - upload_whitelist[path]
         properties:
           upload_whitelist[allowed]:
             type: string
-          upload_whitelist[pattern]:
+          upload_whitelist[domain]:
+            type: string
+          upload_whitelist[path]:
             type: string
           upload_whitelist[reason]:
             type: string
