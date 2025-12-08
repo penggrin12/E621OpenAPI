@@ -594,6 +594,9 @@ paths:
   /post_flags/{id}.json:
     get:
       $ref: "./paths/post_flags/show.yaml"
+  /post_flags/{id}/clear_note.json:
+    post:
+      $ref: "./paths/post_flags/clear_note.yaml"
 
   /post_replacements.json:
     get:
@@ -794,6 +797,12 @@ paths:
   /users/{id}/toggle_uploads.json:
     get:
       $ref: "./paths/users/toggle_uploads.yaml"
+  /users/{user_id}/dmails.json:
+    get:
+      $ref: "./paths/users/dmails/index.yaml"
+  /users/{user_id}/dmails/{id}.json:
+    get:
+      $ref: "./paths/users/dmails/show.yaml"
   /maintenance/user/count_fixes.json:
     post:
       $ref: "./paths/maintenance/user/count_fixes/create.yaml"
@@ -877,6 +886,9 @@ paths:
   /moderator/post/posts/{id}/move_favorites.json:
     post:
       $ref: "./paths/moderator/post/posts/move_favorites.yaml"
+  /moderator/post/posts/{id}/ai_check.json:
+    get:
+      $ref: "./paths/moderator/post/posts/ai_check.yaml"
   /moderator/post/approval.json:
     post:
       $ref: "./paths/moderator/post/approvals/create.yaml"
