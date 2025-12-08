@@ -8080,13 +8080,20 @@ paths:
           $ref: '#/components/responses/NotFound'
   '/post_flags/{id}/clear_note.json':
     post:
-      summary: Create Post Flag
-      operationId: createPostFlag
+      summary: Clear Post Flag Note
+      operationId: clearPostFlagNote
       tags:
         - Post Flags
       security:
         - basicAuth: []
       description: You must be Janitor+
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the post flag.
+          schema:
+            type: integer
       responses:
         '201':
           description: Success
@@ -10852,8 +10859,8 @@ paths:
           $ref: '#/components/responses/NotFound'
   '/users/{user_id}/dmails/{id}.json':
     get:
-      summary: Audit User DMails
-      operationId: auditUserDMails
+      summary: Audit User DMail
+      operationId: auditUserDMail
       tags:
         - DMails
       security:
@@ -11273,6 +11280,13 @@ paths:
       security:
         - basicAuth: []
       description: You must be Moderator+.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the name change request.
+          schema:
+            type: integer
       responses:
         '302':
           description: Success
