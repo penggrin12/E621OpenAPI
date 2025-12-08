@@ -10,6 +10,8 @@ required:
   - is_deleted
   - created_at
   - updated_at
+  - to_name
+  - from_name
 properties:
   id:
     type: integer
@@ -33,3 +35,7 @@ properties:
   updated_at:
     type: string
     format: date-time
+  to_name:
+    type: string
+  from_name:
+    type: string
