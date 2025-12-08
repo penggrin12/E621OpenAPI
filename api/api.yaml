@@ -839,6 +839,8 @@ paths:
   /user_name_change_requests/{id}.json:
     get:
       $ref: "./paths/user_name_change_requests/show.yaml"
+    delete:
+      $ref: "./paths/user_name_change_requests/destroy.yaml"
 
   /wiki_pages.json:
     get:

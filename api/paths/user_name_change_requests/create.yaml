@@ -4,7 +4,6 @@ tags:
   - User Name Change Requests
 security:
   - basicAuth: []
-description: You must be Moderator+.
 requestBody:
   content:
     application/x-www-form-urlencoded:

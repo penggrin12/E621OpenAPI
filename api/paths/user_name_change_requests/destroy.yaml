@@ -1,0 +1,12 @@
+summary: Delete User Name Change Request
+operationId: deleteUserNameChangeRequest
+tags:
+  - User Name Change Requests
+security:
+  - basicAuth: []
+description: You must be Moderator+.
+responses:
+  302:
+    description: Success
+  403:
+    $ref: "../../components/responses/accessDenied.yaml"
