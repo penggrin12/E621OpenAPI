@@ -8,7 +8,7 @@ parameters:
     required: true
     description: The ID or Username of the user.
     schema:
-      type: 'string'
+      type: "string"
 responses:
   200:
     $ref: "../../components/responses/user.yaml"

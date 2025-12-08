@@ -1,0 +1,31 @@
+summary: Audit User DMails
+operationId: auditUserDMails
+tags:
+  - DMails
+security:
+  - basicAuth: []
+description: Must have the bd staff user flag.
+parameters:
+  - name: user_id
+    in: path
+    required: true
+    description: The ID of the user.
+    schema:
+      type: integer
+  - name: id
+    in: path
+    required: true
+    description: The ID of the DMail.
+    schema:
+      type: integer
+responses:
+  200:
+    description: Success
+    content:
+      application/json:
+        schema:
+          $ref: "../../../components/schemas/dMail.yaml"
+  403:
+    $ref: "../../../components/responses/accessDenied.yaml"
+  404:
+    $ref: "../../../components/responses/notFound.yaml"
