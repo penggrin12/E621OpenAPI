@@ -285,6 +285,7 @@ components:
         - set
         - user
         - wiki
+        - replacement
     TicketStatuses:
       type: string
       enum:
@@ -780,6 +781,8 @@ components:
         - is_deleted
         - created_at
         - updated_at
+        - to_name
+        - from_name
       properties:
         id:
           type: integer
@@ -803,6 +806,10 @@ components:
         updated_at:
           type: string
           format: date-time
+        to_name:
+          type: string
+        from_name:
+          type: string
     DeferredPost:
       type: object
       required:
@@ -1634,6 +1641,7 @@ components:
         - is_favorited
         - has_notes
         - duration
+        - uploader_name
       properties:
         id:
           type: integer
@@ -1860,6 +1868,8 @@ components:
         duration:
           type: number
           nullable: true
+        uploader_name:
+          type: string
     PostApproval:
       type: object
       required:
@@ -1941,12 +1951,10 @@ components:
         - created_at
         - post_id
         - reason
-        - creator_id
         - is_resolved
         - updated_at
         - is_deletion
         - type
-        - note
       properties:
         id:
           type: integer
@@ -1959,6 +1967,7 @@ components:
           type: string
         creator_id:
           type: integer
+          description: Only visible to creator and Janitor+
           nullable: true
         is_resolved:
           type: boolean
@@ -1974,6 +1983,7 @@ components:
             - deletion
         note:
           type: string
+          description: Only visible to creator and Janitor+
           nullable: true
     PostReplacement:
       type: object
@@ -2506,6 +2516,8 @@ components:
         - hidden
         - allowed
         - reason
+        - domain
+        - path
       properties:
         id:
           type: integer
@@ -2524,6 +2536,10 @@ components:
         allowed:
           type: boolean
         reason:
+          type: string
+        domain:
+          type: string
+        path:
           type: string
     Upload:
       type: object
@@ -4956,10 +4972,13 @@ paths:
               schema:
                 type: object
                 required:
-                  - post
+                  - post_id
+                  - favorite_count
                 properties:
-                  post:
-                    $ref: '#/components/schemas/Post'
+                  post_id:
+                    type: number
+                  favorite_count:
+                    type: number
         '403':
           $ref: '#/components/responses/AccessDenied'
         '404':
@@ -4981,8 +5000,20 @@ paths:
           schema:
             type: integer
       responses:
-        '204':
+        '200':
           description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - post_id
+                  - favorite_count
+                properties:
+                  post_id:
+                    type: number
+                  favorite_count:
+                    type: number
         '403':
           $ref: '#/components/responses/AccessDenied'
         '404':
@@ -6802,7 +6833,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ExpectedError'
-  /pool_element.js:
+  /pool_element.json:
     post:
       summary: Add Post To Pool
       operationId: addPostToPool
@@ -6810,7 +6841,6 @@ paths:
         - Pools
       security:
         - basicAuth: []
-      description: 'Note that the extension is JS, this route will not return JSON.'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -6828,9 +6858,14 @@ paths:
                 post_id:
                   type: integer
       responses:
-        '200':
+        '201':
           description: Success
-  /pool_element.json:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pool'
+        '404':
+          $ref: '#/components/responses/NotFound'
     delete:
       summary: Remove Post From Pool
       operationId: removePostFromPool
@@ -6844,16 +6879,62 @@ paths:
             schema:
               type: object
               required:
-                - pool_id
                 - post_id
               properties:
                 pool_id:
                   type: integer
+                  description: Mutually exclusive with pool_name.
+                pool_name:
+                  type: string
+                  description: Mutually exclusive with pool_id. The value is not normalized.
                 post_id:
                   type: integer
       responses:
         '204':
           description: Success
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /pool_element/recent.json:
+    get:
+      summary: Get Recent Pools
+      operationId: getRecentPools
+      tags:
+        - Pools
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - post_id
+              properties:
+                pool_id:
+                  type: integer
+                  description: Mutually exclusive with pool_name.
+                pool_name:
+                  type: string
+                  description: Mutually exclusive with pool_id. The value is not normalized.
+                post_id:
+                  type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - name
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
   /pool_versions.json:
     get:
       summary: Search Pool Versions
@@ -7997,13 +8078,33 @@ paths:
                 $ref: '#/components/schemas/PostFlag'
         '404':
           $ref: '#/components/responses/NotFound'
+  '/post_flags/{id}/clear_note.json':
+    post:
+      summary: Create Post Flag
+      operationId: createPostFlag
+      tags:
+        - Post Flags
+      security:
+        - basicAuth: []
+      description: You must be Janitor+
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostFlag'
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /post_replacements.json:
     get:
       summary: Search Post Replacements
       operationId: searchPostReplacements
       tags:
         - Post Replacements
-      description: 'When no results are found, an object with an `post_replacements` key is returned.'
+      description: Rejected replacements can only be seen by staff.
       parameters:
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/page'
@@ -8072,18 +8173,9 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      $ref: '#/components/schemas/PostReplacement'
-                  - type: object
-                    description: No Results
-                    required:
-                      - post_replacements
-                    properties:
-                      post_replacements:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostReplacement'
     post:
       summary: Create Post Replacement
       operationId: createPostReplacement
@@ -10273,15 +10365,24 @@ paths:
             enum:
               - id_asc
               - id_desc
-              - pattern
+              - domain
+              - path
               - updated_at
               - created_at
         - in: query
-          name: 'search[pattern]'
+          name: 'search[domain]'
+          schema:
+            type: string
+        - in: query
+          name: 'search[path]'
           schema:
             type: string
         - in: query
           name: 'search[note]'
+          schema:
+            type: string
+        - in: query
+          name: 'search[reason]'
           schema:
             type: string
       responses:
@@ -10317,11 +10418,14 @@ paths:
               type: object
               required:
                 - 'upload_whitelist[allowed]'
-                - 'upload_whitelist[pattern]'
+                - 'upload_whitelist[domain]'
+                - 'upload_whitelist[path]'
               properties:
                 'upload_whitelist[allowed]':
                   type: string
-                'upload_whitelist[pattern]':
+                'upload_whitelist[domain]':
+                  type: string
+                'upload_whitelist[path]':
                   type: string
                 'upload_whitelist[reason]':
                   type: string
@@ -10715,6 +10819,70 @@ paths:
           $ref: '#/components/responses/AccessDenied'
         '404':
           $ref: '#/components/responses/NotFound'
+  '/users/{user_id}/dmails.json':
+    get:
+      summary: Audit User DMails
+      operationId: auditUserDMails
+      tags:
+        - DMails
+      security:
+        - basicAuth: []
+      description: Must have the bd staff user flag.
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/page'
+        - name: user_id
+          in: path
+          required: true
+          description: The ID of the user.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DMail'
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/users/{user_id}/dmails/{id}.json':
+    get:
+      summary: Audit User DMails
+      operationId: auditUserDMails
+      tags:
+        - DMails
+      security:
+        - basicAuth: []
+      description: Must have the bd staff user flag.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: The ID of the user.
+          schema:
+            type: integer
+        - name: id
+          in: path
+          required: true
+          description: The ID of the DMail.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DMail'
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /maintenance/user/count_fixes.json:
     post:
       summary: Fix User Counts
@@ -11051,7 +11219,6 @@ paths:
         - User Name Change Requests
       security:
         - basicAuth: []
-      description: You must be Moderator+.
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -11098,6 +11265,19 @@ paths:
           $ref: '#/components/responses/AccessDenied'
         '404':
           $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete User Name Change Request
+      operationId: deleteUserNameChangeRequest
+      tags:
+        - User Name Change Requests
+      security:
+        - basicAuth: []
+      description: You must be Moderator+.
+      responses:
+        '302':
+          description: Success
+        '403':
+          $ref: '#/components/responses/AccessDenied'
   /wiki_pages.json:
     get:
       summary: Search Wiki Pages
@@ -11737,6 +11917,31 @@ paths:
           $ref: '#/components/responses/AccessDenied'
         '404':
           $ref: '#/components/responses/NotFound'
+  '/moderator/post/posts/{id}/ai_check.json':
+    get:
+      summary: AI Check Post
+      operationId: aiChecPost
+      tags:
+        - Posts
+      security:
+        - basicAuth: []
+      description: You must be Janitor+.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the post.
+          schema:
+            type: integer
+      responses:
+        '302':
+          description: Success
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ExpectedError'
   /moderator/post/approval.json:
     post:
       summary: Approve Post
