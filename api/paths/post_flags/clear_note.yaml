@@ -1,0 +1,18 @@
+summary: Create Post Flag
+operationId: createPostFlag
+tags:
+  - Post Flags
+security:
+  - basicAuth: []
+description: You must be Janitor+
+responses:
+  201:
+    description: Success
+    content:
+      application/json:
+        schema:
+          $ref: "../../components/schemas/postFlag.yaml"
+  403:
+    $ref: "../../components/responses/accessDenied.yaml"
+  404:
+    $ref: "../../components/responses/notFound.yaml"
