@@ -4,12 +4,10 @@ required:
   - created_at
   - post_id
   - reason
-  - creator_id
   - is_resolved
   - updated_at
   - is_deletion
   - type
-  - note
 properties:
   id:
     type: integer
@@ -22,6 +20,7 @@ properties:
     type: string
   creator_id:
     type: integer
+    description: Only visible to creator and Janitor+
     nullable: true
   is_resolved:
     type: boolean
@@ -37,4 +36,5 @@ properties:
       - deletion
   note:
     type: string
+    description: Only visible to creator and Janitor+
     nullable: true
