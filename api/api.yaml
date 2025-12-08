@@ -505,12 +505,14 @@ paths:
   /pools/{id}/revert.json:
     put:
       $ref: "./paths/pools/revert.yaml"
-  /pool_element.js:
+  /pool_element.json:
     post:
       $ref: "./paths/pool_elements/create.yaml"
-  /pool_element.json:
     delete:
       $ref: "./paths/pool_elements/destroy.yaml"
+  /pool_element/recent.json:
+    get:
+      $ref: "./paths/pool_elements/recent.yaml"
   /pool_versions.json:
     get:
       $ref: "./paths/pool_versions/index.yaml"
