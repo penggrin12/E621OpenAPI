@@ -4,7 +4,7 @@ tags:
   - DMails
 security:
   - basicAuth: []
-description: Must have the bd staff user flag.
+description: Must have the bd auditor user flag.
 parameters:
   - $ref: "../../../components/parameters/limit.yaml"
   - $ref: "../../../components/parameters/page.yaml"
