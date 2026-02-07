@@ -1,0 +1,39 @@
+summary: Login
+operationId: login
+tags:
+  - Sessions
+security:
+  - csrfToken: []
+requestBody:
+  content:
+    application/x-www-form-urlencoded:
+      schema:
+        type: object
+        required:
+          - authenticity_token
+          - session[name]
+          - session[password]
+        properties:
+          authenticity_token:
+            type: string
+            description: CSRF Token
+          session[url]:
+            type: string
+            description: Optional relative URL to redirect to after login, defaults to `/posts`.
+          session[name]:
+            type: string
+          session[password]:
+            type: string
+responses:
+  302:
+    description: Success
+    headers:
+      Set-Cookie:
+        description: The session cookie.
+        schema:
+          type: string
+          example: _danbooru_session=(...); path=/; secure; httponly; samesite=lax
+  403:
+    $ref: "../../components/responses/accessDenied.yaml"
+  406:
+    description: Failure

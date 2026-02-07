@@ -1,0 +1,44 @@
+summary: Create API Key
+operationId: createAPIKey
+tags:
+  - API Keys
+security:
+  - browserAuth: []
+    csrfToken: []
+description: Requires [browser authentication](#operations-Sessions-login) (username & password), as well as hourly password confirmations (reauthentication).
+requestBody:
+  content:
+    application/x-www-form-urlencoded:
+      schema:
+        type: object
+        required:
+          - authenticity_token
+          - api_key[name]
+        properties:
+          authenticity_token:
+            type: string
+            description: CSRF Token
+          api_key[name]:
+            type: string
+          api_key[duration]:
+            oneOf:
+              - type: integer
+                description: days
+              - type: string
+                enum:
+                  - never
+                  - custom
+          api_key[expires_at]:
+            type: string
+            format: date-time
+responses:
+  201:
+    description: Success
+    content:
+      application/json:
+        schema:
+          $ref: "../../components/schemas/apiKey.yaml"
+  403:
+    $ref: "../../components/responses/accessDenied.yaml"
+  422:
+    $ref: "../../components/responses/expectedError.yaml"

@@ -28,6 +28,15 @@ components:
     basicAuth:
       type: http
       scheme: basic
+    browserAuth:
+      type: apiKey
+      in: cookie
+      name: _danbooru_session
+    csrfToken:
+      type: apiKey
+      in: query
+      name: authenticity_token
+      description: "Retrieved via scraping html for the `csrf-token` meta tag."
   parameters:
     id:
       $ref: "./components/parameters/id.yaml"
@@ -178,6 +187,8 @@ components:
       $ref: "./components/schemas/wikiPage.yaml"
     WikiPageVersion:
       $ref: "./components/schemas/wikiPageVersion.yaml"
+    ApiKey:
+      $ref: "./components/schemas/apiKey.yaml"
   responses:
     NotFound:
       $ref: "./components/responses/notFound.yaml"
@@ -194,6 +205,18 @@ components:
       $ref: "./components/requestBodies/warning.yaml"
 
 paths:
+  /api_keys.json:
+    get:
+      $ref: "./paths/api_keys/index.yaml"
+    post:
+      $ref: "./paths/api_keys/create.yaml"
+  /api_keys/{id}.json:
+    delete:
+      $ref: "./paths/api_keys/destroy.yaml"
+  /api_keys/{id}/regenerate.json:
+    post:
+      $ref: "./paths/api_keys/regenerate.yaml"
+
   /artists.json:
     get:
       $ref: "./paths/artists/index.yaml"
@@ -698,6 +721,10 @@ paths:
   /related_tag/bulk.json:
     post:
       $ref: "./paths/related_tags/bulk.yaml"
+
+  /session.json:
+    post:
+      $ref: "./paths/session/create.yaml"
 
   /staff_notes.json:
     get:

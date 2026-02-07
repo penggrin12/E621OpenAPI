@@ -1,0 +1,37 @@
+summary: Regenerate API Key
+operationId: regenerateAPIKey
+tags:
+  - API Keys
+security:
+  - browserAuth: []
+    csrfToken: []
+description: Requires [browser authentication](#operations-Sessions-login) (username & password), as well as hourly password confirmations (reauthentication).
+parameters:
+  - name: id
+    in: path
+    description: The ID of the api key.
+    required: true
+    schema:
+      type: integer
+requestBody:
+  content:
+    application/x-www-form-urlencoded:
+      schema:
+        type: object
+        required:
+          - authenticity_token
+        properties:
+          authenticity_token:
+            type: string
+            description: CSRF Token
+responses:
+  201:
+    description: Success
+    content:
+      application/json:
+        schema:
+          $ref: "../../components/schemas/apiKey.yaml"
+  403:
+    $ref: "../../components/responses/accessDenied.yaml"
+  422:
+    $ref: "../../components/responses/expectedError.yaml"

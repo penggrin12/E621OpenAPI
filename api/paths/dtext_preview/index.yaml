@@ -5,6 +5,7 @@ tags:
 description: Note while this route does not require auth, without auth it requires a CSRF token. For that reason it has been marked as requiring auth.
 security:
   - basicAuth: []
+  - csrfToken: []
 requestBody:
   content:
     application/json:

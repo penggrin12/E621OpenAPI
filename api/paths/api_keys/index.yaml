@@ -1,0 +1,65 @@
+summary: Get API Keys
+operationId: getAPIKeys
+tags:
+  - API Keys
+security:
+  - browserAuth: []
+description: Requires [browser authentication](#operations-Sessions-login) (username & password), as well as hourly password confirmations (reauthentication).
+parameters:
+  - $ref: "../../components/parameters/limit.yaml"
+  - $ref: "../../components/parameters/page.yaml"
+  - $ref: "../../components/parameters/id.yaml"
+  - name: search[order]
+    in: query
+    schema:
+      type: string
+      enum:
+        - id
+        - id_asc
+        - id_desc
+        - name
+        - name_asc
+        - name_desc
+        - created_at
+        - created_at_asc
+        - created_at_desc
+        - updated_at
+        - updated_at_asc
+        - updated_at_desc
+        - expires_at
+        - expires_at_asc
+        - expires_at_desc
+        - last_used_at
+        - last_used_at_asc
+        - last_used_at_desc
+  - name: search[name_matches]
+    in: query
+    schema:
+      type: string
+  # in the code but not permitted in the controller
+  # https://github.com/e621ng/e621ng/blob/1eaa73506322b300818439e1a41e9f5a79676570/app/controllers/api_keys_controller.rb#L70
+  #- name: search[user_id]
+  #  in: query
+  #  schema:
+  #    type: integer
+  #- name: search[user_name]
+  #  in: query
+  #  schema:
+  #    type: string
+  - name: search[is_expired]
+    in: query
+    schema:
+      type: boolean
+responses:
+  200:
+    description: Success
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: "../../components/schemas/apiKey.yaml"
+  403:
+    $ref: "../../components/responses/accessDenied.yaml"
+  404:
+    $ref: "../../components/responses/notFound.yaml"

@@ -1,0 +1,22 @@
+summary: Delete API Key
+operationId: deleteAPIKey
+tags:
+  - API Keys
+security:
+  - browserAuth: []
+    csrfToken: []
+description: Requires [browser authentication](#operations-Sessions-login) (username & password), as well as hourly password confirmations (reauthentication).
+parameters:
+  - name: id
+    in: path
+    description: The ID of the api key.
+    required: true
+    schema:
+      type: integer
+responses:
+  204:
+    description: Success
+  403:
+    $ref: "../../components/responses/accessDenied.yaml"
+  404:
+    $ref: "../../components/responses/notFound.yaml"
