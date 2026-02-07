@@ -556,6 +556,9 @@ paths:
   /posts.json:
     get:
       $ref: "./paths/posts/index.yaml"
+  /posts/random.json:
+    get:
+      $ref: "./paths/posts/random.yaml"
   /posts/{id}.json:
     get:
       $ref: "./paths/posts/show.yaml"
@@ -579,9 +582,9 @@ paths:
   /posts/{id}/flag.json:
     delete:
       $ref: "./paths/posts/flag/destroy.yaml"
-  /posts/random.json:
+  /posts/{id}/favorites.json:
     get:
-      $ref: "./paths/posts/random.yaml"
+      $ref: "./paths/posts/favorites.yaml"
   /posts/{id}/votes.json:
     post:
       $ref: "./paths/posts/votes/create.yaml"
