@@ -85,7 +85,7 @@ responses:
                     items:
                       type: array
                       items:
-                        anyOf:
+                        oneOf:
                           - type: string
                           - type: number
                   urls:

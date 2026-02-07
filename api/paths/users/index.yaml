@@ -63,6 +63,6 @@ responses:
         schema:
           type: array
           items:
-            anyOf:
+            oneOf:
               - $ref: "../../components/schemas/user.yaml"
               - $ref: "../../components/schemas/fullUser.yaml"

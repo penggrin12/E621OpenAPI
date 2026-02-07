@@ -21,7 +21,7 @@ responses:
         schema:
           type: array
           items:
-            anyOf:
+            oneOf:
               - type: integer
                 description: ID of concerned user.
               - type: array

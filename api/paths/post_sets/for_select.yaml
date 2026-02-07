@@ -16,13 +16,13 @@ responses:
             Owned:
               type: array
               items:
-                anyOf:
+                oneOf:
                   - type: string
                   - type: number
             Maintained:
               type: array
               items:
-                anyOf:
+                oneOf:
                   - type: string
                   - type: number
   403:

@@ -23,7 +23,7 @@ responses:
                     type: array
                     example: [["e621.net", 1]]
                     items:
-                      anyOf:
+                      oneOf:
                         - type: string
                         - type: number
                 urls:
