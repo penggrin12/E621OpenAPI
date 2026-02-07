@@ -12,7 +12,7 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: faf66e3
+  version: f897da0
 servers:
   - url: 'https://e621.net'
     description: E621 (production)
@@ -23,6 +23,15 @@ components:
     basicAuth:
       type: http
       scheme: basic
+    browserAuth:
+      type: apiKey
+      in: cookie
+      name: _danbooru_session
+    csrfToken:
+      type: apiKey
+      in: query
+      name: authenticity_token
+      description: Retrieved via scraping html for the `csrf-token` meta tag.
   parameters:
     id:
       name: 'search[id]'
@@ -44,7 +53,7 @@ components:
       schema:
         type: integer
         minimum: 0
-        maximum: 500
+        maximum: 320
     page:
       name: page
       in: query
@@ -3837,6 +3846,115 @@ components:
         parent:
           type: string
           nullable: true
+    ApiKey:
+      type: object
+      required:
+        - id
+        - created_at
+        - updated_at
+        - user_id
+        - key
+        - name
+        - last_used_at
+        - last_used_ip_address
+        - last_user_agent
+        - expires_at
+        - notified_at
+      properties:
+        id:
+          type: integer
+        updated_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        user_id:
+          type: integer
+        key:
+          type: string
+        name:
+          type: string
+        last_used_at:
+          type: string
+          format: date-time
+          nullable: true
+        last_used_ip_address:
+          oneOf:
+            - type: string
+              format: ipv4
+              nullable: true
+            - type: string
+              format: ipv6
+              nullable: true
+        last_user_agent:
+          type: string
+          nullable: true
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+        notified_at:
+          type: string
+          format: date-time
+          nullable: true
+    EditHistory:
+      type: object
+      required:
+        - id
+        - created_at
+        - updated_at
+        - body
+        - subject
+        - versionable_type
+        - versionable_id
+        - version
+        - user_id
+      properties:
+        id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        body:
+          type: string
+        subject:
+          type: string
+          nullable: true
+        versionable_type:
+          type: string
+          enum:
+            - Blip
+            - Comment
+            - ForumPost
+        versionable_id:
+          type: integer
+        version:
+          type: integer
+        user_id:
+          type: integer
+    UserAvatarMenu:
+      type: object
+      required:
+        - has_uploads
+        - has_favorites
+        - has_sets
+        - has_comments
+        - has_forums
+      properties:
+        has_uploads:
+          type: boolean
+        has_favorites:
+          type: boolean
+        has_sets:
+          type: boolean
+        has_comments:
+          type: boolean
+        has_forums:
+          type: boolean
   responses:
     NotFound:
       description: Not Found
@@ -4278,6 +4396,451 @@ components:
                   - record
                   - warning
 paths:
+  /api_keys.json:
+    get:
+      summary: Get API Keys
+      operationId: getAPIKeys
+      tags:
+        - API Keys
+      security:
+        - browserAuth: []
+      description: 'Requires [browser authentication](#operations-Sessions-login) (username & password), as well as hourly password confirmations (reauthentication).'
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of results to return. Between 0 and 320.
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 320
+        - name: page
+          in: query
+          description: The page number of results to get. Between 1 and 750.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 750
+        - name: 'search[id]'
+          in: query
+          description: Search for a specific id.
+          schema:
+            type: integer
+        - name: 'search[order]'
+          in: query
+          schema:
+            type: string
+            enum:
+              - id
+              - id_asc
+              - id_desc
+              - name
+              - name_asc
+              - name_desc
+              - created_at
+              - created_at_asc
+              - created_at_desc
+              - updated_at
+              - updated_at_asc
+              - updated_at_desc
+              - expires_at
+              - expires_at_asc
+              - expires_at_desc
+              - last_used_at
+              - last_used_at_asc
+              - last_used_at_desc
+        - name: 'search[name_matches]'
+          in: query
+          schema:
+            type: string
+        - name: 'search[is_expired]'
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - created_at
+                    - updated_at
+                    - user_id
+                    - key
+                    - name
+                    - last_used_at
+                    - last_used_ip_address
+                    - last_user_agent
+                    - expires_at
+                    - notified_at
+                  properties:
+                    id:
+                      type: integer
+                    updated_at:
+                      type: string
+                      format: date-time
+                    created_at:
+                      type: string
+                      format: date-time
+                    user_id:
+                      type: integer
+                    key:
+                      type: string
+                    name:
+                      type: string
+                    last_used_at:
+                      type: string
+                      format: date-time
+                      nullable: true
+                    last_used_ip_address:
+                      oneOf:
+                        - type: string
+                          format: ipv4
+                          nullable: true
+                        - type: string
+                          format: ipv6
+                          nullable: true
+                    last_user_agent:
+                      type: string
+                      nullable: true
+                    expires_at:
+                      type: string
+                      format: date-time
+                      nullable: true
+                    notified_at:
+                      type: string
+                      format: date-time
+                      nullable: true
+        '403':
+          description: Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - Access Denied
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - not found
+    post:
+      summary: Create API Key
+      operationId: createAPIKey
+      tags:
+        - API Keys
+      security:
+        - browserAuth: []
+          csrfToken: []
+      description: 'Requires [browser authentication](#operations-Sessions-login) (username & password), as well as hourly password confirmations (reauthentication).'
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - authenticity_token
+                - 'api_key[name]'
+              properties:
+                authenticity_token:
+                  type: string
+                  description: CSRF Token
+                'api_key[name]':
+                  type: string
+                'api_key[duration]':
+                  oneOf:
+                    - type: integer
+                      description: days
+                    - type: string
+                      enum:
+                        - never
+                        - custom
+                'api_key[expires_at]':
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - created_at
+                  - updated_at
+                  - user_id
+                  - key
+                  - name
+                  - last_used_at
+                  - last_used_ip_address
+                  - last_user_agent
+                  - expires_at
+                  - notified_at
+                properties:
+                  id:
+                    type: integer
+                  updated_at:
+                    type: string
+                    format: date-time
+                  created_at:
+                    type: string
+                    format: date-time
+                  user_id:
+                    type: integer
+                  key:
+                    type: string
+                  name:
+                    type: string
+                  last_used_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+                  last_used_ip_address:
+                    oneOf:
+                      - type: string
+                        format: ipv4
+                        nullable: true
+                      - type: string
+                        format: ipv6
+                        nullable: true
+                  last_user_agent:
+                    type: string
+                    nullable: true
+                  expires_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+                  notified_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+        '403':
+          description: Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - Access Denied
+        '422':
+          description: Invalid Input Data
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - errors
+                example:
+                  - errors:
+                      key:
+                        - the error
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+  '/api_keys/{id}.json':
+    delete:
+      summary: Delete API Key
+      operationId: deleteAPIKey
+      tags:
+        - API Keys
+      security:
+        - browserAuth: []
+          csrfToken: []
+      description: 'Requires [browser authentication](#operations-Sessions-login) (username & password), as well as hourly password confirmations (reauthentication).'
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the api key.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Success
+        '403':
+          description: Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - Access Denied
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - not found
+  '/api_keys/{id}/regenerate.json':
+    post:
+      summary: Regenerate API Key
+      operationId: regenerateAPIKey
+      tags:
+        - API Keys
+      security:
+        - browserAuth: []
+          csrfToken: []
+      description: 'Requires [browser authentication](#operations-Sessions-login) (username & password), as well as hourly password confirmations (reauthentication).'
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the api key.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - authenticity_token
+              properties:
+                authenticity_token:
+                  type: string
+                  description: CSRF Token
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - created_at
+                  - updated_at
+                  - user_id
+                  - key
+                  - name
+                  - last_used_at
+                  - last_used_ip_address
+                  - last_user_agent
+                  - expires_at
+                  - notified_at
+                properties:
+                  id:
+                    type: integer
+                  updated_at:
+                    type: string
+                    format: date-time
+                  created_at:
+                    type: string
+                    format: date-time
+                  user_id:
+                    type: integer
+                  key:
+                    type: string
+                  name:
+                    type: string
+                  last_used_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+                  last_used_ip_address:
+                    oneOf:
+                      - type: string
+                        format: ipv4
+                        nullable: true
+                      - type: string
+                        format: ipv6
+                        nullable: true
+                  last_user_agent:
+                    type: string
+                    nullable: true
+                  expires_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+                  notified_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+        '403':
+          description: Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - Access Denied
+        '422':
+          description: Invalid Input Data
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - errors
+                example:
+                  - errors:
+                      key:
+                        - the error
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
   /artists.json:
     get:
       summary: Search Artists
@@ -4291,7 +4854,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -4351,6 +4914,14 @@ paths:
           schema:
             type: string
         - name: 'search[is_linked]'
+          in: query
+          schema:
+            type: string
+        - name: 'search[linked_user_id]'
+          in: query
+          schema:
+            type: integer
+        - name: 'search[linked_user_name]'
           in: query
           schema:
             type: string
@@ -4940,7 +5511,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -5057,7 +5628,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -5236,7 +5807,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -5817,7 +6388,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -5939,7 +6510,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -6113,7 +6684,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -6959,7 +7530,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -7468,7 +8039,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -8634,7 +9205,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -9027,6 +9598,7 @@ paths:
       description: 'Note while this route does not require auth, without auth it requires a CSRF token. For that reason it has been marked as requiring auth.'
       security:
         - basicAuth: []
+        - csrfToken: []
       requestBody:
         content:
           application/json:
@@ -9128,6 +9700,223 @@ paths:
                         type: integer
                       preview_height:
                         type: integer
+  /edit_histories.json:
+    get:
+      summary: Search Edit Histories
+      operationId: searchEditHistories
+      tags:
+        - Edit Histories
+      security:
+        - basicAuth: []
+      description: You must be Moderator+.
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of results to return. Between 0 and 320.
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 320
+        - name: page
+          in: query
+          description: The page number of results to get. Between 1 and 750.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 750
+        - name: 'search[id]'
+          in: query
+          description: Search for a specific id.
+          schema:
+            type: integer
+        - name: 'search[ip_addr]'
+          in: query
+          description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+          schema:
+            type: string
+        - name: 'search[order]'
+          in: query
+          schema:
+            type: string
+            enum:
+              - id_asc
+              - id_desc
+        - in: query
+          name: 'search[body_matches]'
+          schema:
+            type: string
+        - in: query
+          name: 'search[subject_matches]'
+          schema:
+            type: string
+        - in: query
+          name: 'search[versionable_type]'
+          schema:
+            type: string
+            enum:
+              - Blip
+              - Comment
+              - ForumPost
+        - in: query
+          name: 'search[versionable_id]'
+          schema:
+            type: integer
+        - in: query
+          name: 'search[editor_id]'
+          schema:
+            type: integer
+        - in: query
+          name: 'search[editor_name]'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - created_at
+                    - updated_at
+                    - body
+                    - subject
+                    - versionable_type
+                    - versionable_id
+                    - version
+                    - user_id
+                  properties:
+                    id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    body:
+                      type: string
+                    subject:
+                      type: string
+                      nullable: true
+                    versionable_type:
+                      type: string
+                      enum:
+                        - Blip
+                        - Comment
+                        - ForumPost
+                    versionable_id:
+                      type: integer
+                    version:
+                      type: integer
+                    user_id:
+                      type: integer
+        '403':
+          description: Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - Access Denied
+  '/edit_histories/{id}.json':
+    get:
+      summary: Get Edit History
+      operationId: getEditHistory
+      tags:
+        - Edit Histories
+      security:
+        - basicAuth: []
+      description: You must be Moderator+.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The versionable id.
+          schema:
+            type: integer
+        - name: type
+          in: query
+          required: true
+          description: The versionable type.
+          schema:
+            type: string
+            enum:
+              - Blip
+              - Comment
+              - ForumPost
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - created_at
+                    - updated_at
+                    - body
+                    - subject
+                    - versionable_type
+                    - versionable_id
+                    - version
+                    - user_id
+                  properties:
+                    id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    body:
+                      type: string
+                    subject:
+                      type: string
+                      nullable: true
+                    versionable_type:
+                      type: string
+                      enum:
+                        - Blip
+                        - Comment
+                        - ForumPost
+                    versionable_id:
+                      type: integer
+                    version:
+                      type: integer
+                    user_id:
+                      type: integer
+        '403':
+          description: Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - Access Denied
   /email_blacklists.json:
     get:
       summary: Search Email Blacklists
@@ -9142,7 +9931,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -9339,7 +10128,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -9943,7 +10732,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -10896,7 +11685,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -12084,7 +12873,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -12848,7 +13637,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -13213,7 +14002,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -13673,7 +14462,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -13943,7 +14732,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -14479,7 +15268,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -14603,7 +15392,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -15298,7 +16087,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -15428,7 +16217,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: date
           in: query
           description: 'The date to list popular uploads for. Only The day, month, and year are considered.'
@@ -15843,7 +16632,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -16249,6 +17038,417 @@ paths:
                           nullable: true
                         uploader_name:
                           type: string
+  /posts/random.json:
+    get:
+      summary: Get Random Post
+      operationId: getRandomPost
+      tags:
+        - Posts
+      parameters:
+        - name: tags
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - post
+                properties:
+                  post:
+                    type: object
+                    required:
+                      - id
+                      - created_at
+                      - updated_at
+                      - file
+                      - preview
+                      - sample
+                      - score
+                      - tags
+                      - locked_tags
+                      - change_seq
+                      - flags
+                      - rating
+                      - fav_count
+                      - sources
+                      - pools
+                      - relationships
+                      - approver_id
+                      - uploader_id
+                      - description
+                      - comment_count
+                      - is_favorited
+                      - has_notes
+                      - duration
+                      - uploader_name
+                    properties:
+                      id:
+                        type: integer
+                      created_at:
+                        type: string
+                        format: date-time
+                      updated_at:
+                        type: string
+                        format: date-time
+                      file:
+                        type: object
+                        required:
+                          - width
+                          - height
+                          - ext
+                          - size
+                          - md5
+                          - url
+                        properties:
+                          width:
+                            type: integer
+                          height:
+                            type: integer
+                          ext:
+                            type: string
+                          size:
+                            type: integer
+                            format: int64
+                          md5:
+                            type: string
+                          url:
+                            type: string
+                            nullable: true
+                      preview:
+                        type: object
+                        required:
+                          - width
+                          - height
+                          - url
+                        properties:
+                          width:
+                            type: integer
+                          height:
+                            type: integer
+                          url:
+                            type: string
+                            nullable: true
+                      sample:
+                        type: object
+                        required:
+                          - has
+                          - height
+                          - width
+                          - url
+                          - alternates
+                        properties:
+                          has:
+                            type: boolean
+                          height:
+                            type: integer
+                            nullable: true
+                          width:
+                            type: integer
+                            nullable: true
+                          url:
+                            type: string
+                            nullable: true
+                          alternates:
+                            type: object
+                            properties:
+                              has:
+                                type: boolean
+                              original:
+                                type: object
+                                required:
+                                  - fps
+                                  - codec
+                                  - size
+                                  - width
+                                  - height
+                                  - url
+                                properties:
+                                  fps:
+                                    type: number
+                                    format: float
+                                  codec:
+                                    type: string
+                                  size:
+                                    type: integer
+                                    format: int64
+                                  width:
+                                    type: integer
+                                  height:
+                                    type: integer
+                                  url:
+                                    type: string
+                                    format: uri
+                              variants:
+                                type: object
+                                properties:
+                                  webm:
+                                    type: object
+                                    required:
+                                      - fps
+                                      - codec
+                                      - size
+                                      - width
+                                      - height
+                                      - url
+                                    properties:
+                                      fps:
+                                        type: number
+                                        format: float
+                                      codec:
+                                        type: string
+                                      size:
+                                        type: integer
+                                        format: int64
+                                      width:
+                                        type: integer
+                                      height:
+                                        type: integer
+                                      url:
+                                        type: string
+                                        format: uri
+                                  mp4:
+                                    type: object
+                                    required:
+                                      - fps
+                                      - codec
+                                      - size
+                                      - width
+                                      - height
+                                      - url
+                                    properties:
+                                      fps:
+                                        type: number
+                                        format: float
+                                      codec:
+                                        type: string
+                                      size:
+                                        type: integer
+                                        format: int64
+                                      width:
+                                        type: integer
+                                      height:
+                                        type: integer
+                                      url:
+                                        type: string
+                                        format: uri
+                              samples:
+                                type: object
+                                properties:
+                                  480p:
+                                    type: object
+                                    required:
+                                      - fps
+                                      - codec
+                                      - size
+                                      - width
+                                      - height
+                                      - url
+                                    properties:
+                                      fps:
+                                        type: number
+                                        format: float
+                                      codec:
+                                        type: string
+                                      size:
+                                        type: integer
+                                        format: int64
+                                      width:
+                                        type: integer
+                                      height:
+                                        type: integer
+                                      url:
+                                        type: string
+                                        format: uri
+                                  720p:
+                                    type: object
+                                    required:
+                                      - fps
+                                      - codec
+                                      - size
+                                      - width
+                                      - height
+                                      - url
+                                    properties:
+                                      fps:
+                                        type: number
+                                        format: float
+                                      codec:
+                                        type: string
+                                      size:
+                                        type: integer
+                                        format: int64
+                                      width:
+                                        type: integer
+                                      height:
+                                        type: integer
+                                      url:
+                                        type: string
+                                        format: uri
+                      score:
+                        type: object
+                        required:
+                          - up
+                          - down
+                          - total
+                        properties:
+                          up:
+                            type: integer
+                          down:
+                            type: integer
+                          total:
+                            type: integer
+                      tags:
+                        type: object
+                        required:
+                          - general
+                          - artist
+                          - copyright
+                          - character
+                          - species
+                          - invalid
+                          - meta
+                          - lore
+                          - contributor
+                        properties:
+                          general:
+                            type: array
+                            items:
+                              type: string
+                          artist:
+                            type: array
+                            items:
+                              type: string
+                          copyright:
+                            type: array
+                            items:
+                              type: string
+                          character:
+                            type: array
+                            items:
+                              type: string
+                          species:
+                            type: array
+                            items:
+                              type: string
+                          invalid:
+                            type: array
+                            items:
+                              type: string
+                          meta:
+                            type: array
+                            items:
+                              type: string
+                          lore:
+                            type: array
+                            items:
+                              type: string
+                          contributor:
+                            type: array
+                            items:
+                              type: string
+                      locked_tags:
+                        type: array
+                        nullable: true
+                        items:
+                          type: string
+                      change_seq:
+                        type: number
+                      flags:
+                        type: object
+                        required:
+                          - pending
+                          - flagged
+                          - note_locked
+                          - status_locked
+                          - rating_locked
+                          - deleted
+                        properties:
+                          pending:
+                            type: boolean
+                          flagged:
+                            type: boolean
+                          note_locked:
+                            type: boolean
+                          status_locked:
+                            type: boolean
+                          rating_locked:
+                            type: boolean
+                          deleted:
+                            type: boolean
+                      rating:
+                        type: string
+                        enum:
+                          - s
+                          - q
+                          - e
+                      fav_count:
+                        type: integer
+                      sources:
+                        type: array
+                        items:
+                          type: string
+                      pools:
+                        type: array
+                        items:
+                          type: integer
+                      relationships:
+                        type: object
+                        required:
+                          - parent_id
+                          - has_children
+                          - has_active_children
+                          - children
+                        properties:
+                          parent_id:
+                            type: integer
+                            nullable: true
+                          has_children:
+                            type: boolean
+                          has_active_children:
+                            type: boolean
+                          children:
+                            type: array
+                            items:
+                              type: integer
+                      approver_id:
+                        type: integer
+                        nullable: true
+                      uploader_id:
+                        type: integer
+                      description:
+                        type: string
+                      comment_count:
+                        type: integer
+                      is_favorited:
+                        type: boolean
+                      has_notes:
+                        type: boolean
+                      duration:
+                        type: number
+                        nullable: true
+                      uploader_name:
+                        type: string
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - not found
   '/posts/{id}.json':
     get:
       summary: Get Post
@@ -18750,401 +19950,431 @@ paths:
                     type: string
                     enum:
                       - not found
-  /posts/random.json:
+  '/posts/{id}/favorites.json':
     get:
-      summary: Get Random Post
-      operationId: getRandomPost
+      summary: List Post Favorites
+      operationId: listPostFavorites
       tags:
         - Posts
       parameters:
-        - name: tags
-          in: query
+        - name: id
+          in: path
+          required: true
+          description: The ID of the post.
           schema:
-            type: string
+            type: integer
+        - name: limit
+          in: query
+          description: The maximum number of results to return. Between 1 and 100.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: page
+          in: query
+          description: The page number of results to get. Between 1 and 750.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 750
+      description: You must be the user or Moderator+ to see users that have their favorites hidden.
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - created_at
+                    - updated_at
+                    - file
+                    - preview
+                    - sample
+                    - score
+                    - tags
+                    - locked_tags
+                    - change_seq
+                    - flags
+                    - rating
+                    - fav_count
+                    - sources
+                    - pools
+                    - relationships
+                    - approver_id
+                    - uploader_id
+                    - description
+                    - comment_count
+                    - is_favorited
+                    - has_notes
+                    - duration
+                    - uploader_name
+                  properties:
+                    id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    file:
+                      type: object
+                      required:
+                        - width
+                        - height
+                        - ext
+                        - size
+                        - md5
+                        - url
+                      properties:
+                        width:
+                          type: integer
+                        height:
+                          type: integer
+                        ext:
+                          type: string
+                        size:
+                          type: integer
+                          format: int64
+                        md5:
+                          type: string
+                        url:
+                          type: string
+                          nullable: true
+                    preview:
+                      type: object
+                      required:
+                        - width
+                        - height
+                        - url
+                      properties:
+                        width:
+                          type: integer
+                        height:
+                          type: integer
+                        url:
+                          type: string
+                          nullable: true
+                    sample:
+                      type: object
+                      required:
+                        - has
+                        - height
+                        - width
+                        - url
+                        - alternates
+                      properties:
+                        has:
+                          type: boolean
+                        height:
+                          type: integer
+                          nullable: true
+                        width:
+                          type: integer
+                          nullable: true
+                        url:
+                          type: string
+                          nullable: true
+                        alternates:
+                          type: object
+                          properties:
+                            has:
+                              type: boolean
+                            original:
+                              type: object
+                              required:
+                                - fps
+                                - codec
+                                - size
+                                - width
+                                - height
+                                - url
+                              properties:
+                                fps:
+                                  type: number
+                                  format: float
+                                codec:
+                                  type: string
+                                size:
+                                  type: integer
+                                  format: int64
+                                width:
+                                  type: integer
+                                height:
+                                  type: integer
+                                url:
+                                  type: string
+                                  format: uri
+                            variants:
+                              type: object
+                              properties:
+                                webm:
+                                  type: object
+                                  required:
+                                    - fps
+                                    - codec
+                                    - size
+                                    - width
+                                    - height
+                                    - url
+                                  properties:
+                                    fps:
+                                      type: number
+                                      format: float
+                                    codec:
+                                      type: string
+                                    size:
+                                      type: integer
+                                      format: int64
+                                    width:
+                                      type: integer
+                                    height:
+                                      type: integer
+                                    url:
+                                      type: string
+                                      format: uri
+                                mp4:
+                                  type: object
+                                  required:
+                                    - fps
+                                    - codec
+                                    - size
+                                    - width
+                                    - height
+                                    - url
+                                  properties:
+                                    fps:
+                                      type: number
+                                      format: float
+                                    codec:
+                                      type: string
+                                    size:
+                                      type: integer
+                                      format: int64
+                                    width:
+                                      type: integer
+                                    height:
+                                      type: integer
+                                    url:
+                                      type: string
+                                      format: uri
+                            samples:
+                              type: object
+                              properties:
+                                480p:
+                                  type: object
+                                  required:
+                                    - fps
+                                    - codec
+                                    - size
+                                    - width
+                                    - height
+                                    - url
+                                  properties:
+                                    fps:
+                                      type: number
+                                      format: float
+                                    codec:
+                                      type: string
+                                    size:
+                                      type: integer
+                                      format: int64
+                                    width:
+                                      type: integer
+                                    height:
+                                      type: integer
+                                    url:
+                                      type: string
+                                      format: uri
+                                720p:
+                                  type: object
+                                  required:
+                                    - fps
+                                    - codec
+                                    - size
+                                    - width
+                                    - height
+                                    - url
+                                  properties:
+                                    fps:
+                                      type: number
+                                      format: float
+                                    codec:
+                                      type: string
+                                    size:
+                                      type: integer
+                                      format: int64
+                                    width:
+                                      type: integer
+                                    height:
+                                      type: integer
+                                    url:
+                                      type: string
+                                      format: uri
+                    score:
+                      type: object
+                      required:
+                        - up
+                        - down
+                        - total
+                      properties:
+                        up:
+                          type: integer
+                        down:
+                          type: integer
+                        total:
+                          type: integer
+                    tags:
+                      type: object
+                      required:
+                        - general
+                        - artist
+                        - copyright
+                        - character
+                        - species
+                        - invalid
+                        - meta
+                        - lore
+                        - contributor
+                      properties:
+                        general:
+                          type: array
+                          items:
+                            type: string
+                        artist:
+                          type: array
+                          items:
+                            type: string
+                        copyright:
+                          type: array
+                          items:
+                            type: string
+                        character:
+                          type: array
+                          items:
+                            type: string
+                        species:
+                          type: array
+                          items:
+                            type: string
+                        invalid:
+                          type: array
+                          items:
+                            type: string
+                        meta:
+                          type: array
+                          items:
+                            type: string
+                        lore:
+                          type: array
+                          items:
+                            type: string
+                        contributor:
+                          type: array
+                          items:
+                            type: string
+                    locked_tags:
+                      type: array
+                      nullable: true
+                      items:
+                        type: string
+                    change_seq:
+                      type: number
+                    flags:
+                      type: object
+                      required:
+                        - pending
+                        - flagged
+                        - note_locked
+                        - status_locked
+                        - rating_locked
+                        - deleted
+                      properties:
+                        pending:
+                          type: boolean
+                        flagged:
+                          type: boolean
+                        note_locked:
+                          type: boolean
+                        status_locked:
+                          type: boolean
+                        rating_locked:
+                          type: boolean
+                        deleted:
+                          type: boolean
+                    rating:
+                      type: string
+                      enum:
+                        - s
+                        - q
+                        - e
+                    fav_count:
+                      type: integer
+                    sources:
+                      type: array
+                      items:
+                        type: string
+                    pools:
+                      type: array
+                      items:
+                        type: integer
+                    relationships:
+                      type: object
+                      required:
+                        - parent_id
+                        - has_children
+                        - has_active_children
+                        - children
+                      properties:
+                        parent_id:
+                          type: integer
+                          nullable: true
+                        has_children:
+                          type: boolean
+                        has_active_children:
+                          type: boolean
+                        children:
+                          type: array
+                          items:
+                            type: integer
+                    approver_id:
+                      type: integer
+                      nullable: true
+                    uploader_id:
+                      type: integer
+                    description:
+                      type: string
+                    comment_count:
+                      type: integer
+                    is_favorited:
+                      type: boolean
+                    has_notes:
+                      type: boolean
+                    duration:
+                      type: number
+                      nullable: true
+                    uploader_name:
+                      type: string
+        '403':
+          description: Access Denied
+          content:
+            application/json:
+              schema:
                 type: object
                 required:
-                  - post
+                  - success
+                  - reason
                 properties:
-                  post:
-                    type: object
-                    required:
-                      - id
-                      - created_at
-                      - updated_at
-                      - file
-                      - preview
-                      - sample
-                      - score
-                      - tags
-                      - locked_tags
-                      - change_seq
-                      - flags
-                      - rating
-                      - fav_count
-                      - sources
-                      - pools
-                      - relationships
-                      - approver_id
-                      - uploader_id
-                      - description
-                      - comment_count
-                      - is_favorited
-                      - has_notes
-                      - duration
-                      - uploader_name
-                    properties:
-                      id:
-                        type: integer
-                      created_at:
-                        type: string
-                        format: date-time
-                      updated_at:
-                        type: string
-                        format: date-time
-                      file:
-                        type: object
-                        required:
-                          - width
-                          - height
-                          - ext
-                          - size
-                          - md5
-                          - url
-                        properties:
-                          width:
-                            type: integer
-                          height:
-                            type: integer
-                          ext:
-                            type: string
-                          size:
-                            type: integer
-                            format: int64
-                          md5:
-                            type: string
-                          url:
-                            type: string
-                            nullable: true
-                      preview:
-                        type: object
-                        required:
-                          - width
-                          - height
-                          - url
-                        properties:
-                          width:
-                            type: integer
-                          height:
-                            type: integer
-                          url:
-                            type: string
-                            nullable: true
-                      sample:
-                        type: object
-                        required:
-                          - has
-                          - height
-                          - width
-                          - url
-                          - alternates
-                        properties:
-                          has:
-                            type: boolean
-                          height:
-                            type: integer
-                            nullable: true
-                          width:
-                            type: integer
-                            nullable: true
-                          url:
-                            type: string
-                            nullable: true
-                          alternates:
-                            type: object
-                            properties:
-                              has:
-                                type: boolean
-                              original:
-                                type: object
-                                required:
-                                  - fps
-                                  - codec
-                                  - size
-                                  - width
-                                  - height
-                                  - url
-                                properties:
-                                  fps:
-                                    type: number
-                                    format: float
-                                  codec:
-                                    type: string
-                                  size:
-                                    type: integer
-                                    format: int64
-                                  width:
-                                    type: integer
-                                  height:
-                                    type: integer
-                                  url:
-                                    type: string
-                                    format: uri
-                              variants:
-                                type: object
-                                properties:
-                                  webm:
-                                    type: object
-                                    required:
-                                      - fps
-                                      - codec
-                                      - size
-                                      - width
-                                      - height
-                                      - url
-                                    properties:
-                                      fps:
-                                        type: number
-                                        format: float
-                                      codec:
-                                        type: string
-                                      size:
-                                        type: integer
-                                        format: int64
-                                      width:
-                                        type: integer
-                                      height:
-                                        type: integer
-                                      url:
-                                        type: string
-                                        format: uri
-                                  mp4:
-                                    type: object
-                                    required:
-                                      - fps
-                                      - codec
-                                      - size
-                                      - width
-                                      - height
-                                      - url
-                                    properties:
-                                      fps:
-                                        type: number
-                                        format: float
-                                      codec:
-                                        type: string
-                                      size:
-                                        type: integer
-                                        format: int64
-                                      width:
-                                        type: integer
-                                      height:
-                                        type: integer
-                                      url:
-                                        type: string
-                                        format: uri
-                              samples:
-                                type: object
-                                properties:
-                                  480p:
-                                    type: object
-                                    required:
-                                      - fps
-                                      - codec
-                                      - size
-                                      - width
-                                      - height
-                                      - url
-                                    properties:
-                                      fps:
-                                        type: number
-                                        format: float
-                                      codec:
-                                        type: string
-                                      size:
-                                        type: integer
-                                        format: int64
-                                      width:
-                                        type: integer
-                                      height:
-                                        type: integer
-                                      url:
-                                        type: string
-                                        format: uri
-                                  720p:
-                                    type: object
-                                    required:
-                                      - fps
-                                      - codec
-                                      - size
-                                      - width
-                                      - height
-                                      - url
-                                    properties:
-                                      fps:
-                                        type: number
-                                        format: float
-                                      codec:
-                                        type: string
-                                      size:
-                                        type: integer
-                                        format: int64
-                                      width:
-                                        type: integer
-                                      height:
-                                        type: integer
-                                      url:
-                                        type: string
-                                        format: uri
-                      score:
-                        type: object
-                        required:
-                          - up
-                          - down
-                          - total
-                        properties:
-                          up:
-                            type: integer
-                          down:
-                            type: integer
-                          total:
-                            type: integer
-                      tags:
-                        type: object
-                        required:
-                          - general
-                          - artist
-                          - copyright
-                          - character
-                          - species
-                          - invalid
-                          - meta
-                          - lore
-                          - contributor
-                        properties:
-                          general:
-                            type: array
-                            items:
-                              type: string
-                          artist:
-                            type: array
-                            items:
-                              type: string
-                          copyright:
-                            type: array
-                            items:
-                              type: string
-                          character:
-                            type: array
-                            items:
-                              type: string
-                          species:
-                            type: array
-                            items:
-                              type: string
-                          invalid:
-                            type: array
-                            items:
-                              type: string
-                          meta:
-                            type: array
-                            items:
-                              type: string
-                          lore:
-                            type: array
-                            items:
-                              type: string
-                          contributor:
-                            type: array
-                            items:
-                              type: string
-                      locked_tags:
-                        type: array
-                        nullable: true
-                        items:
-                          type: string
-                      change_seq:
-                        type: number
-                      flags:
-                        type: object
-                        required:
-                          - pending
-                          - flagged
-                          - note_locked
-                          - status_locked
-                          - rating_locked
-                          - deleted
-                        properties:
-                          pending:
-                            type: boolean
-                          flagged:
-                            type: boolean
-                          note_locked:
-                            type: boolean
-                          status_locked:
-                            type: boolean
-                          rating_locked:
-                            type: boolean
-                          deleted:
-                            type: boolean
-                      rating:
-                        type: string
-                        enum:
-                          - s
-                          - q
-                          - e
-                      fav_count:
-                        type: integer
-                      sources:
-                        type: array
-                        items:
-                          type: string
-                      pools:
-                        type: array
-                        items:
-                          type: integer
-                      relationships:
-                        type: object
-                        required:
-                          - parent_id
-                          - has_children
-                          - has_active_children
-                          - children
-                        properties:
-                          parent_id:
-                            type: integer
-                            nullable: true
-                          has_children:
-                            type: boolean
-                          has_active_children:
-                            type: boolean
-                          children:
-                            type: array
-                            items:
-                              type: integer
-                      approver_id:
-                        type: integer
-                        nullable: true
-                      uploader_id:
-                        type: integer
-                      description:
-                        type: string
-                      comment_count:
-                        type: integer
-                      is_favorited:
-                        type: boolean
-                      has_notes:
-                        type: boolean
-                      duration:
-                        type: number
-                        nullable: true
-                      uploader_name:
-                        type: string
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - Access Denied
         '404':
           description: Not Found
           content:
@@ -19338,7 +20568,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -20226,7 +21456,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -20314,7 +21544,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -20445,7 +21675,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -20852,7 +22082,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -21804,7 +23034,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: 'The page number of results to get. Between 1 and 750. Note that for post versions specifically, you can only go through the 10,000 most recent results with page numbers.'
@@ -22227,7 +23457,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -22836,7 +24066,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -22939,7 +24169,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -23449,7 +24679,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -24024,6 +25254,61 @@ paths:
                     type: string
                     enum:
                       - Access Denied
+  /session.json:
+    post:
+      summary: Login
+      operationId: login
+      tags:
+        - Sessions
+      security:
+        - csrfToken: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - authenticity_token
+                - 'session[name]'
+                - 'session[password]'
+              properties:
+                authenticity_token:
+                  type: string
+                  description: CSRF Token
+                'session[url]':
+                  type: string
+                  description: 'Optional relative URL to redirect to after login, defaults to `/posts`.'
+                'session[name]':
+                  type: string
+                'session[password]':
+                  type: string
+      responses:
+        '302':
+          description: Success
+          headers:
+            Set-Cookie:
+              description: The session cookie.
+              schema:
+                type: string
+                example: _danbooru_session=(...); path=/; secure; httponly; samesite=lax
+        '403':
+          description: Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - Access Denied
+        '406':
+          description: Failure
   /staff_notes.json:
     get:
       summary: Search Staff Notes
@@ -24038,7 +25323,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -24612,7 +25897,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -25359,7 +26644,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -25399,6 +26684,11 @@ paths:
             type: string
         - in: query
           name: 'search[accused_id]'
+          description: You must be Janitor+.
+          schema:
+            type: integer
+        - in: query
+          name: 'search[disp_id]'
           description: You must be Janitor+.
           schema:
             type: integer
@@ -25967,7 +27257,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -26397,7 +27687,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -26828,7 +28118,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -27038,6 +28328,331 @@ paths:
                               type: string
                             profile_artinfo:
                               type: string
+  /users/me.json:
+    get:
+      summary: Get Current User
+      operationId: getMe
+      description: |
+        This will return the default settings for anonymous users if no authentication is used.
+        This most interesting part is probably the default blacklist, located in `blacklisted_tags`.
+      tags:
+        - Users
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - allOf:
+                      - type: object
+                        required:
+                          - id
+                          - created_at
+                          - name
+                          - level
+                          - base_upload_limit
+                          - post_upload_count
+                          - post_update_count
+                          - note_update_count
+                          - is_banned
+                          - can_approve_posts
+                          - can_upload_free
+                          - level_string
+                          - avatar_id
+                        properties:
+                          id:
+                            type: integer
+                          created_at:
+                            type: string
+                            format: date-time
+                          name:
+                            type: string
+                          level:
+                            type: integer
+                          base_upload_limit:
+                            type: integer
+                          post_upload_count:
+                            type: integer
+                          post_update_count:
+                            type: integer
+                          note_update_count:
+                            type: integer
+                          is_banned:
+                            type: boolean
+                          can_approve_posts:
+                            type: boolean
+                          can_upload_free:
+                            type: boolean
+                          level_string:
+                            type: string
+                          avatar_id:
+                            type: integer
+                            nullable: true
+                          is_verified:
+                            type: boolean
+                      - type: object
+                        required:
+                          - blacklist_users
+                          - description_collapsed_initially
+                          - hide_comments
+                          - show_hidden_comments
+                          - show_post_statistics
+                          - receive_email_notifications
+                          - enable_keyboard_navigation
+                          - enable_privacy_mode
+                          - style_usernames
+                          - enable_auto_complete
+                          - disable_cropped_thumbnails
+                          - enable_safe_mode
+                          - disable_responsive_mode
+                          - no_flagging
+                          - disable_user_dmails
+                          - enable_compact_uploader
+                          - replacements_beta
+                          - updated_at
+                          - email
+                          - last_logged_in_at
+                          - last_forum_read_at
+                          - recent_tags
+                          - comment_threshold
+                          - default_image_size
+                          - favorite_tags
+                          - blacklisted_tags
+                          - time_zone
+                          - per_page
+                          - custom_style
+                          - favorite_count
+                          - api_regen_multiplier
+                          - api_burst_limit
+                          - remaining_api_limit
+                          - statement_timeout
+                          - favorite_limit
+                          - tag_query_limit
+                          - has_mail
+                          - forum_notification_dot
+                        properties:
+                          blacklist_users:
+                            type: boolean
+                          description_collapsed_initially:
+                            type: boolean
+                          hide_comments:
+                            type: boolean
+                          show_hidden_comments:
+                            type: boolean
+                          show_post_statistics:
+                            type: boolean
+                          receive_email_notifications:
+                            type: boolean
+                          enable_keyboard_navigation:
+                            type: boolean
+                          enable_privacy_mode:
+                            type: boolean
+                          style_usernames:
+                            type: boolean
+                          enable_auto_complete:
+                            type: boolean
+                          can_approve_posts:
+                            type: boolean
+                          disable_cropped_thumbnails:
+                            type: boolean
+                          enable_safe_mode:
+                            type: boolean
+                          disable_responsive_mode:
+                            type: boolean
+                          no_flagging:
+                            type: boolean
+                          disable_user_dmails:
+                            type: boolean
+                          enable_compact_uploader:
+                            type: boolean
+                          replacements_beta:
+                            type: boolean
+                          updated_at:
+                            type: string
+                            format: date-time
+                          email:
+                            type: string
+                          last_logged_in_at:
+                            type: string
+                          last_forum_read_at:
+                            type: string
+                          recent_tags:
+                            type: string
+                          comment_threshold:
+                            type: integer
+                          default_image_size:
+                            type: string
+                            enum:
+                              - large
+                              - fit
+                              - fitv
+                              - original
+                          favorite_tags:
+                            type: string
+                          blacklisted_tags:
+                            type: string
+                          time_zone:
+                            type: string
+                          per_page:
+                            type: integer
+                          custom_style:
+                            type: string
+                          favorite_count:
+                            type: integer
+                          api_regen_multiplier:
+                            type: integer
+                          api_burst_limit:
+                            type: integer
+                          remaining_api_limit:
+                            type: integer
+                          statement_timeout:
+                            type: integer
+                          favorite_limit:
+                            type: integer
+                          tag_query_limit:
+                            type: integer
+                          has_mail:
+                            type: boolean
+                          forum_notification_dot:
+                            type: boolean
+                  - allOf:
+                      - type: object
+                        required:
+                          - id
+                          - created_at
+                          - name
+                          - level
+                          - base_upload_limit
+                          - post_upload_count
+                          - post_update_count
+                          - note_update_count
+                          - is_banned
+                          - can_approve_posts
+                          - can_upload_free
+                          - level_string
+                          - avatar_id
+                        properties:
+                          id:
+                            type: integer
+                          created_at:
+                            type: string
+                            format: date-time
+                          name:
+                            type: string
+                          level:
+                            type: integer
+                          base_upload_limit:
+                            type: integer
+                          post_upload_count:
+                            type: integer
+                          post_update_count:
+                            type: integer
+                          note_update_count:
+                            type: integer
+                          is_banned:
+                            type: boolean
+                          can_approve_posts:
+                            type: boolean
+                          can_upload_free:
+                            type: boolean
+                          level_string:
+                            type: string
+                          avatar_id:
+                            type: integer
+                            nullable: true
+                          is_verified:
+                            type: boolean
+                      - type: object
+                        required:
+                          - wiki_page_version_count
+                          - artist_version_count
+                          - pool_version_count
+                          - forum_post_count
+                          - comment_count
+                          - flag_count
+                          - favorite_count
+                          - positive_feedback_count
+                          - neutral_feedback_count
+                          - negative_feedback_count
+                          - upload_limit
+                          - profile_about
+                          - profile_artinfo
+                        properties:
+                          wiki_page_version_count:
+                            type: integer
+                          artist_version_count:
+                            type: integer
+                          pool_version_count:
+                            type: integer
+                          forum_post_count:
+                            type: integer
+                          comment_count:
+                            type: integer
+                          flag_count:
+                            type: integer
+                          favorite_count:
+                            type: integer
+                          positive_feedback_count:
+                            type: integer
+                          neutral_feedback_count:
+                            type: integer
+                          negative_feedback_count:
+                            type: integer
+                          upload_limit:
+                            type: integer
+                          profile_about:
+                            type: string
+                          profile_artinfo:
+                            type: string
+  /users/avatar_menu.json:
+    get:
+      summary: Get Avatar Menu
+      operationId: getAvatarMenu
+      tags:
+        - Users
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - has_uploads
+                  - has_favorites
+                  - has_sets
+                  - has_comments
+                  - has_forums
+                properties:
+                  has_uploads:
+                    type: boolean
+                  has_favorites:
+                    type: boolean
+                  has_sets:
+                    type: boolean
+                  has_comments:
+                    type: boolean
+                  has_forums:
+                    type: boolean
+        '403':
+          description: Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - Access Denied
   '/users/{id}.json':
     get:
       summary: Get User
@@ -28041,7 +29656,9 @@ paths:
       operationId: toggleUserUploads
       tags:
         - Users
-      description: You must be Janitor+.
+      description: |
+        You must be Janitor+.
+        This endpoint will return HTML when disabling uploads (due to a reason being required), this endpoint should only be used for reenabling. Use [Disable User Uploads](#operation-Users-disableUserUploads) to disable uploads.
       parameters:
         - name: id
           in: path
@@ -28086,6 +29703,69 @@ paths:
                     type: string
                     enum:
                       - not found
+  '/users/{id}/disable_uploads.json':
+    post:
+      summary: Disable User Uploads
+      operationId: disableUserUploads
+      tags:
+        - Users
+      description: You must be Janitor+.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the user.
+          schema:
+            type: integer
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - 'staff_note[body]'
+              properties:
+                'staff_note[body]':
+                  type: string
+      responses:
+        '302':
+          description: |
+            Redirect
+            Success should be determined based on the html, any errors will be present in an alert.
+        '403':
+          description: Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - Access Denied
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - not found
   '/users/{user_id}/dmails.json':
     get:
       summary: Audit User DMails
@@ -28094,7 +29774,7 @@ paths:
         - DMails
       security:
         - basicAuth: []
-      description: Must have the bd staff user flag.
+      description: Must have the bd auditor user flag.
       parameters:
         - name: limit
           in: query
@@ -28102,7 +29782,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -28205,7 +29885,7 @@ paths:
         - DMails
       security:
         - basicAuth: []
-      description: Must have the bd staff user flag.
+      description: Must have the bd auditor user flag.
       parameters:
         - name: user_id
           in: path
@@ -28383,7 +30063,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -28934,7 +30614,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -29209,7 +30889,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -29798,7 +31478,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.
@@ -30143,6 +31823,43 @@ paths:
                     type: array
                     items:
                       type: string
+  '/admins/users/{id}/anonymize.json':
+    post:
+      summary: Admin Anonymize User
+      operationId: adminAnonymizeUser
+      tags:
+        - Admin Users
+      security:
+        - basicAuth: []
+      description: You must have the bd staff user flag. Cannot be used on staff.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the user.
+          schema:
+            type: integer
+      responses:
+        '302':
+          description: |
+            Redirect
+            Success should be determined based on the html, any errors will be present in an alert.
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - not found
   '/moderator/post/posts/{id}/delete.json':
     post:
       summary: Delete Post
@@ -31916,7 +33633,7 @@ paths:
           schema:
             type: integer
             minimum: 0
-            maximum: 500
+            maximum: 320
         - name: page
           in: query
           description: The page number of results to get. Between 1 and 750.

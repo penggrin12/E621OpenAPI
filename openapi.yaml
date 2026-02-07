@@ -12,7 +12,7 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: faf66e3
+  version: f897da0
 servers:
   - url: 'https://e621.net'
     description: E621 (production)
@@ -23,6 +23,15 @@ components:
     basicAuth:
       type: http
       scheme: basic
+    browserAuth:
+      type: apiKey
+      in: cookie
+      name: _danbooru_session
+    csrfToken:
+      type: apiKey
+      in: query
+      name: authenticity_token
+      description: Retrieved via scraping html for the `csrf-token` meta tag.
   parameters:
     id:
       name: 'search[id]'
@@ -44,7 +53,7 @@ components:
       schema:
         type: integer
         minimum: 0
-        maximum: 500
+        maximum: 320
     page:
       name: page
       in: query
@@ -2830,6 +2839,115 @@ components:
         parent:
           type: string
           nullable: true
+    ApiKey:
+      type: object
+      required:
+        - id
+        - created_at
+        - updated_at
+        - user_id
+        - key
+        - name
+        - last_used_at
+        - last_used_ip_address
+        - last_user_agent
+        - expires_at
+        - notified_at
+      properties:
+        id:
+          type: integer
+        updated_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        user_id:
+          type: integer
+        key:
+          type: string
+        name:
+          type: string
+        last_used_at:
+          type: string
+          format: date-time
+          nullable: true
+        last_used_ip_address:
+          oneOf:
+            - type: string
+              format: ipv4
+              nullable: true
+            - type: string
+              format: ipv6
+              nullable: true
+        last_user_agent:
+          type: string
+          nullable: true
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+        notified_at:
+          type: string
+          format: date-time
+          nullable: true
+    EditHistory:
+      type: object
+      required:
+        - id
+        - created_at
+        - updated_at
+        - body
+        - subject
+        - versionable_type
+        - versionable_id
+        - version
+        - user_id
+      properties:
+        id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        body:
+          type: string
+        subject:
+          type: string
+          nullable: true
+        versionable_type:
+          type: string
+          enum:
+            - Blip
+            - Comment
+            - ForumPost
+        versionable_id:
+          type: integer
+        version:
+          type: integer
+        user_id:
+          type: integer
+    UserAvatarMenu:
+      type: object
+      required:
+        - has_uploads
+        - has_favorites
+        - has_sets
+        - has_comments
+        - has_forums
+      properties:
+        has_uploads:
+          type: boolean
+        has_favorites:
+          type: boolean
+        has_sets:
+          type: boolean
+        has_comments:
+          type: boolean
+        has_forums:
+          type: boolean
   responses:
     NotFound:
       description: Not Found
@@ -2892,6 +3010,171 @@ components:
           schema:
             $ref: '#/components/schemas/WarningRecordType'
 paths:
+  /api_keys.json:
+    get:
+      summary: Get API Keys
+      operationId: getAPIKeys
+      tags:
+        - API Keys
+      security:
+        - browserAuth: []
+      description: 'Requires [browser authentication](#operations-Sessions-login) (username & password), as well as hourly password confirmations (reauthentication).'
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/id'
+        - name: 'search[order]'
+          in: query
+          schema:
+            type: string
+            enum:
+              - id
+              - id_asc
+              - id_desc
+              - name
+              - name_asc
+              - name_desc
+              - created_at
+              - created_at_asc
+              - created_at_desc
+              - updated_at
+              - updated_at_asc
+              - updated_at_desc
+              - expires_at
+              - expires_at_asc
+              - expires_at_desc
+              - last_used_at
+              - last_used_at_asc
+              - last_used_at_desc
+        - name: 'search[name_matches]'
+          in: query
+          schema:
+            type: string
+        - name: 'search[is_expired]'
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApiKey'
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      summary: Create API Key
+      operationId: createAPIKey
+      tags:
+        - API Keys
+      security:
+        - browserAuth: []
+          csrfToken: []
+      description: 'Requires [browser authentication](#operations-Sessions-login) (username & password), as well as hourly password confirmations (reauthentication).'
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - authenticity_token
+                - 'api_key[name]'
+              properties:
+                authenticity_token:
+                  type: string
+                  description: CSRF Token
+                'api_key[name]':
+                  type: string
+                'api_key[duration]':
+                  oneOf:
+                    - type: integer
+                      description: days
+                    - type: string
+                      enum:
+                        - never
+                        - custom
+                'api_key[expires_at]':
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKey'
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '422':
+          $ref: '#/components/responses/ExpectedError'
+  '/api_keys/{id}.json':
+    delete:
+      summary: Delete API Key
+      operationId: deleteAPIKey
+      tags:
+        - API Keys
+      security:
+        - browserAuth: []
+          csrfToken: []
+      description: 'Requires [browser authentication](#operations-Sessions-login) (username & password), as well as hourly password confirmations (reauthentication).'
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the api key.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Success
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/api_keys/{id}/regenerate.json':
+    post:
+      summary: Regenerate API Key
+      operationId: regenerateAPIKey
+      tags:
+        - API Keys
+      security:
+        - browserAuth: []
+          csrfToken: []
+      description: 'Requires [browser authentication](#operations-Sessions-login) (username & password), as well as hourly password confirmations (reauthentication).'
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the api key.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - authenticity_token
+              properties:
+                authenticity_token:
+                  type: string
+                  description: CSRF Token
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKey'
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '422':
+          $ref: '#/components/responses/ExpectedError'
   /artists.json:
     get:
       summary: Search Artists
@@ -2949,6 +3232,14 @@ paths:
           schema:
             type: string
         - name: 'search[is_linked]'
+          in: query
+          schema:
+            type: string
+        - name: 'search[linked_user_id]'
+          in: query
+          schema:
+            type: integer
+        - name: 'search[linked_user_name]'
           in: query
           schema:
             type: string
@@ -4799,6 +5090,7 @@ paths:
       description: 'Note while this route does not require auth, without auth it requires a CSRF token. For that reason it has been marked as requiring auth.'
       security:
         - basicAuth: []
+        - csrfToken: []
       requestBody:
         content:
           application/json:
@@ -4816,6 +5108,103 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DTextResponse'
+  /edit_histories.json:
+    get:
+      summary: Search Edit Histories
+      operationId: searchEditHistories
+      tags:
+        - Edit Histories
+      security:
+        - basicAuth: []
+      description: You must be Moderator+.
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/ip_addr'
+        - name: 'search[order]'
+          in: query
+          schema:
+            type: string
+            enum:
+              - id_asc
+              - id_desc
+        - in: query
+          name: 'search[body_matches]'
+          schema:
+            type: string
+        - in: query
+          name: 'search[subject_matches]'
+          schema:
+            type: string
+        - in: query
+          name: 'search[versionable_type]'
+          schema:
+            type: string
+            enum:
+              - Blip
+              - Comment
+              - ForumPost
+        - in: query
+          name: 'search[versionable_id]'
+          schema:
+            type: integer
+        - in: query
+          name: 'search[editor_id]'
+          schema:
+            type: integer
+        - in: query
+          name: 'search[editor_name]'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EditHistory'
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+  '/edit_histories/{id}.json':
+    get:
+      summary: Get Edit History
+      operationId: getEditHistory
+      tags:
+        - Edit Histories
+      security:
+        - basicAuth: []
+      description: You must be Moderator+.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The versionable id.
+          schema:
+            type: integer
+        - name: type
+          in: query
+          required: true
+          description: The versionable type.
+          schema:
+            type: string
+            enum:
+              - Blip
+              - Comment
+              - ForumPost
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EditHistory'
+        '403':
+          $ref: '#/components/responses/AccessDenied'
   /email_blacklists.json:
     get:
       summary: Search Email Blacklists
@@ -7057,6 +7446,31 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Post'
+  /posts/random.json:
+    get:
+      summary: Get Random Post
+      operationId: getRandomPost
+      tags:
+        - Posts
+      parameters:
+        - name: tags
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - post
+                properties:
+                  post:
+                    $ref: '#/components/schemas/Post'
+        '404':
+          $ref: '#/components/responses/NotFound'
   '/posts/{id}.json':
     get:
       summary: Get Post
@@ -7390,29 +7804,39 @@ paths:
           $ref: '#/components/responses/AccessDenied'
         '404':
           $ref: '#/components/responses/NotFound'
-  /posts/random.json:
+  '/posts/{id}/favorites.json':
     get:
-      summary: Get Random Post
-      operationId: getRandomPost
+      summary: List Post Favorites
+      operationId: listPostFavorites
       tags:
         - Posts
       parameters:
-        - name: tags
-          in: query
+        - name: id
+          in: path
+          required: true
+          description: The ID of the post.
           schema:
-            type: string
+            type: integer
+        - name: limit
+          in: query
+          description: The maximum number of results to return. Between 1 and 100.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - $ref: '#/components/parameters/page'
+      description: You must be the user or Moderator+ to see users that have their favorites hidden.
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - post
-                properties:
-                  post:
-                    $ref: '#/components/schemas/Post'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+        '403':
+          $ref: '#/components/responses/AccessDenied'
         '404':
           $ref: '#/components/responses/NotFound'
   '/posts/{id}/votes.json':
@@ -9340,6 +9764,47 @@ paths:
                         category_id: 0
         '403':
           $ref: '#/components/responses/AccessDenied'
+  /session.json:
+    post:
+      summary: Login
+      operationId: login
+      tags:
+        - Sessions
+      security:
+        - csrfToken: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - authenticity_token
+                - 'session[name]'
+                - 'session[password]'
+              properties:
+                authenticity_token:
+                  type: string
+                  description: CSRF Token
+                'session[url]':
+                  type: string
+                  description: 'Optional relative URL to redirect to after login, defaults to `/posts`.'
+                'session[name]':
+                  type: string
+                'session[password]':
+                  type: string
+      responses:
+        '302':
+          description: Success
+          headers:
+            Set-Cookie:
+              description: The session cookie.
+              schema:
+                type: string
+                example: _danbooru_session=(...); path=/; secure; httponly; samesite=lax
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '406':
+          description: Failure
   /staff_notes.json:
     get:
       summary: Search Staff Notes
@@ -10010,6 +10475,11 @@ paths:
           schema:
             type: integer
         - in: query
+          name: 'search[disp_id]'
+          description: You must be Janitor+.
+          schema:
+            type: integer
+        - in: query
           name: 'search[qtype]'
           schema:
             $ref: '#/components/schemas/TicketTypes'
@@ -10629,6 +11099,39 @@ paths:
                   anyOf:
                     - $ref: '#/components/schemas/User'
                     - $ref: '#/components/schemas/FullUser'
+  /users/me.json:
+    get:
+      summary: Get Current User
+      operationId: getMe
+      description: |
+        This will return the default settings for anonymous users if no authentication is used.
+        This most interesting part is probably the default blacklist, located in `blacklisted_tags`.
+      tags:
+        - Users
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullCurrentUser'
+  /users/avatar_menu.json:
+    get:
+      summary: Get Avatar Menu
+      operationId: getAvatarMenu
+      tags:
+        - Users
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAvatarMenu'
+        '403':
+          $ref: '#/components/responses/AccessDenied'
   '/users/{id}.json':
     get:
       summary: Get User
@@ -10809,7 +11312,9 @@ paths:
       operationId: toggleUserUploads
       tags:
         - Users
-      description: You must be Janitor+.
+      description: |
+        You must be Janitor+.
+        This endpoint will return HTML when disabling uploads (due to a reason being required), this endpoint should only be used for reenabling. Use [Disable User Uploads](#operation-Users-disableUserUploads) to disable uploads.
       parameters:
         - name: id
           in: path
@@ -10826,6 +11331,41 @@ paths:
           $ref: '#/components/responses/AccessDenied'
         '404':
           $ref: '#/components/responses/NotFound'
+  '/users/{id}/disable_uploads.json':
+    post:
+      summary: Disable User Uploads
+      operationId: disableUserUploads
+      tags:
+        - Users
+      description: You must be Janitor+.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the user.
+          schema:
+            type: integer
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - 'staff_note[body]'
+              properties:
+                'staff_note[body]':
+                  type: string
+      responses:
+        '302':
+          description: |
+            Redirect
+            Success should be determined based on the html, any errors will be present in an alert.
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
   '/users/{user_id}/dmails.json':
     get:
       summary: Audit User DMails
@@ -10834,7 +11374,7 @@ paths:
         - DMails
       security:
         - basicAuth: []
-      description: Must have the bd staff user flag.
+      description: Must have the bd auditor user flag.
       parameters:
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/page'
@@ -10865,7 +11405,7 @@ paths:
         - DMails
       security:
         - basicAuth: []
-      description: Must have the bd staff user flag.
+      description: Must have the bd auditor user flag.
       parameters:
         - name: user_id
           in: path
@@ -11712,6 +12252,29 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ExpectedError'
+  '/admins/users/{id}/anonymize.json':
+    post:
+      summary: Admin Anonymize User
+      operationId: adminAnonymizeUser
+      tags:
+        - Admin Users
+      security:
+        - basicAuth: []
+      description: You must have the bd staff user flag. Cannot be used on staff.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the user.
+          schema:
+            type: integer
+      responses:
+        '302':
+          description: |
+            Redirect
+            Success should be determined based on the html, any errors will be present in an alert.
+        '404':
+          $ref: '#/components/responses/NotFound'
   '/moderator/post/posts/{id}/delete.json':
     post:
       summary: Delete Post
