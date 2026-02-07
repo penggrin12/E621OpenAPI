@@ -38,6 +38,11 @@ parameters:
     schema:
       type: integer
   - in: query
+    name: search[disp_id]
+    description: You must be Janitor+.
+    schema:
+      type: integer
+  - in: query
     name: search[qtype]
     schema:
       $ref: "../../components/schemas/ticketTypes.yaml"
