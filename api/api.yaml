@@ -782,6 +782,9 @@ paths:
   /users.json:
     get:
       $ref: "./paths/users/index.yaml"
+  /users/me.json:
+    get:
+      $ref: "./paths/users/me.yaml"
   /users/{id}.json:
     get:
       $ref: "./paths/users/show.yaml"
