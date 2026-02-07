@@ -189,6 +189,8 @@ components:
       $ref: "./components/schemas/wikiPageVersion.yaml"
     ApiKey:
       $ref: "./components/schemas/apiKey.yaml"
+    EditHistory:
+      $ref: "./components/schemas/editHistory.yaml"
   responses:
     NotFound:
       $ref: "./components/responses/notFound.yaml"
@@ -362,6 +364,13 @@ paths:
   /dtext_preview.json:
     post:
       $ref: "./paths/dtext_preview/index.yaml"
+
+  /edit_histories.json:
+    get:
+      $ref: "./paths/edit_histories/index.yaml"
+  /edit_histories/{id}.json:
+    get:
+      $ref: "./paths/edit_histories/show.yaml"
 
   /email_blacklists.json:
     get:

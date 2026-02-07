@@ -1,0 +1,35 @@
+summary: Get Edit History
+operationId: getEditHistory
+tags:
+  - Edit Histories
+security:
+  - basicAuth: []
+description: You must be Moderator+.
+parameters:
+  - name: id
+    in: path
+    required: true
+    description: The versionable id.
+    schema:
+      type: integer
+  - name: type
+    in: query
+    required: true
+    description: The versionable type.
+    schema:
+      type: string
+      enum:
+        - Blip
+        - Comment
+        - ForumPost
+responses:
+  200:
+    description: Success
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: "../../components/schemas/editHistory.yaml"
+  403:
+    $ref: "../../components/responses/accessDenied.yaml"
