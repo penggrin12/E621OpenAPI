@@ -191,6 +191,8 @@ components:
       $ref: "./components/schemas/apiKey.yaml"
     EditHistory:
       $ref: "./components/schemas/editHistory.yaml"
+    UserAvatarMenu:
+      $ref: "./components/schemas/userAvatarMenu.yaml"
   responses:
     NotFound:
       $ref: "./components/responses/notFound.yaml"
@@ -824,6 +826,9 @@ paths:
   /users/me.json:
     get:
       $ref: "./paths/users/me.yaml"
+  /users/avatar_menu.json:
+    get:
+      $ref: "./paths/users/avatar_menu.yaml"
   /users/{id}.json:
     get:
       $ref: "./paths/users/show.yaml"

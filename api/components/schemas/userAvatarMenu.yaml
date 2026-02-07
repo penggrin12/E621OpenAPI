@@ -1,0 +1,18 @@
+type: object
+required:
+  - has_uploads
+  - has_favorites
+  - has_sets
+  - has_comments
+  - has_forums
+properties:
+  has_uploads:
+    type: boolean
+  has_favorites:
+    type: boolean
+  has_sets:
+    type: boolean
+  has_comments:
+    type: boolean
+  has_forums:
+    type: boolean

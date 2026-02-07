@@ -1,0 +1,15 @@
+summary: Get Avatar Menu
+operationId: getAvatarMenu
+tags:
+  - Users
+security:
+  - basicAuth: []
+responses:
+  200:
+    description: Success
+    content:
+      application/json:
+        schema:
+          $ref: "../../components/schemas/userAvatarMenu.yaml"
+  403:
+    $ref: "../../components/responses/accessDenied.yaml"
