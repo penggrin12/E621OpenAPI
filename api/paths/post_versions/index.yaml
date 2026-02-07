@@ -2,7 +2,6 @@ summary: Search Post Versions
 operationId: searchPostVersions
 tags:
   - Post Versions
-description: Errors if no results are found.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - name: page

@@ -2,7 +2,6 @@ summary: Search Post Flags
 operationId: searchPostFlags
 tags:
   - Post Flags
-description: When no results are found, an object with an `post_flags` key is returned.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -49,15 +48,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/postFlag.yaml"
-            - type: object
-              description: No Results
-              required:
-                - post_flags
-              properties:
-                post_flags:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/postFlag.yaml"

@@ -2,7 +2,6 @@ summary: Search Staff Notes
 operationId: searchStaffNotes
 tags:
   - Staff Notes
-description: When no results are found, an object with an `staff_notes` key is returned.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -56,15 +55,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/staffNote.yaml"
-            - type: object
-              description: No Results
-              required:
-                - staff_notes
-              properties:
-                blips:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/staffNote.yaml"

@@ -2,7 +2,6 @@ summary: Search Pool Versions
 operationId: searchPoolVersions
 tags:
   - Pool Versions
-description: When no results are found, an object with an `pool_versions` key is returned.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -34,15 +33,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/poolVersion.yaml"
-            - type: object
-              description: No Results
-              required:
-                - pool_versions
-              properties:
-                pool_versions:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/poolVersion.yaml"

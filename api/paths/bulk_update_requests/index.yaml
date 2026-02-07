@@ -2,7 +2,6 @@ summary: Search Bulk Update Requests
 operationId: searchBulkUpdateRequests
 tags:
   - Bulk Update Requests
-description: When no results are found, an object with an `bulk_update_requests` key is returned.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -64,15 +63,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/bulkUpdateRequest.yaml"
-            - type: object
-              description: No Results
-              required:
-                - bulk_update_requests
-              properties:
-                bulk_update_requests:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/bulkUpdateRequest.yaml"

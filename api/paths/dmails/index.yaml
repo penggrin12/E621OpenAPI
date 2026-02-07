@@ -2,7 +2,6 @@ summary: Search DMails
 operationId: searchDMails
 tags:
   - DMails
-description: When no results are found, an object with a `dmails` key is returned.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"

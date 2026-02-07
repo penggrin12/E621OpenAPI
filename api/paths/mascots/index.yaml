@@ -2,7 +2,6 @@ summary: Search Mascots
 operationId: searchMascots
 tags:
   - Mascots
-description: When no results are found, an object with an `mascots` key is returned.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -13,15 +12,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/mascot.yaml"
-            - type: object
-              description: No Results
-              required:
-                - mascots
-              properties:
-                mascots:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/mascot.yaml"

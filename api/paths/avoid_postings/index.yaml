@@ -2,7 +2,6 @@ summary: Search Avoid Posting Entries
 operationId: searchAvoidPostings
 tags:
   - Avoid Posting Entries
-description: When no results are found, an object with an `avoid_postings` key is returned.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -64,15 +63,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/avoidPosting.yaml"
-            - type: object
-              description: No Results
-              required:
-                - avoid_postings
-              properties:
-                avoid_postings:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/avoidPosting.yaml"

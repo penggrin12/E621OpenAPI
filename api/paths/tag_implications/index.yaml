@@ -2,7 +2,6 @@ summary: Search Tag Implications
 operationId: searchTagImplications
 tags:
   - Tag Implications
-description: When no results are found, an object with an `tag_implications` key is returned.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -64,15 +63,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/tagImplication.yaml"
-            - type: object
-              description: No Results
-              required:
-                - tag_implications
-              properties:
-                tag_implications:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/tagImplication.yaml"

@@ -61,15 +61,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/avoidPostingVersion.yaml"
-            - type: object
-              description: No Results
-              required:
-                - avoid_posting_versions
-              properties:
-                avoid_posting_versions:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/avoidPostingVersion.yaml"

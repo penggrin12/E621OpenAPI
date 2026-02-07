@@ -4,7 +4,6 @@ tags:
   - IP Bans
 security:
   - basicAuth: []
-description: You must be Admin+. When no results are found, an object with an `ip_bans` key is returned.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -35,15 +34,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/ipBan.yaml"
-            - type: object
-              description: No Results
-              required:
-                - ip_bans
-              properties:
-                ip_bans:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/ipBan.yaml"

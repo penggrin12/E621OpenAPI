@@ -2,7 +2,7 @@ summary: Search Tickets
 operationId: searchTickets
 tags:
   - Tickets
-description: You must be Janitor+ to see tickets you did not create. When no results are found, an object with an `tickets` key is returned.
+description: You must be Janitor+ to see tickets you did not create.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -67,17 +67,8 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/ticket.yaml"
-            - type: object
-              description: No Results
-              required:
-                - tickets
-              properties:
-                tickets:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/ticket.yaml"
   403:
     $ref: "../../components/responses/accessDenied.yaml"

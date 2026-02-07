@@ -2,7 +2,6 @@ summary: Search Bans
 operationId: searchBans
 tags:
   - Bans
-description: When no results are found, an object with an `bans` key is returned.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -52,15 +51,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/ban.yaml"
-            - type: object
-              description: No Results
-              required:
-                - bans
-              properties:
-                bans:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/ban.yaml"

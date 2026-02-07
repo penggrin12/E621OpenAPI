@@ -4,7 +4,7 @@ tags:
   - Avoid Posting Entries
 security:
   - basicAuth: []
-description: Must have the bd staff user flag. When no results are found, an object with an `avoid_posting_versions` key is returned.
+description: Must have the bd staff user flag.
 requestBody:
   content:
     application/x-www-form-urlencoded:

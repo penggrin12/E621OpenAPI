@@ -2,7 +2,6 @@ summary: Search User Feedbacks
 operationId: searchUserFeedbacks
 tags:
   - User Feedbacks
-description: When no results are found, an object with an `user_feedbacks` key is returned.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -53,15 +52,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/userFeedback.yaml"
-            - type: object
-              description: No Results
-              required:
-                - user_feedbacks
-              properties:
-                user_feedbacks:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/userFeedback.yaml"

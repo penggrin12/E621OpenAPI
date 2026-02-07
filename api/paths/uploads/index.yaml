@@ -2,7 +2,6 @@ summary: Search Uploads
 operationId: searchUploads
 tags:
   - Uploads
-description: You must be Janitor+. When no results are found, an object with an `uploads` key is returned.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -75,15 +74,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/upload.yaml"
-            - type: object
-              description: No Results
-              required:
-                - uploads
-              properties:
-                uploads:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/upload.yaml"

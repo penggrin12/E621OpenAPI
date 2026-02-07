@@ -2,7 +2,6 @@ summary: Search Takedowns
 operationId: searchTakedowns
 tags:
   - Takedowns
-description: When no results are found, an object with an `takedowns` key is returned.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -83,15 +82,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/takedown.yaml"
-            - type: object
-              description: No Results
-              required:
-                - takedowns
-              properties:
-                takedowns:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/takedown.yaml"

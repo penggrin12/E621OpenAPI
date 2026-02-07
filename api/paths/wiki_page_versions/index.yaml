@@ -2,7 +2,6 @@ summary: Search Wiki Page Versions
 operationId: searchWikiPageVersions
 tags:
   - Wiki Page Versions
-description: When no results are found, an object with an `wiki_page_versions` key is returned.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -49,15 +48,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/wikiPageVersion.yaml"
-            - type: object
-              description: No Results
-              required:
-                - wiki_page_versions
-              properties:
-                wiki_page_versions:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/wikiPageVersion.yaml"

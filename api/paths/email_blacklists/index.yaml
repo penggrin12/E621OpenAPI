@@ -2,7 +2,6 @@ summary: Search Email Blacklists
 operationId: searchEmailBlacklists
 tags:
   - Email Blacklists
-description: You must be Admin+. When no results are found, an object with an `email_blacklists` key is returned.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -30,15 +29,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/emailBlacklist.yaml"
-            - type: object
-              description: No Results
-              required:
-                - email_blacklists
-              properties:
-                email_blacklists:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/emailBlacklist.yaml"

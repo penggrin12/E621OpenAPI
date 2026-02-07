@@ -2,7 +2,6 @@ summary: Search Forum Posts
 operationId: searchForumPosts
 tags:
   - Forum Posts
-description: When no results are found, an object with an `forum_posts` key is returned.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -48,15 +47,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/forumPost.yaml"
-            - type: object
-              description: No Results
-              required:
-                - forum_posts
-              properties:
-                forum_posts:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/forumPost.yaml"

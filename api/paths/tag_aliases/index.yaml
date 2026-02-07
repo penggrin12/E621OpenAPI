@@ -2,7 +2,6 @@ summary: Search Tag Aliases
 operationId: searchTagAliases
 tags:
   - Tag Aliases
-description: When no results are found, an object with an `tag_aliases` key is returned.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -64,15 +63,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/tagAlias.yaml"
-            - type: object
-              description: No Results
-              required:
-                - tag_aliases
-              properties:
-                tag_aliases:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/tagAlias.yaml"

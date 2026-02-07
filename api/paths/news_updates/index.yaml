@@ -2,7 +2,6 @@ summary: List News Updates
 operationId: listNewsUpdates
 tags:
   - News Updates
-description: When no results are found, an object with an `news_updates` key is returned.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -12,15 +11,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/newsUpdate.yaml"
-            - type: object
-              description: No Results
-              required:
-                - news_updates
-              properties:
-                news_updates:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/newsUpdate.yaml"

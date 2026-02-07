@@ -4,7 +4,7 @@ tags:
   - Post Disapprovals
 security:
   - basicAuth: []
-description: You must have the "Approve Posts" permission When no results are found, an object with a `post_disapprovals` key is returned.
+description: You must have the "Approve Posts" permission.
 parameters:
   - $ref: "../../../../components/parameters/limit.yaml"
   - $ref: "../../../../components/parameters/page.yaml"
@@ -52,15 +52,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../../../components/schemas/postDisapproval.yaml"
-            - type: object
-              description: No Results
-              required:
-                - post_disapprovals
-              properties:
-                post_disapprovals:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../../../components/schemas/postDisapproval.yaml"

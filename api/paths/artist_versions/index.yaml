@@ -2,7 +2,6 @@ summary: Search Artist Versions
 operationId: searchArtistVersions
 tags:
   - Artist Versions
-description: When no results are found, an object with an `artist_versions` key is returned.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
@@ -43,15 +42,6 @@ responses:
     content:
       application/json:
         schema:
-          anyOf:
-            - type: array
-              items:
-                $ref: "../../components/schemas/artistVersion.yaml"
-            - type: object
-              description: No Results
-              required:
-                - artist_versions
-              properties:
-                artist_versions:
-                  type: array
-                  maxItems: 0
+          type: array
+          items:
+            $ref: "../../components/schemas/artistVersion.yaml"
