@@ -901,6 +901,9 @@ paths:
   /admins/users/{id}.json:
     patch:
       $ref: "./paths/admin/users/update.yaml"
+  /admins/users/{id}/anonymize.json:
+    post:
+      $ref: "./paths/admin/users/confirm_anonymize.yaml"
 
   /moderator/post/posts/{id}/delete.json:
     post:
