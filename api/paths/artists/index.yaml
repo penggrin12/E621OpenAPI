@@ -56,6 +56,14 @@ parameters:
     in: query
     schema:
       type: string
+  - name: search[linked_user_id]
+    in: query
+    schema:
+      type: integer
+  - name: search[linked_user_name]
+    in: query
+    schema:
+      type: string
 responses:
   200:
     description: Success
