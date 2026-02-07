@@ -838,6 +838,9 @@ paths:
   /users/{id}/toggle_uploads.json:
     get:
       $ref: "./paths/users/toggle_uploads.yaml"
+  /users/{id}/disable_uploads.json:
+    post:
+      $ref: "./paths/users/disable_uploads.yaml"
   /users/{user_id}/dmails.json:
     get:
       $ref: "./paths/users/dmails/index.yaml"
