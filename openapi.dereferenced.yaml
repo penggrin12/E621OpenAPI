@@ -12,7 +12,7 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: f897da0
+  version: d145b87
 servers:
   - url: 'https://e621.net'
     description: E621 (production)
@@ -4990,7 +4990,7 @@ paths:
                           items:
                             type: array
                             items:
-                              anyOf:
+                              oneOf:
                                 - type: string
                                 - type: number
                         urls:
@@ -5222,7 +5222,7 @@ paths:
                             - - e621.net
                               - 1
                           items:
-                            anyOf:
+                            oneOf:
                               - type: string
                               - type: number
                       urls:
@@ -5503,7 +5503,6 @@ paths:
       operationId: searchArtistVersions
       tags:
         - Artist Versions
-      description: 'When no results are found, an object with an `artist_versions` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -5564,57 +5563,48 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - artist_id
-                        - name
-                        - updater_id
-                        - created_at
-                        - updated_at
-                        - is_active
-                        - other_names
-                        - notes_changed
-                        - urls
-                      properties:
-                        id:
-                          type: integer
-                        artist_id:
-                          type: integer
-                        name:
-                          type: string
-                        updater_id:
-                          type: integer
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                        is_active:
-                          type: boolean
-                        other_names:
-                          type: array
-                          items:
-                            type: string
-                        notes_changed:
-                          type: boolean
-                        urls:
-                          type: array
-                          items:
-                            type: string
-                            format: uri
-                  - type: object
-                    description: No Results
-                    required:
-                      - artist_versions
-                    properties:
-                      artist_versions:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - artist_id
+                    - name
+                    - updater_id
+                    - created_at
+                    - updated_at
+                    - is_active
+                    - other_names
+                    - notes_changed
+                    - urls
+                  properties:
+                    id:
+                      type: integer
+                    artist_id:
+                      type: integer
+                    name:
+                      type: string
+                    updater_id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    is_active:
+                      type: boolean
+                    other_names:
+                      type: array
+                      items:
+                        type: string
+                    notes_changed:
+                      type: boolean
+                    urls:
+                      type: array
+                      items:
+                        type: string
+                        format: uri
   /artist_urls.json:
     get:
       summary: Search Artist URLs
@@ -5799,7 +5789,6 @@ paths:
       operationId: searchAvoidPostings
       tags:
         - Avoid Posting Entries
-      description: 'When no results are found, an object with an `avoid_postings` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -5881,49 +5870,40 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - creator_id
-                        - updater_id
-                        - artist_id
-                        - details
-                        - is_active
-                        - created_at
-                        - updated_at
-                      properties:
-                        id:
-                          type: integer
-                        creator_id:
-                          type: integer
-                        updater_id:
-                          type: integer
-                        artist_id:
-                          type: integer
-                        staff_notes:
-                          type: string
-                          description: Only visible to Janitor+
-                        details:
-                          type: string
-                        is_active:
-                          type: boolean
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                  - type: object
-                    description: No Results
-                    required:
-                      - avoid_postings
-                    properties:
-                      avoid_postings:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - creator_id
+                    - updater_id
+                    - artist_id
+                    - details
+                    - is_active
+                    - created_at
+                    - updated_at
+                  properties:
+                    id:
+                      type: integer
+                    creator_id:
+                      type: integer
+                    updater_id:
+                      type: integer
+                    artist_id:
+                      type: integer
+                    staff_notes:
+                      type: string
+                      description: Only visible to Janitor+
+                    details:
+                      type: string
+                    is_active:
+                      type: boolean
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
     post:
       summary: Create Avoid Posting Entry
       operationId: createAvoidPosting
@@ -5931,7 +5911,7 @@ paths:
         - Avoid Posting Entries
       security:
         - basicAuth: []
-      description: 'Must have the bd staff user flag. When no results are found, an object with an `avoid_posting_versions` key is returned.'
+      description: Must have the bd staff user flag.
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -6460,49 +6440,39 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - updater_id
-                        - avoid_posting_id
-                        - details
-                        - is_active
-                        - updated_at
-                      properties:
-                        id:
-                          type: integer
-                        updater_id:
-                          type: integer
-                        avoid_posting_id:
-                          type: integer
-                        details:
-                          type: string
-                        staff_notes:
-                          type: string
-                          description: Only visible to Janitor+
-                        is_active:
-                          type: boolean
-                        updated_at:
-                          type: string
-                          format: date-time
-                  - type: object
-                    description: No Results
-                    required:
-                      - avoid_posting_versions
-                    properties:
-                      avoid_posting_versions:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - updater_id
+                    - avoid_posting_id
+                    - details
+                    - is_active
+                    - updated_at
+                  properties:
+                    id:
+                      type: integer
+                    updater_id:
+                      type: integer
+                    avoid_posting_id:
+                      type: integer
+                    details:
+                      type: string
+                    staff_notes:
+                      type: string
+                      description: Only visible to Janitor+
+                    is_active:
+                      type: boolean
+                    updated_at:
+                      type: string
+                      format: date-time
   /bans.json:
     get:
       summary: Search Bans
       operationId: searchBans
       tags:
         - Bans
-      description: 'When no results are found, an object with an `bans` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -6568,45 +6538,36 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - user_id
-                        - reason
-                        - expires_at
-                        - banner_id
-                        - created_at
-                        - updated_at
-                      properties:
-                        id:
-                          type: integer
-                        user_id:
-                          type: integer
-                        reason:
-                          type: string
-                        expires_at:
-                          type: string
-                          format: date-time
-                          nullable: true
-                        banner_id:
-                          type: integer
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                  - type: object
-                    description: No Results
-                    required:
-                      - bans
-                    properties:
-                      bans:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - user_id
+                    - reason
+                    - expires_at
+                    - banner_id
+                    - created_at
+                    - updated_at
+                  properties:
+                    id:
+                      type: integer
+                    user_id:
+                      type: integer
+                    reason:
+                      type: string
+                    expires_at:
+                      type: string
+                      format: date-time
+                      nullable: true
+                    banner_id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
   '/bans/{id}.json':
     get:
       summary: Get Ban
@@ -6676,7 +6637,6 @@ paths:
       operationId: searchBlips
       tags:
         - Blips
-      description: 'When no results are found, an object with an `blips` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -6733,59 +6693,50 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - creator_id
-                        - body
-                        - response_to
-                        - created_at
-                        - updated_at
-                        - is_hidden
-                        - warning_type
-                        - warning_user_id
-                        - updater_id
-                        - creator_name
-                      properties:
-                        id:
-                          type: integer
-                        creator_id:
-                          type: integer
-                        body:
-                          type: string
-                        response_to:
-                          type: integer
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                        is_hidden:
-                          type: boolean
-                        warning_type:
-                          type: string
-                          enum:
-                            - warning
-                            - record
-                            - ban
-                        warning_user_id:
-                          type: integer
-                        updater_id:
-                          type: integer
-                        creator_name:
-                          type: string
-                  - type: object
-                    description: No Results
-                    required:
-                      - blips
-                    properties:
-                      blips:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - creator_id
+                    - body
+                    - response_to
+                    - created_at
+                    - updated_at
+                    - is_hidden
+                    - warning_type
+                    - warning_user_id
+                    - updater_id
+                    - creator_name
+                  properties:
+                    id:
+                      type: integer
+                    creator_id:
+                      type: integer
+                    body:
+                      type: string
+                    response_to:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    is_hidden:
+                      type: boolean
+                    warning_type:
+                      type: string
+                      enum:
+                        - warning
+                        - record
+                        - ban
+                    warning_user_id:
+                      type: integer
+                    updater_id:
+                      type: integer
+                    creator_name:
+                      type: string
     post:
       summary: Create Blip
       operationId: createBlip
@@ -7522,7 +7473,6 @@ paths:
       operationId: searchBulkUpdateRequests
       tags:
         - Bulk Update Requests
-      description: 'When no results are found, an object with an `bulk_update_requests` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -7600,61 +7550,52 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - creator_id
-                        - forum_topic_id
-                        - script
-                        - status
-                        - created_at
-                        - updated_at
-                        - approver_id
-                        - forum_post_id
-                        - title
-                      properties:
-                        id:
-                          type: integer
-                        creator_id:
-                          type: integer
-                        forum_topic_id:
-                          type: integer
-                          nullable: true
-                        script:
-                          type: string
-                          example:
-                            - alias a -> b
-                        status:
-                          type: string
-                          enum:
-                            - approved
-                            - rejected
-                            - pending
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                        approver_id:
-                          type: integer
-                          nullable: true
-                        forum_post_id:
-                          type: integer
-                          nullable: true
-                        title:
-                          type: string
-                  - type: object
-                    description: No Results
-                    required:
-                      - bulk_update_requests
-                    properties:
-                      bulk_update_requests:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - creator_id
+                    - forum_topic_id
+                    - script
+                    - status
+                    - created_at
+                    - updated_at
+                    - approver_id
+                    - forum_post_id
+                    - title
+                  properties:
+                    id:
+                      type: integer
+                    creator_id:
+                      type: integer
+                    forum_topic_id:
+                      type: integer
+                      nullable: true
+                    script:
+                      type: string
+                      example:
+                        - alias a -> b
+                    status:
+                      type: string
+                      enum:
+                        - approved
+                        - rejected
+                        - pending
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    approver_id:
+                      type: integer
+                      nullable: true
+                    forum_post_id:
+                      type: integer
+                      nullable: true
+                    title:
+                      type: string
     post:
       summary: Create Bulk Update Request
       operationId: createBulkUpdateRequest
@@ -8031,7 +7972,7 @@ paths:
       operationId: searchComments
       tags:
         - Comments
-      description: 'For searching comments, group_by=comment must be set. When no results are found, an object with an `comments` key is returned.'
+      description: 'For searching comments, group_by=comment must be set.'
       parameters:
         - name: limit
           in: query
@@ -8122,73 +8063,64 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - created_at
-                        - post_id
-                        - creator_id
-                        - body
-                        - score
-                        - updated_at
-                        - updater_id
-                        - do_not_bump_post
-                        - is_hidden
-                        - is_sticky
-                        - warning_type
-                        - warning_user_id
-                        - creator_name
-                        - updater_name
-                      properties:
-                        id:
-                          type: integer
-                        created_at:
-                          type: string
-                          format: date-time
-                        post_id:
-                          type: integer
-                        creator_id:
-                          type: integer
-                        body:
-                          type: string
-                        score:
-                          type: integer
-                        updated_at:
-                          type: string
-                          format: date-time
-                        updater_id:
-                          type: integer
-                        do_not_bump_post:
-                          type: boolean
-                          deprecated: true
-                        is_hidden:
-                          type: boolean
-                        is_sticky:
-                          type: boolean
-                        warning_type:
-                          type: string
-                          enum:
-                            - warning
-                            - record
-                            - ban
-                        warning_user_id:
-                          type: integer
-                          nullable: true
-                        creator_name:
-                          type: string
-                        updater_name:
-                          type: string
-                  - type: object
-                    description: No Results
-                    required:
-                      - comments
-                    properties:
-                      comments:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - created_at
+                    - post_id
+                    - creator_id
+                    - body
+                    - score
+                    - updated_at
+                    - updater_id
+                    - do_not_bump_post
+                    - is_hidden
+                    - is_sticky
+                    - warning_type
+                    - warning_user_id
+                    - creator_name
+                    - updater_name
+                  properties:
+                    id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    post_id:
+                      type: integer
+                    creator_id:
+                      type: integer
+                    body:
+                      type: string
+                    score:
+                      type: integer
+                    updated_at:
+                      type: string
+                      format: date-time
+                    updater_id:
+                      type: integer
+                    do_not_bump_post:
+                      type: boolean
+                      deprecated: true
+                    is_hidden:
+                      type: boolean
+                    is_sticky:
+                      type: boolean
+                    warning_type:
+                      type: string
+                      enum:
+                        - warning
+                        - record
+                        - ban
+                    warning_user_id:
+                      type: integer
+                      nullable: true
+                    creator_name:
+                      type: string
+                    updater_name:
+                      type: string
     post:
       summary: Create Comment
       operationId: createComment
@@ -9197,7 +9129,6 @@ paths:
       operationId: searchDMails
       tags:
         - DMails
-      description: 'When no results are found, an object with a `dmails` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -9923,7 +9854,6 @@ paths:
       operationId: searchEmailBlacklists
       tags:
         - Email Blacklists
-      description: 'You must be Admin+. When no results are found, an object with an `email_blacklists` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -9967,38 +9897,29 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - created_at
-                        - updated_at
-                        - domain
-                        - creator_id
-                        - reason
-                      properties:
-                        id:
-                          type: integer
-                        created_at:
-                          type: string
-                        updated_at:
-                          type: string
-                        domain:
-                          type: string
-                        creator_id:
-                          type: string
-                        reason:
-                          type: string
-                  - type: object
-                    description: No Results
-                    required:
-                      - email_blacklists
-                    properties:
-                      email_blacklists:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - created_at
+                    - updated_at
+                    - domain
+                    - creator_id
+                    - reason
+                  properties:
+                    id:
+                      type: integer
+                    created_at:
+                      type: string
+                    updated_at:
+                      type: string
+                    domain:
+                      type: string
+                    creator_id:
+                      type: string
+                    reason:
+                      type: string
     post:
       summary: Create Email Blacklist
       operationId: createEmailBlacklist
@@ -10724,7 +10645,6 @@ paths:
       operationId: searchForumPosts
       tags:
         - Forum Posts
-      description: 'When no results are found, an object with an `forum_posts` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -10786,57 +10706,48 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - topic_id
-                        - creator_id
-                        - updater_id
-                        - body
-                        - is_hidden
-                        - created_at
-                        - updated_at
-                        - warning_type
-                        - warning_user_id
-                      properties:
-                        id:
-                          type: integer
-                        topic_id:
-                          type: integer
-                        creator_id:
-                          type: integer
-                        updater_id:
-                          type: integer
-                        body:
-                          type: string
-                        is_hidden:
-                          type: boolean
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                        warning_type:
-                          type: string
-                          enum:
-                            - warning
-                            - record
-                            - ban
-                        warning_user_id:
-                          type: integer
-                          nullable: true
-                  - type: object
-                    description: No Results
-                    required:
-                      - forum_posts
-                    properties:
-                      forum_posts:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - topic_id
+                    - creator_id
+                    - updater_id
+                    - body
+                    - is_hidden
+                    - created_at
+                    - updated_at
+                    - warning_type
+                    - warning_user_id
+                  properties:
+                    id:
+                      type: integer
+                    topic_id:
+                      type: integer
+                    creator_id:
+                      type: integer
+                    updater_id:
+                      type: integer
+                    body:
+                      type: string
+                    is_hidden:
+                      type: boolean
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    warning_type:
+                      type: string
+                      enum:
+                        - warning
+                        - record
+                        - ban
+                    warning_user_id:
+                      type: integer
+                      nullable: true
     post:
       summary: Create Forum Post
       operationId: createForumPost
@@ -12865,7 +12776,6 @@ paths:
         - IP Bans
       security:
         - basicAuth: []
-      description: 'You must be Admin+. When no results are found, an object with an `ip_bans` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -12916,38 +12826,29 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      description: 'Due to a global filter, the ip_addr is not present no matter your user level.'
-                      required:
-                        - id
-                        - creator_id
-                        - reason
-                        - created_at
-                        - updated_at
-                      properties:
-                        id:
-                          type: integer
-                        creator_id:
-                          type: integer
-                        reason:
-                          type: string
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                  - type: object
-                    description: No Results
-                    required:
-                      - ip_bans
-                    properties:
-                      ip_bans:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  description: 'Due to a global filter, the ip_addr is not present no matter your user level.'
+                  required:
+                    - id
+                    - creator_id
+                    - reason
+                    - created_at
+                    - updated_at
+                  properties:
+                    id:
+                      type: integer
+                    creator_id:
+                      type: integer
+                    reason:
+                      type: string
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
     post:
       summary: Create IP Ban
       operationId: createIPBan
@@ -13629,7 +13530,6 @@ paths:
       operationId: searchMascots
       tags:
         - Mascots
-      description: 'When no results are found, an object with an `mascots` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -13656,65 +13556,56 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - creator_id
-                        - display_name
-                        - md5
-                        - file_ext
-                        - background_color
-                        - artist_url
-                        - artist_name
-                        - active
-                        - created_at
-                        - updated_at
-                        - available_on
-                        - url_path
-                      properties:
-                        id:
-                          type: integer
-                        creator_id:
-                          type: integer
-                        display_name:
-                          type: string
-                        md5:
-                          type: string
-                        file_ext:
-                          type: string
-                        background_color:
-                          type: string
-                        artist_url:
-                          type: string
-                          format: uri
-                        artist_name:
-                          type: string
-                        active:
-                          type: boolean
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                        available_on:
-                          type: array
-                          items:
-                            type: string
-                        url_path:
-                          type: string
-                          format: uri
-                  - type: object
-                    description: No Results
-                    required:
-                      - mascots
-                    properties:
-                      mascots:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - creator_id
+                    - display_name
+                    - md5
+                    - file_ext
+                    - background_color
+                    - artist_url
+                    - artist_name
+                    - active
+                    - created_at
+                    - updated_at
+                    - available_on
+                    - url_path
+                  properties:
+                    id:
+                      type: integer
+                    creator_id:
+                      type: integer
+                    display_name:
+                      type: string
+                    md5:
+                      type: string
+                    file_ext:
+                      type: string
+                    background_color:
+                      type: string
+                    artist_url:
+                      type: string
+                      format: uri
+                    artist_name:
+                      type: string
+                    active:
+                      type: boolean
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    available_on:
+                      type: array
+                      items:
+                        type: string
+                    url_path:
+                      type: string
+                      format: uri
     post:
       summary: Create Mascot
       operationId: createMascot
@@ -14454,7 +14345,6 @@ paths:
       operationId: listNewsUpdates
       tags:
         - News Updates
-      description: 'When no results are found, an object with an `news_updates` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -14476,40 +14366,31 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - message
-                        - creator_id
-                        - updater_id
-                        - created_at
-                        - updated_at
-                      properties:
-                        id:
-                          type: integer
-                        message:
-                          type: string
-                        creator_id:
-                          type: integer
-                        updater_id:
-                          type: integer
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                  - type: object
-                    description: No Results
-                    required:
-                      - news_updates
-                    properties:
-                      news_updates:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - message
+                    - creator_id
+                    - updater_id
+                    - created_at
+                    - updated_at
+                  properties:
+                    id:
+                      type: integer
+                    message:
+                      type: string
+                    creator_id:
+                      type: integer
+                    updater_id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
     post:
       summary: Create News Update
       operationId: createNewsUpdate
@@ -14724,7 +14605,6 @@ paths:
       operationId: searchNotes
       tags:
         - Notes
-      description: 'When no results are found, an object with an `notes` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -14790,61 +14670,52 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - created_at
-                        - updated_at
-                        - creator_id
-                        - x
-                        - 'y'
-                        - width
-                        - height
-                        - version
-                        - is_active
-                        - post_id
-                        - body
-                        - creator_name
-                      properties:
-                        id:
-                          type: integer
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                        creator_id:
-                          type: integer
-                        x:
-                          type: integer
-                        'y':
-                          type: integer
-                        width:
-                          type: integer
-                        height:
-                          type: integer
-                        version:
-                          type: number
-                        is_active:
-                          type: boolean
-                        post_id:
-                          type: integer
-                        body:
-                          type: string
-                        creator_name:
-                          type: string
-                  - type: object
-                    description: No Results
-                    required:
-                      - notes
-                    properties:
-                      notes:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - created_at
+                    - updated_at
+                    - creator_id
+                    - x
+                    - 'y'
+                    - width
+                    - height
+                    - version
+                    - is_active
+                    - post_id
+                    - body
+                    - creator_name
+                  properties:
+                    id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    creator_id:
+                      type: integer
+                    x:
+                      type: integer
+                    'y':
+                      type: integer
+                    width:
+                      type: integer
+                    height:
+                      type: integer
+                    version:
+                      type: number
+                    is_active:
+                      type: boolean
+                    post_id:
+                      type: integer
+                    body:
+                      type: string
+                    creator_name:
+                      type: string
     post:
       summary: Create Note
       operationId: createNote
@@ -15260,7 +15131,6 @@ paths:
       operationId: searchNoteVersions
       tags:
         - Note Versions
-      description: 'When no results are found, an object with an `note_versions` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -15324,61 +15194,52 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - created_at
-                        - updated_at
-                        - x
-                        - 'y'
-                        - width
-                        - height
-                        - body
-                        - version
-                        - is_active
-                        - note_id
-                        - post_id
-                        - updater_id
-                      properties:
-                        id:
-                          type: integer
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                        x:
-                          type: integer
-                        'y':
-                          type: integer
-                        width:
-                          type: integer
-                        height:
-                          type: integer
-                        body:
-                          type: string
-                        version:
-                          type: number
-                        is_active:
-                          type: boolean
-                        note_id:
-                          type: integer
-                        post_id:
-                          type: integer
-                        updater_id:
-                          type: integer
-                  - type: object
-                    description: No Results
-                    required:
-                      - note_versions
-                    properties:
-                      note_versions:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - created_at
+                    - updated_at
+                    - x
+                    - 'y'
+                    - width
+                    - height
+                    - body
+                    - version
+                    - is_active
+                    - note_id
+                    - post_id
+                    - updater_id
+                  properties:
+                    id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    x:
+                      type: integer
+                    'y':
+                      type: integer
+                    width:
+                      type: integer
+                    height:
+                      type: integer
+                    body:
+                      type: string
+                    version:
+                      type: number
+                    is_active:
+                      type: boolean
+                    note_id:
+                      type: integer
+                    post_id:
+                      type: integer
+                    updater_id:
+                      type: integer
   /pools.json:
     get:
       summary: Search Pools
@@ -16079,7 +15940,6 @@ paths:
       operationId: searchPoolVersions
       tags:
         - Pool Versions
-      description: 'When no results are found, an object with an `pool_versions` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -16131,79 +15991,70 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - pool_id
-                        - post_ids
-                        - updater_id
-                        - created_at
-                        - updated_at
-                        - name
-                        - name_changed
-                        - description
-                        - description_changed
-                        - is_active
-                        - is_locked
-                        - category
-                        - version
-                        - added_post_ids
-                        - removed_post_ids
-                      properties:
-                        id:
-                          type: integer
-                        pool_id:
-                          type: integer
-                        post_ids:
-                          type: array
-                          items:
-                            type: integer
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                        updater_id:
-                          type: integer
-                        name:
-                          type: string
-                        name_changed:
-                          type: boolean
-                        description:
-                          type: string
-                        description_changed:
-                          type: boolean
-                        is_active:
-                          type: boolean
-                        is_locked:
-                          type: boolean
-                        category:
-                          type: string
-                          enum:
-                            - collection
-                            - series
-                        version:
-                          type: number
-                        added_post_ids:
-                          type: array
-                          items:
-                            type: integer
-                        removed_post_ids:
-                          type: array
-                          items:
-                            type: integer
-                  - type: object
-                    description: No Results
-                    required:
-                      - pool_versions
-                    properties:
-                      pool_versions:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - pool_id
+                    - post_ids
+                    - updater_id
+                    - created_at
+                    - updated_at
+                    - name
+                    - name_changed
+                    - description
+                    - description_changed
+                    - is_active
+                    - is_locked
+                    - category
+                    - version
+                    - added_post_ids
+                    - removed_post_ids
+                  properties:
+                    id:
+                      type: integer
+                    pool_id:
+                      type: integer
+                    post_ids:
+                      type: array
+                      items:
+                        type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    updater_id:
+                      type: integer
+                    name:
+                      type: string
+                    name_changed:
+                      type: boolean
+                    description:
+                      type: string
+                    description_changed:
+                      type: boolean
+                    is_active:
+                      type: boolean
+                    is_locked:
+                      type: boolean
+                    category:
+                      type: string
+                      enum:
+                        - collection
+                        - series
+                    version:
+                      type: number
+                    added_post_ids:
+                      type: array
+                      items:
+                        type: integer
+                    removed_post_ids:
+                      type: array
+                      items:
+                        type: integer
   /popular.json:
     get:
       summary: List Most Upvoted Posts
@@ -20560,7 +20411,6 @@ paths:
       operationId: searchPostSets
       tags:
         - Post Sets
-      description: 'When no results are found, an object with a `post_sets` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -20630,57 +20480,48 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - created_at
-                        - updated_at
-                        - creator_id
-                        - is_public
-                        - name
-                        - shortname
-                        - description
-                        - transfer_on_delete
-                        - post_ids
-                        - post_count
-                      properties:
-                        id:
-                          type: integer
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                        creator_id:
-                          type: integer
-                        is_public:
-                          type: boolean
-                        name:
-                          type: string
-                        shortname:
-                          type: string
-                        description:
-                          type: string
-                        post_count:
-                          type: integer
-                        transfer_on_delete:
-                          type: boolean
-                        post_ids:
-                          type: array
-                          items:
-                            type: integer
-                  - type: object
-                    description: No Results
-                    required:
-                      - post_sets
-                    properties:
-                      post_sets:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - created_at
+                    - updated_at
+                    - creator_id
+                    - is_public
+                    - name
+                    - shortname
+                    - description
+                    - transfer_on_delete
+                    - post_ids
+                    - post_count
+                  properties:
+                    id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    creator_id:
+                      type: integer
+                    is_public:
+                      type: boolean
+                    name:
+                      type: string
+                    shortname:
+                      type: string
+                    description:
+                      type: string
+                    post_count:
+                      type: integer
+                    transfer_on_delete:
+                      type: boolean
+                    post_ids:
+                      type: array
+                      items:
+                        type: integer
     post:
       summary: Create Post Set
       operationId: createPostSet
@@ -21400,13 +21241,13 @@ paths:
                   Owned:
                     type: array
                     items:
-                      anyOf:
+                      oneOf:
                         - type: string
                         - type: number
                   Maintained:
                     type: array
                     items:
-                      anyOf:
+                      oneOf:
                         - type: string
                         - type: number
         '403':
@@ -21448,7 +21289,6 @@ paths:
       operationId: searchPostApprovals
       tags:
         - Post Approvals
-      description: 'When no results are found, an object with an `post_approvals` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -21498,37 +21338,28 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - user_id
-                        - post_id
-                        - created_at
-                        - updated_at
-                      properties:
-                        id:
-                          type: integer
-                        user_id:
-                          type: integer
-                        post_id:
-                          type: integer
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                  - type: object
-                    description: No Results
-                    required:
-                      - post_aprovals
-                    properties:
-                      post_approvals:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - user_id
+                    - post_id
+                    - created_at
+                    - updated_at
+                  properties:
+                    id:
+                      type: integer
+                    user_id:
+                      type: integer
+                    post_id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
   /post_events.json:
     get:
       summary: Search Post Events
@@ -21667,7 +21498,6 @@ paths:
       operationId: searchPostFlags
       tags:
         - Post Flags
-      description: 'When no results are found, an object with an `post_flags` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -21734,57 +21564,48 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - created_at
-                        - post_id
-                        - reason
-                        - is_resolved
-                        - updated_at
-                        - is_deletion
-                        - type
-                      properties:
-                        id:
-                          type: integer
-                        created_at:
-                          type: string
-                          format: date-time
-                        post_id:
-                          type: integer
-                        reason:
-                          type: string
-                        creator_id:
-                          type: integer
-                          description: Only visible to creator and Janitor+
-                          nullable: true
-                        is_resolved:
-                          type: boolean
-                        updated_at:
-                          type: string
-                          format: date-time
-                        is_deletion:
-                          type: boolean
-                        type:
-                          type: string
-                          enum:
-                            - flag
-                            - deletion
-                        note:
-                          type: string
-                          description: Only visible to creator and Janitor+
-                          nullable: true
-                  - type: object
-                    description: No Results
-                    required:
-                      - post_flags
-                    properties:
-                      post_flags:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - created_at
+                    - post_id
+                    - reason
+                    - is_resolved
+                    - updated_at
+                    - is_deletion
+                    - type
+                  properties:
+                    id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    post_id:
+                      type: integer
+                    reason:
+                      type: string
+                    creator_id:
+                      type: integer
+                      description: Only visible to creator and Janitor+
+                      nullable: true
+                    is_resolved:
+                      type: boolean
+                    updated_at:
+                      type: string
+                      format: date-time
+                    is_deletion:
+                      type: boolean
+                    type:
+                      type: string
+                      enum:
+                        - flag
+                        - deletion
+                    note:
+                      type: string
+                      description: Only visible to creator and Janitor+
+                      nullable: true
     post:
       summary: Create Post Flag
       operationId: createPostFlag
@@ -23026,7 +22847,6 @@ paths:
       operationId: searchPostVersions
       tags:
         - Post Versions
-      description: Errors if no results are found.
       parameters:
         - name: limit
           in: query
@@ -23449,7 +23269,6 @@ paths:
       operationId: searchTags
       tags:
         - Tags
-      description: 'When no results are found, an object with an `tags` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -23524,62 +23343,53 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - name
-                        - post_count
-                        - related_tags
-                        - related_tags_updated_at
-                        - category
-                        - is_locked
-                        - created_at
-                        - updated_at
-                      properties:
-                        id:
-                          type: integer
-                        name:
-                          type: string
-                        post_count:
-                          type: integer
-                        related_tags:
-                          type: array
-                          items:
-                            type: string
-                        related_tags_updated_at:
-                          type: string
-                          nullable: true
-                          format: date-time
-                        category:
-                          type: integer
-                          enum:
-                            - 0
-                            - 1
-                            - 3
-                            - 4
-                            - 5
-                            - 6
-                            - 7
-                            - 8
-                        is_locked:
-                          type: boolean
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                  - type: object
-                    description: No Results
-                    required:
-                      - tags
-                    properties:
-                      tags:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - name
+                    - post_count
+                    - related_tags
+                    - related_tags_updated_at
+                    - category
+                    - is_locked
+                    - created_at
+                    - updated_at
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    post_count:
+                      type: integer
+                    related_tags:
+                      type: array
+                      items:
+                        type: string
+                    related_tags_updated_at:
+                      type: string
+                      nullable: true
+                      format: date-time
+                    category:
+                      type: integer
+                      enum:
+                        - 0
+                        - 1
+                        - 3
+                        - 4
+                        - 5
+                        - 6
+                        - 7
+                        - 8
+                    is_locked:
+                      type: boolean
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
   '/tags/{id}.json':
     get:
       summary: Get Tag
@@ -24058,7 +23868,6 @@ paths:
       operationId: searchTagVersions
       tags:
         - Tag Versions
-      description: 'When no results are found, an object with an `tag_type_versions` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -24097,71 +23906,61 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - created_at
-                        - updated_at
-                        - old_type
-                        - new_type
-                        - is_locked
-                        - tag_id
-                        - creator_id
-                      properties:
-                        id:
-                          type: integer
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                        old_type:
-                          type: integer
-                          enum:
-                            - 0
-                            - 1
-                            - 3
-                            - 4
-                            - 5
-                            - 6
-                            - 7
-                            - 8
-                        new_type:
-                          type: integer
-                          enum:
-                            - 0
-                            - 1
-                            - 3
-                            - 4
-                            - 5
-                            - 6
-                            - 7
-                            - 8
-                        is_locked:
-                          type: boolean
-                        tag_id:
-                          type: integer
-                        creator_id:
-                          type: integer
-                  - type: object
-                    description: No Results
-                    required:
-                      - tag_type_versions
-                    properties:
-                      tag_type_versions:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - created_at
+                    - updated_at
+                    - old_type
+                    - new_type
+                    - is_locked
+                    - tag_id
+                    - creator_id
+                  properties:
+                    id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    old_type:
+                      type: integer
+                      enum:
+                        - 0
+                        - 1
+                        - 3
+                        - 4
+                        - 5
+                        - 6
+                        - 7
+                        - 8
+                    new_type:
+                      type: integer
+                      enum:
+                        - 0
+                        - 1
+                        - 3
+                        - 4
+                        - 5
+                        - 6
+                        - 7
+                        - 8
+                    is_locked:
+                      type: boolean
+                    tag_id:
+                      type: integer
+                    creator_id:
+                      type: integer
   /tag_aliases.json:
     get:
       summary: Search Tag Aliases
       operationId: searchTagAliases
       tags:
         - Tag Aliases
-      description: 'When no results are found, an object with an `tag_aliases` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -24265,71 +24064,62 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - antecedent_name
-                        - reason
-                        - creator_id
-                        - created_at
-                        - forum_post_id
-                        - updated_at
-                        - forum_topic_id
-                        - consequent_name
-                        - status
-                        - post_count
-                        - approver_id
-                      properties:
-                        id:
-                          type: integer
-                        antecedent_name:
-                          type: string
-                        reason:
-                          type: string
-                        creator_id:
-                          type: integer
-                        created_at:
-                          type: string
-                          nullable: true
-                          format: date-time
-                        forum_post_id:
-                          type: integer
-                          nullable: true
-                        updated_at:
-                          type: string
-                          nullable: true
-                          format: date-time
-                        forum_topic_id:
-                          type: integer
-                          nullable: true
-                        consequent_name:
-                          type: string
-                        status:
-                          type: string
-                          enum:
-                            - active
-                            - deleted
-                            - processing
-                            - queued
-                            - retired
-                            - error
-                            - pending
-                        post_count:
-                          type: integer
-                        approver_id:
-                          type: integer
-                          nullable: true
-                  - type: object
-                    description: No Results
-                    required:
-                      - tag_aliases
-                    properties:
-                      tag_aliases:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - antecedent_name
+                    - reason
+                    - creator_id
+                    - created_at
+                    - forum_post_id
+                    - updated_at
+                    - forum_topic_id
+                    - consequent_name
+                    - status
+                    - post_count
+                    - approver_id
+                  properties:
+                    id:
+                      type: integer
+                    antecedent_name:
+                      type: string
+                    reason:
+                      type: string
+                    creator_id:
+                      type: integer
+                    created_at:
+                      type: string
+                      nullable: true
+                      format: date-time
+                    forum_post_id:
+                      type: integer
+                      nullable: true
+                    updated_at:
+                      type: string
+                      nullable: true
+                      format: date-time
+                    forum_topic_id:
+                      type: integer
+                      nullable: true
+                    consequent_name:
+                      type: string
+                    status:
+                      type: string
+                      enum:
+                        - active
+                        - deleted
+                        - processing
+                        - queued
+                        - retired
+                        - error
+                        - pending
+                    post_count:
+                      type: integer
+                    approver_id:
+                      type: integer
+                      nullable: true
   '/tag_aliases/{id}.json':
     get:
       summary: Get Tag Alias
@@ -24671,7 +24461,6 @@ paths:
       operationId: searchTagImplications
       tags:
         - Tag Implications
-      description: 'When no results are found, an object with an `tag_implications` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -24775,71 +24564,62 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - reason
-                        - creator_id
-                        - created_at
-                        - forum_post_id
-                        - antecedent_name
-                        - consequent_name
-                        - status
-                        - forum_topic_id
-                        - updated_at
-                        - descendant_names
-                        - approver_id
-                      properties:
-                        id:
-                          type: integer
-                        reason:
-                          type: string
-                        creator_id:
-                          type: integer
-                        created_at:
-                          type: string
-                          format: date-time
-                        forum_post_id:
-                          type: integer
-                          nullable: true
-                        antecedent_name:
-                          type: string
-                        consequent_name:
-                          type: string
-                        status:
-                          type: string
-                          enum:
-                            - active
-                            - deleted
-                            - processing
-                            - queued
-                            - retired
-                            - error
-                            - pending
-                        forum_topic_id:
-                          type: integer
-                          nullable: true
-                        updated_at:
-                          type: string
-                          format: date-time
-                        descendant_names:
-                          type: array
-                          items:
-                            type: string
-                        approver_id:
-                          type: integer
-                          nullable: true
-                  - type: object
-                    description: No Results
-                    required:
-                      - tag_implications
-                    properties:
-                      tag_implications:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - reason
+                    - creator_id
+                    - created_at
+                    - forum_post_id
+                    - antecedent_name
+                    - consequent_name
+                    - status
+                    - forum_topic_id
+                    - updated_at
+                    - descendant_names
+                    - approver_id
+                  properties:
+                    id:
+                      type: integer
+                    reason:
+                      type: string
+                    creator_id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    forum_post_id:
+                      type: integer
+                      nullable: true
+                    antecedent_name:
+                      type: string
+                    consequent_name:
+                      type: string
+                    status:
+                      type: string
+                      enum:
+                        - active
+                        - deleted
+                        - processing
+                        - queued
+                        - retired
+                        - error
+                        - pending
+                    forum_topic_id:
+                      type: integer
+                      nullable: true
+                    updated_at:
+                      type: string
+                      format: date-time
+                    descendant_names:
+                      type: array
+                      items:
+                        type: string
+                    approver_id:
+                      type: integer
+                      nullable: true
   '/tag_implications/{id}.json':
     get:
       summary: Get Tag Implication
@@ -25315,7 +25095,6 @@ paths:
       operationId: searchStaffNotes
       tags:
         - Staff Notes
-      description: 'When no results are found, an object with an `staff_notes` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -25385,46 +25164,37 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - created_at
-                        - updated_at
-                        - user_id
-                        - creator_id
-                        - body
-                        - is_deleted
-                        - updater_id
-                      properties:
-                        id:
-                          type: integer
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                        user_id:
-                          type: integer
-                        creator_id:
-                          type: integer
-                        body:
-                          type: string
-                        is_deleted:
-                          type: boolean
-                        updater_id:
-                          type: integer
-                  - type: object
-                    description: No Results
-                    required:
-                      - staff_notes
-                    properties:
-                      blips:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - created_at
+                    - updated_at
+                    - user_id
+                    - creator_id
+                    - body
+                    - is_deleted
+                    - updater_id
+                  properties:
+                    id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    user_id:
+                      type: integer
+                    creator_id:
+                      type: integer
+                    body:
+                      type: string
+                    is_deleted:
+                      type: boolean
+                    updater_id:
+                      type: integer
     post:
       summary: Create Staff Note
       operationId: createStaffNote
@@ -25889,7 +25659,6 @@ paths:
       operationId: searchTakedowns
       tags:
         - Takedowns
-      description: 'When no results are found, an object with an `takedowns` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -25990,49 +25759,40 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - status
-                        - approver_id
-                        - reason_hidden
-                        - created_at
-                        - updated_at
-                        - post_count
-                      properties:
-                        id:
-                          type: integer
-                        status:
-                          type: string
-                          enum:
-                            - approved
-                            - denied
-                            - partial
-                            - pending
-                        approver_id:
-                          type: integer
-                          nullable: true
-                        reason_hidden:
-                          type: boolean
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                        post_count:
-                          type: integer
-                  - type: object
-                    description: No Results
-                    required:
-                      - takedowns
-                    properties:
-                      takedowns:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - status
+                    - approver_id
+                    - reason_hidden
+                    - created_at
+                    - updated_at
+                    - post_count
+                  properties:
+                    id:
+                      type: integer
+                    status:
+                      type: string
+                      enum:
+                        - approved
+                        - denied
+                        - partial
+                        - pending
+                    approver_id:
+                      type: integer
+                      nullable: true
+                    reason_hidden:
+                      type: boolean
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    post_count:
+                      type: integer
     post:
       summary: Create Takedown
       operationId: createTakedown
@@ -26636,7 +26396,7 @@ paths:
       operationId: searchTickets
       tags:
         - Tickets
-      description: 'You must be Janitor+ to see tickets you did not create. When no results are found, an object with an `tickets` key is returned.'
+      description: You must be Janitor+ to see tickets you did not create.
       parameters:
         - name: limit
           in: query
@@ -26728,80 +26488,71 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - creator_id
-                        - reason
-                        - disp_id
-                        - qtype
-                        - status
-                        - created_at
-                        - updated_at
-                        - response
-                        - handler_id
-                        - report_reason
-                        - accused_id
-                      properties:
-                        id:
-                          type: integer
-                        creator_id:
-                          type: integer
-                        reason:
-                          type: string
-                        disp_id:
-                          type: number
-                        qtype:
-                          type: string
-                          enum:
-                            - blip
-                            - comment
-                            - dmail
-                            - forum
-                            - pool
-                            - post
-                            - set
-                            - user
-                            - wiki
-                            - replacement
-                        status:
-                          type: string
-                          enum:
-                            - pending
-                            - partial
-                            - approved
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                        response:
-                          type: string
-                        handler_id:
-                          type: integer
-                          nullable: true
-                        claimant_id:
-                          type: integer
-                          nullable: true
-                          description: Only visible to Moderator+.
-                        report_reason:
-                          type: string
-                          nullable: true
-                        accused_id:
-                          type: integer
-                          nullable: true
-                  - type: object
-                    description: No Results
-                    required:
-                      - tickets
-                    properties:
-                      tickets:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - creator_id
+                    - reason
+                    - disp_id
+                    - qtype
+                    - status
+                    - created_at
+                    - updated_at
+                    - response
+                    - handler_id
+                    - report_reason
+                    - accused_id
+                  properties:
+                    id:
+                      type: integer
+                    creator_id:
+                      type: integer
+                    reason:
+                      type: string
+                    disp_id:
+                      type: number
+                    qtype:
+                      type: string
+                      enum:
+                        - blip
+                        - comment
+                        - dmail
+                        - forum
+                        - pool
+                        - post
+                        - set
+                        - user
+                        - wiki
+                        - replacement
+                    status:
+                      type: string
+                      enum:
+                        - pending
+                        - partial
+                        - approved
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    response:
+                      type: string
+                    handler_id:
+                      type: integer
+                      nullable: true
+                    claimant_id:
+                      type: integer
+                      nullable: true
+                      description: Only visible to Moderator+.
+                    report_reason:
+                      type: string
+                      nullable: true
+                    accused_id:
+                      type: integer
+                      nullable: true
         '403':
           description: Access Denied
           content:
@@ -27249,7 +27000,6 @@ paths:
       operationId: searchUploads
       tags:
         - Uploads
-      description: 'You must be Janitor+. When no results are found, an object with an `uploads` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -27342,101 +27092,92 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - source
-                        - rating
-                        - uploader_id
-                        - tag_string
-                        - status
-                        - backtrace
-                        - post_id
-                        - md5_confirmation
-                        - created_at
-                        - updated_at
-                        - parent_id
-                        - md5
-                        - file_ext
-                        - file_size
-                        - image_width
-                        - image_height
-                        - description
-                        - uploader_name
-                      properties:
-                        id:
-                          type: integer
-                        source:
-                          type: string
-                        rating:
-                          type: string
-                          enum:
-                            - s
-                            - q
-                            - e
-                        uploader_id:
-                          type: integer
-                        tag_string:
-                          type: string
-                        status:
-                          type: string
-                          description: |
-                            Note: The "error" status will be proceeded by an error, ex: "error: RuntimeError - No file or source URL provided"
-                          enum:
-                            - completed
-                            - duplicate
-                            - error
-                            - processing
-                            - pending
-                        backtrace:
-                          type: string
-                          nullable: true
-                        post_id:
-                          type: integer
-                          nullable: true
-                        md5_confirmation:
-                          type: string
-                          nullable: true
-                          deprecated: true
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                        parent_id:
-                          type: integer
-                          nullable: true
-                        md5:
-                          type: string
-                          nullable: true
-                        file_ext:
-                          type: string
-                          nullable: true
-                        file_size:
-                          type: integer
-                          nullable: true
-                        image_width:
-                          type: integer
-                          nullable: true
-                        image_height:
-                          type: integer
-                          nullable: true
-                        description:
-                          type: string
-                        uploader_name:
-                          type: string
-                  - type: object
-                    description: No Results
-                    required:
-                      - uploads
-                    properties:
-                      uploads:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - source
+                    - rating
+                    - uploader_id
+                    - tag_string
+                    - status
+                    - backtrace
+                    - post_id
+                    - md5_confirmation
+                    - created_at
+                    - updated_at
+                    - parent_id
+                    - md5
+                    - file_ext
+                    - file_size
+                    - image_width
+                    - image_height
+                    - description
+                    - uploader_name
+                  properties:
+                    id:
+                      type: integer
+                    source:
+                      type: string
+                    rating:
+                      type: string
+                      enum:
+                        - s
+                        - q
+                        - e
+                    uploader_id:
+                      type: integer
+                    tag_string:
+                      type: string
+                    status:
+                      type: string
+                      description: |
+                        Note: The "error" status will be proceeded by an error, ex: "error: RuntimeError - No file or source URL provided"
+                      enum:
+                        - completed
+                        - duplicate
+                        - error
+                        - processing
+                        - pending
+                    backtrace:
+                      type: string
+                      nullable: true
+                    post_id:
+                      type: integer
+                      nullable: true
+                    md5_confirmation:
+                      type: string
+                      nullable: true
+                      deprecated: true
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    parent_id:
+                      type: integer
+                      nullable: true
+                    md5:
+                      type: string
+                      nullable: true
+                    file_ext:
+                      type: string
+                      nullable: true
+                    file_size:
+                      type: integer
+                      nullable: true
+                    image_width:
+                      type: integer
+                      nullable: true
+                    image_height:
+                      type: integer
+                      nullable: true
+                    description:
+                      type: string
+                    uploader_name:
+                      type: string
     post:
       summary: Upload Post
       operationId: uploadPost
@@ -27679,7 +27420,6 @@ paths:
       operationId: searchUploadWhitelists
       tags:
         - Upload Whitelists
-      description: 'When no results are found, an object with an `upload_whitelists` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -27733,52 +27473,43 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - created_at
-                        - updated_at
-                        - pattern
-                        - note
-                        - hidden
-                        - allowed
-                        - reason
-                        - domain
-                        - path
-                      properties:
-                        id:
-                          type: integer
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                        pattern:
-                          type: string
-                        note:
-                          type: string
-                        hidden:
-                          type: boolean
-                        allowed:
-                          type: boolean
-                        reason:
-                          type: string
-                        domain:
-                          type: string
-                        path:
-                          type: string
-                  - type: object
-                    description: No Results
-                    required:
-                      - upload_whitelists
-                    properties:
-                      upload_whitelists:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - created_at
+                    - updated_at
+                    - pattern
+                    - note
+                    - hidden
+                    - allowed
+                    - reason
+                    - domain
+                    - path
+                  properties:
+                    id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    pattern:
+                      type: string
+                    note:
+                      type: string
+                    hidden:
+                      type: boolean
+                    allowed:
+                      type: boolean
+                    reason:
+                      type: string
+                    domain:
+                      type: string
+                    path:
+                      type: string
     post:
       summary: Create Upload Whitelist
       operationId: createUploadWhitelist
@@ -28192,7 +27923,7 @@ paths:
               schema:
                 type: array
                 items:
-                  anyOf:
+                  oneOf:
                     - type: object
                       required:
                         - id
@@ -30055,7 +29786,6 @@ paths:
       operationId: searchUserFeedbacks
       tags:
         - User Feedbacks
-      description: 'When no results are found, an object with an `user_feedbacks` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -30126,53 +29856,44 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - user_id
-                        - creator_id
-                        - category
-                        - body
-                        - created_at
-                        - updated_at
-                        - updater_id
-                        - is_deleted
-                      properties:
-                        id:
-                          type: integer
-                        user_id:
-                          type: integer
-                        creator_id:
-                          type: integer
-                        category:
-                          type: string
-                          enum:
-                            - negative
-                            - neutral
-                            - positive
-                        body:
-                          type: string
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                        updater_id:
-                          type: integer
-                        is_deleted:
-                          type: boolean
-                  - type: object
-                    description: No Results
-                    required:
-                      - user_feedbacks
-                    properties:
-                      user_feedbacks:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - user_id
+                    - creator_id
+                    - category
+                    - body
+                    - created_at
+                    - updated_at
+                    - updater_id
+                    - is_deleted
+                  properties:
+                    id:
+                      type: integer
+                    user_id:
+                      type: integer
+                    creator_id:
+                      type: integer
+                    category:
+                      type: string
+                      enum:
+                        - negative
+                        - neutral
+                        - positive
+                    body:
+                      type: string
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    updater_id:
+                      type: integer
+                    is_deleted:
+                      type: boolean
     post:
       summary: Create User Feedback
       operationId: createUserFeedback
@@ -30606,7 +30327,7 @@ paths:
         - User Name Change Requests
       security:
         - basicAuth: []
-      description: 'You must be Moderator+. When no results are found, an object with an `user_name_change_requests` key is returned.'
+      description: You must be Moderator+.
       parameters:
         - name: limit
           in: query
@@ -30656,50 +30377,41 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - approver_id
-                        - user_id
-                        - original_name
-                        - desired_name
-                        - created_at
-                        - updated_at
-                        - status
-                      properties:
-                        id:
-                          type: integer
-                        approver_id:
-                          type: integer
-                        user_id:
-                          type: integer
-                        original_name:
-                          type: string
-                        desired_name:
-                          type: string
-                        change_reason:
-                          type: string
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                        status:
-                          type: string
-                          enum:
-                            - approved
-                  - type: object
-                    description: No Results
-                    required:
-                      - user_name_change_requests
-                    properties:
-                      user_name_change_requests:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - approver_id
+                    - user_id
+                    - original_name
+                    - desired_name
+                    - created_at
+                    - updated_at
+                    - status
+                  properties:
+                    id:
+                      type: integer
+                    approver_id:
+                      type: integer
+                    user_id:
+                      type: integer
+                    original_name:
+                      type: string
+                    desired_name:
+                      type: string
+                    change_reason:
+                      type: string
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    status:
+                      type: string
+                      enum:
+                        - approved
     post:
       summary: Create User Name Change Request
       operationId: createUserNameChangeRequest
@@ -31470,7 +31182,6 @@ paths:
       operationId: searchWikiPageVersions
       tags:
         - Wiki Page Versions
-      description: 'When no results are found, an object with an `wiki_page_versions` key is returned.'
       parameters:
         - name: limit
           in: query
@@ -31537,62 +31248,53 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - created_at
-                        - updated_at
-                        - title
-                        - body
-                        - updater_id
-                        - wiki_page_id
-                        - is_locked
-                        - other_names
-                        - is_deleted
-                        - reason
-                        - parent
-                      properties:
-                        id:
-                          type: integer
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                        title:
-                          type: string
-                        body:
-                          type: string
-                        updater_id:
-                          type: integer
-                        wiki_page_id:
-                          type: integer
-                        is_locked:
-                          type: boolean
-                        other_names:
-                          type: array
-                          items:
-                            type: string
-                        is_deleted:
-                          type: boolean
-                        reason:
-                          type: string
-                          nullable: true
-                        parent:
-                          type: string
-                          nullable: true
-                  - type: object
-                    description: No Results
-                    required:
-                      - wiki_page_versions
-                    properties:
-                      wiki_page_versions:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - created_at
+                    - updated_at
+                    - title
+                    - body
+                    - updater_id
+                    - wiki_page_id
+                    - is_locked
+                    - other_names
+                    - is_deleted
+                    - reason
+                    - parent
+                  properties:
+                    id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    title:
+                      type: string
+                    body:
+                      type: string
+                    updater_id:
+                      type: integer
+                    wiki_page_id:
+                      type: integer
+                    is_locked:
+                      type: boolean
+                    other_names:
+                      type: array
+                      items:
+                        type: string
+                    is_deleted:
+                      type: boolean
+                    reason:
+                      type: string
+                      nullable: true
+                    parent:
+                      type: string
+                      nullable: true
   '/wiki_page_versions/{id}.json':
     get:
       summary: Get Wiki Page Version
@@ -31698,7 +31400,7 @@ paths:
               schema:
                 type: array
                 items:
-                  anyOf:
+                  oneOf:
                     - type: integer
                       description: ID of concerned user.
                     - type: array
@@ -33625,7 +33327,7 @@ paths:
         - Post Disapprovals
       security:
         - basicAuth: []
-      description: 'You must have the "Approve Posts" permission When no results are found, an object with a `post_disapprovals` key is returned.'
+      description: You must have the "Approve Posts" permission.
       parameters:
         - name: limit
           in: query
@@ -33689,48 +33391,39 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - type: array
-                    items:
-                      type: object
-                      required:
-                        - id
-                        - user_id
-                        - post_id
-                        - reason
-                        - message
-                        - created_at
-                        - updated_at
-                      properties:
-                        id:
-                          type: integer
-                        user_id:
-                          type: integer
-                        post_id:
-                          type: integer
-                        reason:
-                          type: string
-                          enum:
-                            - borderline_quality
-                            - borderline_relevancy
-                            - other
-                        message:
-                          type: string
-                          nullable: true
-                        created_at:
-                          type: string
-                          format: date-time
-                        updated_at:
-                          type: string
-                          format: date-time
-                  - type: object
-                    description: No Results
-                    required:
-                      - post_disapprovals
-                    properties:
-                      post_disapprovals:
-                        type: array
-                        maxItems: 0
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - user_id
+                    - post_id
+                    - reason
+                    - message
+                    - created_at
+                    - updated_at
+                  properties:
+                    id:
+                      type: integer
+                    user_id:
+                      type: integer
+                    post_id:
+                      type: integer
+                    reason:
+                      type: string
+                      enum:
+                        - borderline_quality
+                        - borderline_relevancy
+                        - other
+                    message:
+                      type: string
+                      nullable: true
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
     post:
       summary: Create Post Disapproval
       operationId: createPostDisapproval
