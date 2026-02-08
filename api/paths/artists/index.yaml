@@ -76,18 +76,8 @@ responses:
               - $ref: "../../components/schemas/artist.yaml"
               - type: object
                 required:
-                  - domains
                   - urls
                 properties:
-                  domains:
-                    type: array
-                    example: [["e621.net", 1]]
-                    items:
-                      type: array
-                      items:
-                        oneOf:
-                          - type: string
-                          - type: number
                   urls:
                     type: array
                     items:
