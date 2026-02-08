@@ -829,24 +829,24 @@ paths:
   /users/avatar_menu.json:
     get:
       $ref: "./paths/users/avatar_menu.yaml"
-  /users/{id}.json:
+  /users/{idOrName}.json:
     get:
       $ref: "./paths/users/show.yaml"
     patch:
       $ref: "./paths/users/update.yaml"
-  /users/{id}/upload_limit.json:
+  /users/{idOrName}/upload_limit.json:
     get:
       $ref: "./paths/users/upload_limit.yaml"
   /users/{id}/flush_favorites.json:
     post:
       $ref: "./paths/users/flush_favorites.yaml"
-  /users/{id}/fix_counts.json:
+  /users/{idOrName}/fix_counts.json:
     get:
       $ref: "./paths/users/fix_counts.yaml"
-  /users/{id}/toggle_uploads.json:
+  /users/{idOrName}/toggle_uploads.json:
     get:
       $ref: "./paths/users/toggle_uploads.yaml"
-  /users/{id}/disable_uploads.json:
+  /users/{idOrName}/disable_uploads.json:
     post:
       $ref: "./paths/users/disable_uploads.yaml"
   /users/{user_id}/dmails.json:

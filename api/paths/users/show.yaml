@@ -3,10 +3,10 @@ operationId: getUser
 tags:
   - Users
 parameters:
-  - name: id
+  - name: idOrName
     in: path
     required: true
-    description: The ID or Username of the user.
+    description: An ID that can be either an integer or a name.
     schema:
       type: "string"
 responses:

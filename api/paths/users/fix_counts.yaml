@@ -4,12 +4,12 @@ tags:
   - Users
 description: You must be Janitor+.
 parameters:
-  - name: id
+  - name: idOrName
     in: path
     required: true
-    description: The ID of the user.
+    description: An ID that can be either an integer or a name.
     schema:
-      type: integer
+      type: string
 security:
   - basicAuth: []
 responses:
