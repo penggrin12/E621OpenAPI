@@ -837,7 +837,7 @@ paths:
   /users/{idOrName}/upload_limit.json:
     get:
       $ref: "./paths/users/upload_limit.yaml"
-  /users/{id}/flush_favorites.json:
+  /users/{idOrName}/flush_favorites.json:
     post:
       $ref: "./paths/users/flush_favorites.yaml"
   /users/{idOrName}/fix_counts.json:
