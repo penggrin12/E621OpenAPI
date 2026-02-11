@@ -12,7 +12,7 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: d145b87
+  version: c393565
 servers:
   - url: 'https://e621.net'
     description: E621 (production)
@@ -1331,7 +1331,10 @@ components:
         post_id:
           type: integer
         score:
-          type: integer
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
         post:
           type: object
           required:
@@ -3255,20 +3258,8 @@ paths:
                     - $ref: '#/components/schemas/Artist'
                     - type: object
                       required:
-                        - domains
                         - urls
                       properties:
-                        domains:
-                          type: array
-                          example:
-                            - - e621.net
-                              - 1
-                          items:
-                            type: array
-                            items:
-                              oneOf:
-                                - type: string
-                                - type: number
                         urls:
                           type: array
                           items:
@@ -10863,17 +10854,17 @@ paths:
                 $ref: '#/components/schemas/UserAvatarMenu'
         '403':
           $ref: '#/components/responses/AccessDenied'
-  '/users/{id}.json':
+  '/users/{idOrName}.json':
     get:
       summary: Get User
       operationId: getUser
       tags:
         - Users
       parameters:
-        - name: id
+        - name: idOrName
           in: path
           required: true
-          description: The ID or Username of the user.
+          description: An ID that can be either an integer or a name.
           schema:
             type: string
       responses:
@@ -10887,12 +10878,12 @@ paths:
       tags:
         - Users
       parameters:
-        - name: id
+        - name: idOrName
           in: path
           required: true
-          description: 'The ID of the user. The actual value is ignored, but something must be supplied.'
+          description: An ID that can be either an integer or a name.
           schema:
-            type: integer
+            type: string
       security:
         - basicAuth: []
       requestBody:
@@ -10971,7 +10962,7 @@ paths:
           $ref: '#/components/responses/AccessDenied'
         '422':
           $ref: '#/components/responses/ExpectedError'
-  '/users/{id}/upload_limit.json':
+  '/users/{idOrName}/upload_limit.json':
     get:
       summary: Get User Upload Limit
       operationId: getUserUploadLimit
@@ -10980,18 +10971,18 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
+        - name: idOrName
           in: path
           required: true
-          description: The ID of the user.
+          description: An ID that can be either an integer or a name.
           schema:
-            type: integer
+            type: string
       responses:
         '200':
           $ref: '#/components/responses/UserResponse'
         '403':
           $ref: '#/components/responses/AccessDenied'
-  '/users/{id}/flush_favorites.json':
+  '/users/{idOrName}/flush_favorites.json':
     post:
       summary: Clear User Favorites
       operationId: clearUserFavorites
@@ -10999,12 +10990,12 @@ paths:
         - Users
       description: You must be Admin+.
       parameters:
-        - name: id
+        - name: idOrName
           in: path
           required: true
-          description: The ID of the user.
+          description: An ID that can be either an integer or a name.
           schema:
-            type: integer
+            type: string
       security:
         - basicAuth: []
       responses:
@@ -11014,7 +11005,7 @@ paths:
           $ref: '#/components/responses/AccessDenied'
         '404':
           $ref: '#/components/responses/NotFound'
-  '/users/{id}/fix_counts.json':
+  '/users/{idOrName}/fix_counts.json':
     get:
       summary: Fix Specific User Counts
       operationId: fixSpecificUserCounts
@@ -11022,12 +11013,12 @@ paths:
         - Users
       description: You must be Janitor+.
       parameters:
-        - name: id
+        - name: idOrName
           in: path
           required: true
-          description: The ID of the user.
+          description: An ID that can be either an integer or a name.
           schema:
-            type: integer
+            type: string
       security:
         - basicAuth: []
       responses:
@@ -11037,7 +11028,7 @@ paths:
           $ref: '#/components/responses/AccessDenied'
         '404':
           $ref: '#/components/responses/NotFound'
-  '/users/{id}/toggle_uploads.json':
+  '/users/{idOrName}/toggle_uploads.json':
     get:
       summary: Toggle User Uploads
       operationId: toggleUserUploads
@@ -11047,12 +11038,12 @@ paths:
         You must be Janitor+.
         This endpoint will return HTML when disabling uploads (due to a reason being required), this endpoint should only be used for reenabling. Use [Disable User Uploads](#operation-Users-disableUserUploads) to disable uploads.
       parameters:
-        - name: id
+        - name: idOrName
           in: path
           required: true
-          description: The ID of the user.
+          description: An ID that can be either an integer or a name.
           schema:
-            type: integer
+            type: string
       security:
         - basicAuth: []
       responses:
@@ -11062,7 +11053,7 @@ paths:
           $ref: '#/components/responses/AccessDenied'
         '404':
           $ref: '#/components/responses/NotFound'
-  '/users/{id}/disable_uploads.json':
+  '/users/{idOrName}/disable_uploads.json':
     post:
       summary: Disable User Uploads
       operationId: disableUserUploads
@@ -11070,12 +11061,12 @@ paths:
         - Users
       description: You must be Janitor+.
       parameters:
-        - name: id
+        - name: idOrName
           in: path
           required: true
-          description: The ID of the user.
+          description: An ID that can be either an integer or a name.
           schema:
-            type: integer
+            type: string
       security:
         - basicAuth: []
       requestBody:
