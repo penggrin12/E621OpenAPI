@@ -3,12 +3,12 @@ operationId: editCurrentUser
 tags:
   - Users
 parameters:
-  - name: id
+  - name: idOrName
     in: path
     required: true
-    description: The ID of the user. The actual value is ignored, but something must be supplied.
+    description: An ID that can be either an integer or a name.
     schema:
-      type: integer
+      type: string
 security:
   - basicAuth: []
 requestBody:

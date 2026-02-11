@@ -9,7 +9,7 @@ parameters:
     required: true
     description: An ID that can be either an integer or a name.
     schema:
-      type: integer
+      type: string
 security:
   - basicAuth: []
 responses:

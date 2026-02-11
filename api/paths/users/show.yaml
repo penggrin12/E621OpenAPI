@@ -8,7 +8,7 @@ parameters:
     required: true
     description: An ID that can be either an integer or a name.
     schema:
-      type: "string"
+      type: string
 responses:
   200:
     $ref: "../../components/responses/user.yaml"
