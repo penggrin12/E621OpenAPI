@@ -12,7 +12,7 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: c393565
+  version: bdaa075
 servers:
   - url: 'https://e621.net'
     description: E621 (production)
@@ -36,15 +36,19 @@ components:
     id:
       name: 'search[id]'
       in: query
-      description: Search for a specific id.
+      description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
       schema:
-        type: integer
+        oneOf:
+          - type: integer
+          - type: string
     idOrName:
       name: idOrName
       in: path
       required: true
       schema:
-        type: string
+        oneOf:
+          - type: integer
+          - type: string
       description: An ID that can be either an integer or a name.
     limit:
       name: limit
@@ -345,7 +349,7 @@ components:
         notes:
           type: string
           nullable: true
-    ArtistURL:
+    ArtistUrl:
       type: object
       required:
         - id
@@ -1562,7 +1566,7 @@ components:
         updated_at:
           type: string
           format: date-time
-    IPBan:
+    IpBan:
       type: object
       description: 'Due to a global filter, the ip_addr is not present no matter your user level.'
       required:
@@ -1584,7 +1588,7 @@ components:
         updated_at:
           type: string
           format: date-time
-    IQDBPost:
+    IqdbPost:
       type: object
       required:
         - id
@@ -1780,7 +1784,7 @@ components:
           type: string
         preview_file_url:
           type: string
-    IQDBResponse:
+    IqdbResponse:
       type: object
       required:
         - hash
@@ -3958,6 +3962,87 @@ components:
           type: boolean
         has_forums:
           type: boolean
+    TagCorrection:
+      type: object
+      required:
+        - post_count
+        - real_post_count
+        - category
+        - category_cache
+        - tag
+      properties:
+        post_count:
+          type: integer
+        real_post_count:
+          type: integer
+        category:
+          type: integer
+          enum:
+            - 0
+            - 1
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+        category_cache:
+          type: integer
+          enum:
+            - 0
+            - 1
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+        tag:
+          type: object
+          required:
+            - id
+            - name
+            - post_count
+            - related_tags
+            - related_tags_updated_at
+            - category
+            - is_locked
+            - created_at
+            - updated_at
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            post_count:
+              type: integer
+            related_tags:
+              type: array
+              items:
+                type: string
+            related_tags_updated_at:
+              type: string
+              nullable: true
+              format: date-time
+            category:
+              type: integer
+              enum:
+                - 0
+                - 1
+                - 3
+                - 4
+                - 5
+                - 6
+                - 7
+                - 8
+            is_locked:
+              type: boolean
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
   responses:
     NotFound:
       description: Not Found
@@ -4425,9 +4510,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -4867,9 +4954,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -4911,11 +5000,11 @@ paths:
         - name: 'search[creator_id]'
           in: query
           schema:
-            type: string
+            type: integer
         - name: 'search[has_tag]'
           in: query
           schema:
-            type: string
+            type: boolean
         - name: 'search[is_linked]'
           in: query
           schema:
@@ -5148,7 +5237,9 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            oneOf:
+              - type: integer
+              - type: string
           description: An ID that can be either an integer or a name.
       responses:
         '200':
@@ -5281,11 +5372,13 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            oneOf:
+              - type: integer
+              - type: string
           description: An ID that can be either an integer or a name.
       requestBody:
         content:
-          application/c-www-form-urlencoded:
+          application/x-www-form-urlencoded:
             schema:
               type: object
               properties:
@@ -5377,7 +5470,9 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            oneOf:
+              - type: integer
+              - type: string
           description: An ID that can be either an integer or a name.
       responses:
         '204':
@@ -5429,7 +5524,9 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            oneOf:
+              - type: integer
+              - type: string
           description: An ID that can be either an integer or a name.
         - name: version_id
           in: query
@@ -5511,9 +5608,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[ip_addr]'
           in: query
           description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
@@ -5619,9 +5718,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           description: The order of the results.
@@ -5797,9 +5898,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[ip_addr]'
           in: query
           description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
@@ -5915,8 +6018,6 @@ paths:
                   type: string
                 'avoid_posting[is_active]':
                   type: boolean
-                'avoid_posting[artist_attributes][id]':
-                  type: integer
                 'avoid_posting[artist_attributes][name]':
                   type: string
                   description: 'If provided and the artist does not exist, an artist will be created.'
@@ -6012,7 +6113,9 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            oneOf:
+              - type: integer
+              - type: string
           description: An ID that can be either an integer or a name.
       responses:
         '200':
@@ -6081,7 +6184,9 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            oneOf:
+              - type: integer
+              - type: string
           description: An ID that can be either an integer or a name.
       requestBody:
         content:
@@ -6108,43 +6213,8 @@ paths:
                 'avoid_posting[artist_attributes][linked_user_id]':
                   type: integer
       responses:
-        '200':
+        '204':
           description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - id
-                  - creator_id
-                  - updater_id
-                  - artist_id
-                  - details
-                  - is_active
-                  - created_at
-                  - updated_at
-                properties:
-                  id:
-                    type: integer
-                  creator_id:
-                    type: integer
-                  updater_id:
-                    type: integer
-                  artist_id:
-                    type: integer
-                  staff_notes:
-                    type: string
-                    description: Only visible to Janitor+
-                  details:
-                    type: string
-                  is_active:
-                    type: boolean
-                  created_at:
-                    type: string
-                    format: date-time
-                  updated_at:
-                    type: string
-                    format: date-time
         '403':
           description: Access Denied
           content:
@@ -6207,7 +6277,9 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            oneOf:
+              - type: integer
+              - type: string
           description: An ID that can be either an integer or a name.
       responses:
         '204':
@@ -6258,7 +6330,9 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            oneOf:
+              - type: integer
+              - type: string
           description: An ID that can be either an integer or a name.
       responses:
         '204':
@@ -6309,7 +6383,9 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            oneOf:
+              - type: integer
+              - type: string
           description: An ID that can be either an integer or a name.
       responses:
         '204':
@@ -6369,9 +6445,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[ip_addr]'
           in: query
           description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
@@ -6481,9 +6559,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           description: The order of the results.
@@ -6645,9 +6725,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[ip_addr]'
           in: query
           description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
@@ -6863,50 +6945,48 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  required:
-                    - id
-                    - creator_id
-                    - body
-                    - response_to
-                    - created_at
-                    - updated_at
-                    - is_hidden
-                    - warning_type
-                    - warning_user_id
-                    - updater_id
-                    - creator_name
-                  properties:
-                    id:
-                      type: integer
-                    creator_id:
-                      type: integer
-                    body:
-                      type: string
-                    response_to:
-                      type: integer
-                    created_at:
-                      type: string
-                      format: date-time
-                    updated_at:
-                      type: string
-                      format: date-time
-                    is_hidden:
-                      type: boolean
-                    warning_type:
-                      type: string
-                      enum:
-                        - warning
-                        - record
-                        - ban
-                    warning_user_id:
-                      type: integer
-                    updater_id:
-                      type: integer
-                    creator_name:
-                      type: string
+                type: object
+                required:
+                  - id
+                  - creator_id
+                  - body
+                  - response_to
+                  - created_at
+                  - updated_at
+                  - is_hidden
+                  - warning_type
+                  - warning_user_id
+                  - updater_id
+                  - creator_name
+                properties:
+                  id:
+                    type: integer
+                  creator_id:
+                    type: integer
+                  body:
+                    type: string
+                  response_to:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+                  is_hidden:
+                    type: boolean
+                  warning_type:
+                    type: string
+                    enum:
+                      - warning
+                      - record
+                      - ban
+                  warning_user_id:
+                    type: integer
+                  updater_id:
+                    type: integer
+                  creator_name:
+                    type: string
         '403':
           description: Access Denied
           content:
@@ -6963,53 +7043,8 @@ paths:
                 'blip[body]':
                   type: string
       responses:
-        '200':
+        '204':
           description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - id
-                  - creator_id
-                  - body
-                  - response_to
-                  - created_at
-                  - updated_at
-                  - is_hidden
-                  - warning_type
-                  - warning_user_id
-                  - updater_id
-                  - creator_name
-                properties:
-                  id:
-                    type: integer
-                  creator_id:
-                    type: integer
-                  body:
-                    type: string
-                  response_to:
-                    type: integer
-                  created_at:
-                    type: string
-                    format: date-time
-                  updated_at:
-                    type: string
-                    format: date-time
-                  is_hidden:
-                    type: boolean
-                  warning_type:
-                    type: string
-                    enum:
-                      - warning
-                      - record
-                      - ban
-                  warning_user_id:
-                    type: integer
-                  updater_id:
-                    type: integer
-                  creator_name:
-                    type: string
         '403':
           description: Access Denied
           content:
@@ -7481,9 +7516,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -7981,9 +8018,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[ip_addr]'
           in: query
           description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
@@ -8866,7 +8905,7 @@ paths:
           required: true
           description: The ID of the comment.
           schema:
-            type: string
+            type: integer
         - name: score
           in: query
           required: true
@@ -8956,7 +8995,7 @@ paths:
           required: true
           description: The ID of the comment.
           schema:
-            type: string
+            type: integer
       responses:
         '204':
           description: Success
@@ -9080,7 +9119,7 @@ paths:
                       type: string
   /comment_votes/delete.json:
     post:
-      summary: Delete Comment Vote
+      summary: Delete Comment Votes
       operationId: deleteCommentVotes
       tags:
         - Comment Votes
@@ -9137,9 +9176,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - in: query
           name: 'search[title_matches]'
           schema:
@@ -9648,9 +9689,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[ip_addr]'
           in: query
           description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
@@ -9862,9 +9905,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -10653,9 +10698,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -11412,7 +11459,7 @@ paths:
           required: true
           description: The ID of the forum post.
           schema:
-            type: string
+            type: integer
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -11521,7 +11568,7 @@ paths:
           required: true
           description: The ID of the forum post.
           schema:
-            type: string
+            type: integer
       responses:
         '204':
           description: Success
@@ -11597,9 +11644,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -12562,7 +12611,9 @@ paths:
           required: true
           description: The ID or name of the help page.
           schema:
-            type: string
+            oneOf:
+              - type: integer
+              - type: string
       responses:
         '200':
           description: Success
@@ -12762,7 +12813,7 @@ paths:
   /ip_bans.json:
     get:
       summary: List IP Bans
-      operationId: listIPBans
+      operationId: listIpBans
       tags:
         - IP Bans
       security:
@@ -12784,9 +12835,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[ip_addr]'
           in: query
           description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
@@ -12842,7 +12895,7 @@ paths:
                       format: date-time
     post:
       summary: Create IP Ban
-      operationId: createIPBan
+      operationId: createIpBan
       tags:
         - IP Bans
       security:
@@ -12924,7 +12977,7 @@ paths:
   '/ip_bans/{id}.json':
     delete:
       summary: Delete IP Ban
-      operationId: deleteIPBan
+      operationId: deleteIpBan
       tags:
         - IP Bans
       security:
@@ -12975,7 +13028,7 @@ paths:
   /iqdb_queries.json:
     get:
       summary: Query IQDB
-      operationId: queryIQDBGet
+      operationId: queryIqdbGet
       tags:
         - IQDB
       parameters:
@@ -13001,230 +13054,225 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - posts
-                properties:
-                  posts:
-                    type: array
-                    items:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - hash
+                    - post_id
+                    - score
+                    - post
+                  properties:
+                    hash:
+                      type: string
+                    post_id:
+                      type: integer
+                    score:
+                      type: number
+                      format: float
+                      minimum: 0
+                      maximum: 100
+                    post:
                       type: object
                       required:
-                        - hash
-                        - post_id
-                        - score
-                        - post
+                        - posts
                       properties:
-                        hash:
-                          type: string
-                        post_id:
-                          type: integer
-                        score:
-                          type: number
-                          format: float
-                          minimum: 0
-                          maximum: 100
-                        post:
+                        posts:
                           type: object
                           required:
-                            - posts
+                            - id
+                            - created_at
+                            - updated_at
+                            - up_score
+                            - down_score
+                            - score
+                            - source
+                            - md5
+                            - rating
+                            - is_note_locked
+                            - is_rating_locked
+                            - is_status_locked
+                            - is_pending
+                            - is_flagged
+                            - is_deleted
+                            - uploader_id
+                            - approver_id
+                            - last_noted_at
+                            - last_comment_bumped_at
+                            - fav_count
+                            - tag_string
+                            - tag_count
+                            - tag_count_general
+                            - tag_count_artist
+                            - tag_count_character
+                            - tag_count_copyright
+                            - file_ext
+                            - file_size
+                            - image_width
+                            - image_height
+                            - parent_id
+                            - has_children
+                            - last_commented_at
+                            - has_active_children
+                            - bit_flags
+                            - tag_count_meta
+                            - locked_tags
+                            - tag_count_species
+                            - tag_count_invalid
+                            - description
+                            - comment_count
+                            - change_seq
+                            - tag_count_lore
+                            - bg_color
+                            - generated_samples
+                            - duration
+                            - is_comment_disabled
+                            - is_comment_locked
+                            - has_large
+                            - has_visible_children
+                            - children_ids
+                            - pool_ids
+                            - is_favorited
                           properties:
-                            posts:
-                              type: object
-                              required:
-                                - id
-                                - created_at
-                                - updated_at
-                                - up_score
-                                - down_score
-                                - score
-                                - source
-                                - md5
-                                - rating
-                                - is_note_locked
-                                - is_rating_locked
-                                - is_status_locked
-                                - is_pending
-                                - is_flagged
-                                - is_deleted
-                                - uploader_id
-                                - approver_id
-                                - last_noted_at
-                                - last_comment_bumped_at
-                                - fav_count
-                                - tag_string
-                                - tag_count
-                                - tag_count_general
-                                - tag_count_artist
-                                - tag_count_character
-                                - tag_count_copyright
-                                - file_ext
-                                - file_size
-                                - image_width
-                                - image_height
-                                - parent_id
-                                - has_children
-                                - last_commented_at
-                                - has_active_children
-                                - bit_flags
-                                - tag_count_meta
-                                - locked_tags
-                                - tag_count_species
-                                - tag_count_invalid
-                                - description
-                                - comment_count
-                                - change_seq
-                                - tag_count_lore
-                                - bg_color
-                                - generated_samples
-                                - duration
-                                - is_comment_disabled
-                                - is_comment_locked
-                                - has_large
-                                - has_visible_children
-                                - children_ids
-                                - pool_ids
-                                - is_favorited
-                              properties:
-                                id:
-                                  type: integer
-                                created_at:
-                                  type: string
-                                  format: date-time
-                                updated_at:
-                                  type: string
-                                  format: date-time
-                                up_score:
-                                  type: integer
-                                down_score:
-                                  type: integer
-                                score:
-                                  type: integer
-                                source:
-                                  type: string
-                                md5:
-                                  type: string
-                                rating:
-                                  type: string
-                                  enum:
-                                    - s
-                                    - q
-                                    - e
-                                is_note_locked:
-                                  type: boolean
-                                is_rating_locked:
-                                  type: boolean
-                                is_status_locked:
-                                  type: boolean
-                                is_pending:
-                                  type: boolean
-                                is_flagged:
-                                  type: boolean
-                                is_deleted:
-                                  type: boolean
-                                uploader_id:
-                                  type: integer
-                                approver_id:
-                                  type: integer
-                                last_noted_at:
-                                  type: string
-                                  format: date-time
-                                  nullable: true
-                                last_comment_bumped_at:
-                                  type: string
-                                  format: date-time
-                                  nullable: true
-                                fav_count:
-                                  type: integer
-                                tag_string:
-                                  type: string
-                                tag_count:
-                                  type: integer
-                                tag_count_general:
-                                  type: integer
-                                tag_count_artist:
-                                  type: integer
-                                tag_count_character:
-                                  type: integer
-                                tag_count_copyright:
-                                  type: integer
-                                file_ext:
-                                  type: string
-                                file_size:
-                                  type: integer
-                                  format: int64
-                                image_width:
-                                  type: integer
-                                image_height:
-                                  type: integer
-                                parent_id:
-                                  type: integer
-                                  nullable: true
-                                has_children:
-                                  type: boolean
-                                last_commented_at:
-                                  type: string
-                                  format: date-time
-                                  nullable: true
-                                has_active_children:
-                                  type: boolean
-                                bit_flags:
-                                  type: number
-                                tag_count_meta:
-                                  type: integer
-                                locked_tags:
-                                  type: string
-                                  nullable: true
-                                tag_count_species:
-                                  type: integer
-                                tag_count_invalid:
-                                  type: integer
-                                description:
-                                  type: string
-                                comment_count:
-                                  type: integer
-                                change_seq:
-                                  type: integer
-                                tag_count_lore:
-                                  type: integer
-                                bg_color:
-                                  type: string
-                                  nullable: true
-                                generated_samples:
-                                  type: array
-                                  nullable: true
-                                  items:
-                                    type: string
-                                    enum:
-                                      - 720p
-                                      - 480p
-                                      - original
-                                duration:
-                                  type: string
-                                  nullable: true
-                                is_comment_disabled:
-                                  type: boolean
-                                is_comment_locked:
-                                  type: boolean
-                                has_large:
-                                  type: boolean
-                                has_visible_children:
-                                  type: boolean
-                                children_ids:
-                                  type: string
-                                  nullable: true
-                                pool_ids:
-                                  type: array
-                                  items:
-                                    type: integer
-                                is_favorited:
-                                  type: boolean
-                                file_url:
-                                  type: string
-                                large_file_url:
-                                  type: string
-                                preview_file_url:
-                                  type: string
+                            id:
+                              type: integer
+                            created_at:
+                              type: string
+                              format: date-time
+                            updated_at:
+                              type: string
+                              format: date-time
+                            up_score:
+                              type: integer
+                            down_score:
+                              type: integer
+                            score:
+                              type: integer
+                            source:
+                              type: string
+                            md5:
+                              type: string
+                            rating:
+                              type: string
+                              enum:
+                                - s
+                                - q
+                                - e
+                            is_note_locked:
+                              type: boolean
+                            is_rating_locked:
+                              type: boolean
+                            is_status_locked:
+                              type: boolean
+                            is_pending:
+                              type: boolean
+                            is_flagged:
+                              type: boolean
+                            is_deleted:
+                              type: boolean
+                            uploader_id:
+                              type: integer
+                            approver_id:
+                              type: integer
+                            last_noted_at:
+                              type: string
+                              format: date-time
+                              nullable: true
+                            last_comment_bumped_at:
+                              type: string
+                              format: date-time
+                              nullable: true
+                            fav_count:
+                              type: integer
+                            tag_string:
+                              type: string
+                            tag_count:
+                              type: integer
+                            tag_count_general:
+                              type: integer
+                            tag_count_artist:
+                              type: integer
+                            tag_count_character:
+                              type: integer
+                            tag_count_copyright:
+                              type: integer
+                            file_ext:
+                              type: string
+                            file_size:
+                              type: integer
+                              format: int64
+                            image_width:
+                              type: integer
+                            image_height:
+                              type: integer
+                            parent_id:
+                              type: integer
+                              nullable: true
+                            has_children:
+                              type: boolean
+                            last_commented_at:
+                              type: string
+                              format: date-time
+                              nullable: true
+                            has_active_children:
+                              type: boolean
+                            bit_flags:
+                              type: number
+                            tag_count_meta:
+                              type: integer
+                            locked_tags:
+                              type: string
+                              nullable: true
+                            tag_count_species:
+                              type: integer
+                            tag_count_invalid:
+                              type: integer
+                            description:
+                              type: string
+                            comment_count:
+                              type: integer
+                            change_seq:
+                              type: integer
+                            tag_count_lore:
+                              type: integer
+                            bg_color:
+                              type: string
+                              nullable: true
+                            generated_samples:
+                              type: array
+                              nullable: true
+                              items:
+                                type: string
+                                enum:
+                                  - 720p
+                                  - 480p
+                                  - original
+                            duration:
+                              type: string
+                              nullable: true
+                            is_comment_disabled:
+                              type: boolean
+                            is_comment_locked:
+                              type: boolean
+                            has_large:
+                              type: boolean
+                            has_visible_children:
+                              type: boolean
+                            children_ids:
+                              type: string
+                              nullable: true
+                            pool_ids:
+                              type: array
+                              items:
+                                type: integer
+                            is_favorited:
+                              type: boolean
+                            file_url:
+                              type: string
+                            large_file_url:
+                              type: string
+                            preview_file_url:
+                              type: string
         '403':
           description: Access Denied
           content:
@@ -13243,7 +13291,7 @@ paths:
                       - Access Denied
     post:
       summary: Query IQDB
-      operationId: queryIQDPost
+      operationId: queryIqdbPost
       tags:
         - IQDB
       requestBody:
@@ -13281,230 +13329,225 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - posts
-                properties:
-                  posts:
-                    type: array
-                    items:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - hash
+                    - post_id
+                    - score
+                    - post
+                  properties:
+                    hash:
+                      type: string
+                    post_id:
+                      type: integer
+                    score:
+                      type: number
+                      format: float
+                      minimum: 0
+                      maximum: 100
+                    post:
                       type: object
                       required:
-                        - hash
-                        - post_id
-                        - score
-                        - post
+                        - posts
                       properties:
-                        hash:
-                          type: string
-                        post_id:
-                          type: integer
-                        score:
-                          type: number
-                          format: float
-                          minimum: 0
-                          maximum: 100
-                        post:
+                        posts:
                           type: object
                           required:
-                            - posts
+                            - id
+                            - created_at
+                            - updated_at
+                            - up_score
+                            - down_score
+                            - score
+                            - source
+                            - md5
+                            - rating
+                            - is_note_locked
+                            - is_rating_locked
+                            - is_status_locked
+                            - is_pending
+                            - is_flagged
+                            - is_deleted
+                            - uploader_id
+                            - approver_id
+                            - last_noted_at
+                            - last_comment_bumped_at
+                            - fav_count
+                            - tag_string
+                            - tag_count
+                            - tag_count_general
+                            - tag_count_artist
+                            - tag_count_character
+                            - tag_count_copyright
+                            - file_ext
+                            - file_size
+                            - image_width
+                            - image_height
+                            - parent_id
+                            - has_children
+                            - last_commented_at
+                            - has_active_children
+                            - bit_flags
+                            - tag_count_meta
+                            - locked_tags
+                            - tag_count_species
+                            - tag_count_invalid
+                            - description
+                            - comment_count
+                            - change_seq
+                            - tag_count_lore
+                            - bg_color
+                            - generated_samples
+                            - duration
+                            - is_comment_disabled
+                            - is_comment_locked
+                            - has_large
+                            - has_visible_children
+                            - children_ids
+                            - pool_ids
+                            - is_favorited
                           properties:
-                            posts:
-                              type: object
-                              required:
-                                - id
-                                - created_at
-                                - updated_at
-                                - up_score
-                                - down_score
-                                - score
-                                - source
-                                - md5
-                                - rating
-                                - is_note_locked
-                                - is_rating_locked
-                                - is_status_locked
-                                - is_pending
-                                - is_flagged
-                                - is_deleted
-                                - uploader_id
-                                - approver_id
-                                - last_noted_at
-                                - last_comment_bumped_at
-                                - fav_count
-                                - tag_string
-                                - tag_count
-                                - tag_count_general
-                                - tag_count_artist
-                                - tag_count_character
-                                - tag_count_copyright
-                                - file_ext
-                                - file_size
-                                - image_width
-                                - image_height
-                                - parent_id
-                                - has_children
-                                - last_commented_at
-                                - has_active_children
-                                - bit_flags
-                                - tag_count_meta
-                                - locked_tags
-                                - tag_count_species
-                                - tag_count_invalid
-                                - description
-                                - comment_count
-                                - change_seq
-                                - tag_count_lore
-                                - bg_color
-                                - generated_samples
-                                - duration
-                                - is_comment_disabled
-                                - is_comment_locked
-                                - has_large
-                                - has_visible_children
-                                - children_ids
-                                - pool_ids
-                                - is_favorited
-                              properties:
-                                id:
-                                  type: integer
-                                created_at:
-                                  type: string
-                                  format: date-time
-                                updated_at:
-                                  type: string
-                                  format: date-time
-                                up_score:
-                                  type: integer
-                                down_score:
-                                  type: integer
-                                score:
-                                  type: integer
-                                source:
-                                  type: string
-                                md5:
-                                  type: string
-                                rating:
-                                  type: string
-                                  enum:
-                                    - s
-                                    - q
-                                    - e
-                                is_note_locked:
-                                  type: boolean
-                                is_rating_locked:
-                                  type: boolean
-                                is_status_locked:
-                                  type: boolean
-                                is_pending:
-                                  type: boolean
-                                is_flagged:
-                                  type: boolean
-                                is_deleted:
-                                  type: boolean
-                                uploader_id:
-                                  type: integer
-                                approver_id:
-                                  type: integer
-                                last_noted_at:
-                                  type: string
-                                  format: date-time
-                                  nullable: true
-                                last_comment_bumped_at:
-                                  type: string
-                                  format: date-time
-                                  nullable: true
-                                fav_count:
-                                  type: integer
-                                tag_string:
-                                  type: string
-                                tag_count:
-                                  type: integer
-                                tag_count_general:
-                                  type: integer
-                                tag_count_artist:
-                                  type: integer
-                                tag_count_character:
-                                  type: integer
-                                tag_count_copyright:
-                                  type: integer
-                                file_ext:
-                                  type: string
-                                file_size:
-                                  type: integer
-                                  format: int64
-                                image_width:
-                                  type: integer
-                                image_height:
-                                  type: integer
-                                parent_id:
-                                  type: integer
-                                  nullable: true
-                                has_children:
-                                  type: boolean
-                                last_commented_at:
-                                  type: string
-                                  format: date-time
-                                  nullable: true
-                                has_active_children:
-                                  type: boolean
-                                bit_flags:
-                                  type: number
-                                tag_count_meta:
-                                  type: integer
-                                locked_tags:
-                                  type: string
-                                  nullable: true
-                                tag_count_species:
-                                  type: integer
-                                tag_count_invalid:
-                                  type: integer
-                                description:
-                                  type: string
-                                comment_count:
-                                  type: integer
-                                change_seq:
-                                  type: integer
-                                tag_count_lore:
-                                  type: integer
-                                bg_color:
-                                  type: string
-                                  nullable: true
-                                generated_samples:
-                                  type: array
-                                  nullable: true
-                                  items:
-                                    type: string
-                                    enum:
-                                      - 720p
-                                      - 480p
-                                      - original
-                                duration:
-                                  type: string
-                                  nullable: true
-                                is_comment_disabled:
-                                  type: boolean
-                                is_comment_locked:
-                                  type: boolean
-                                has_large:
-                                  type: boolean
-                                has_visible_children:
-                                  type: boolean
-                                children_ids:
-                                  type: string
-                                  nullable: true
-                                pool_ids:
-                                  type: array
-                                  items:
-                                    type: integer
-                                is_favorited:
-                                  type: boolean
-                                file_url:
-                                  type: string
-                                large_file_url:
-                                  type: string
-                                preview_file_url:
-                                  type: string
+                            id:
+                              type: integer
+                            created_at:
+                              type: string
+                              format: date-time
+                            updated_at:
+                              type: string
+                              format: date-time
+                            up_score:
+                              type: integer
+                            down_score:
+                              type: integer
+                            score:
+                              type: integer
+                            source:
+                              type: string
+                            md5:
+                              type: string
+                            rating:
+                              type: string
+                              enum:
+                                - s
+                                - q
+                                - e
+                            is_note_locked:
+                              type: boolean
+                            is_rating_locked:
+                              type: boolean
+                            is_status_locked:
+                              type: boolean
+                            is_pending:
+                              type: boolean
+                            is_flagged:
+                              type: boolean
+                            is_deleted:
+                              type: boolean
+                            uploader_id:
+                              type: integer
+                            approver_id:
+                              type: integer
+                            last_noted_at:
+                              type: string
+                              format: date-time
+                              nullable: true
+                            last_comment_bumped_at:
+                              type: string
+                              format: date-time
+                              nullable: true
+                            fav_count:
+                              type: integer
+                            tag_string:
+                              type: string
+                            tag_count:
+                              type: integer
+                            tag_count_general:
+                              type: integer
+                            tag_count_artist:
+                              type: integer
+                            tag_count_character:
+                              type: integer
+                            tag_count_copyright:
+                              type: integer
+                            file_ext:
+                              type: string
+                            file_size:
+                              type: integer
+                              format: int64
+                            image_width:
+                              type: integer
+                            image_height:
+                              type: integer
+                            parent_id:
+                              type: integer
+                              nullable: true
+                            has_children:
+                              type: boolean
+                            last_commented_at:
+                              type: string
+                              format: date-time
+                              nullable: true
+                            has_active_children:
+                              type: boolean
+                            bit_flags:
+                              type: number
+                            tag_count_meta:
+                              type: integer
+                            locked_tags:
+                              type: string
+                              nullable: true
+                            tag_count_species:
+                              type: integer
+                            tag_count_invalid:
+                              type: integer
+                            description:
+                              type: string
+                            comment_count:
+                              type: integer
+                            change_seq:
+                              type: integer
+                            tag_count_lore:
+                              type: integer
+                            bg_color:
+                              type: string
+                              nullable: true
+                            generated_samples:
+                              type: array
+                              nullable: true
+                              items:
+                                type: string
+                                enum:
+                                  - 720p
+                                  - 480p
+                                  - original
+                            duration:
+                              type: string
+                              nullable: true
+                            is_comment_disabled:
+                              type: boolean
+                            is_comment_locked:
+                              type: boolean
+                            has_large:
+                              type: boolean
+                            has_visible_children:
+                              type: boolean
+                            children_ids:
+                              type: string
+                              nullable: true
+                            pool_ids:
+                              type: array
+                              items:
+                                type: integer
+                            is_favorited:
+                              type: boolean
+                            file_url:
+                              type: string
+                            large_file_url:
+                              type: string
+                            preview_file_url:
+                              type: string
         '403':
           description: Access Denied
           content:
@@ -13544,9 +13587,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
       responses:
         '200':
           description: Success
@@ -13900,9 +13945,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -14619,9 +14666,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -15145,9 +15194,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[ip_addr]'
           in: query
           description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
@@ -15260,9 +15311,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -15375,7 +15428,7 @@ paths:
                   enum:
                     - collection
                     - series
-                'ipool[s_active]':
+                'pool[is_active]':
                   type: boolean
                 'pool[post_ids_string]':
                   type: string
@@ -15954,9 +16007,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[ip_addr]'
           in: query
           description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
@@ -20253,7 +20308,7 @@ paths:
           required: true
           description: The ID of the post.
           schema:
-            type: string
+            type: integer
         - name: score
           in: query
           required: true
@@ -20349,7 +20404,7 @@ paths:
           required: true
           description: The ID of the post.
           schema:
-            type: string
+            type: integer
       responses:
         '204':
           description: Success
@@ -20425,9 +20480,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -21303,9 +21360,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -21382,9 +21441,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -21512,9 +21573,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[ip_addr]'
           in: query
           description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
@@ -21910,9 +21973,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - in: query
           name: 'search[file_ext]'
           schema:
@@ -22861,9 +22926,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - in: query
           name: 'search[updater_name]'
           schema:
@@ -23157,10 +23224,60 @@ paths:
                     type: string
                     enum:
                       - not found
+  '/post_versions/{id}/undo.json':
+    put:
+      summary: Undo Post Version
+      operationId: undoPostVersion
+      tags:
+        - Post Versions
+      security:
+        - basicAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the post version.
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Success
+        '403':
+          description: Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - Access Denied
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - not found
   /post_votes/lock.json:
     post:
-      summary: Lock Post Vote
-      operationId: lockPostVote
+      summary: Lock Post Votes
+      operationId: lockPostVotes
       tags:
         - Post Votes
       security:
@@ -23283,9 +23400,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -23627,21 +23746,65 @@ paths:
               schema:
                 type: object
                 required:
-                  - post
+                  - post_count
+                  - real_post_count
+                  - category
+                  - category_cache
+                  - tag
                 properties:
-                  post:
+                  post_count:
+                    type: integer
+                  real_post_count:
+                    type: integer
+                  category:
+                    type: integer
+                    enum:
+                      - 0
+                      - 1
+                      - 3
+                      - 4
+                      - 5
+                      - 6
+                      - 7
+                      - 8
+                  category_cache:
+                    type: integer
+                    enum:
+                      - 0
+                      - 1
+                      - 3
+                      - 4
+                      - 5
+                      - 6
+                      - 7
+                      - 8
+                  tag:
                     type: object
                     required:
+                      - id
+                      - name
                       - post_count
-                      - real_post_count
+                      - related_tags
+                      - related_tags_updated_at
                       - category
-                      - category_cache
-                      - tag
+                      - is_locked
+                      - created_at
+                      - updated_at
                     properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
                       post_count:
                         type: integer
-                      real_post_count:
-                        type: integer
+                      related_tags:
+                        type: array
+                        items:
+                          type: string
+                      related_tags_updated_at:
+                        type: string
+                        nullable: true
+                        format: date-time
                       category:
                         type: integer
                         enum:
@@ -23653,63 +23816,14 @@ paths:
                           - 6
                           - 7
                           - 8
-                      category_cache:
-                        type: integer
-                        enum:
-                          - 0
-                          - 1
-                          - 3
-                          - 4
-                          - 5
-                          - 6
-                          - 7
-                          - 8
-                      tag:
-                        type: object
-                        required:
-                          - id
-                          - name
-                          - post_count
-                          - related_tags
-                          - related_tags_updated_at
-                          - category
-                          - is_locked
-                          - created_at
-                          - updated_at
-                        properties:
-                          id:
-                            type: integer
-                          name:
-                            type: string
-                          post_count:
-                            type: integer
-                          related_tags:
-                            type: array
-                            items:
-                              type: string
-                          related_tags_updated_at:
-                            type: string
-                            nullable: true
-                            format: date-time
-                          category:
-                            type: integer
-                            enum:
-                              - 0
-                              - 1
-                              - 3
-                              - 4
-                              - 5
-                              - 6
-                              - 7
-                              - 8
-                          is_locked:
-                            type: boolean
-                          created_at:
-                            type: string
-                            format: date-time
-                          updated_at:
-                            type: string
-                            format: date-time
+                      is_locked:
+                        type: boolean
+                      created_at:
+                        type: string
+                        format: date-time
+                      updated_at:
+                        type: string
+                        format: date-time
         '404':
           description: Not Found
           content:
@@ -23751,6 +23865,8 @@ paths:
               properties:
                 commit:
                   type: string
+                  enum:
+                    - Fix
                   description: 'If not set, nothing will happen.'
       responses:
         '302':
@@ -23861,10 +23977,10 @@ paths:
                       - Access Denied
   /tag_type_versions.json:
     get:
-      summary: Search Tag Versions
-      operationId: searchTagVersions
+      summary: Search Tag Type Versions
+      operationId: searchTagTypeVersions
       tags:
-        - Tag Versions
+        - Tag Type Versions
       parameters:
         - name: limit
           in: query
@@ -23882,9 +23998,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[tag]'
           in: query
           schema:
@@ -23975,9 +24093,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -24475,9 +24595,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -25109,9 +25231,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -25312,37 +25436,35 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  required:
-                    - id
-                    - created_at
-                    - updated_at
-                    - user_id
-                    - creator_id
-                    - body
-                    - is_deleted
-                    - updater_id
-                  properties:
-                    id:
-                      type: integer
-                    created_at:
-                      type: string
-                      format: date-time
-                    updated_at:
-                      type: string
-                      format: date-time
-                    user_id:
-                      type: integer
-                    creator_id:
-                      type: integer
-                    body:
-                      type: string
-                    is_deleted:
-                      type: boolean
-                    updater_id:
-                      type: integer
+                type: object
+                required:
+                  - id
+                  - created_at
+                  - updated_at
+                  - user_id
+                  - creator_id
+                  - body
+                  - is_deleted
+                  - updater_id
+                properties:
+                  id:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+                  user_id:
+                    type: integer
+                  creator_id:
+                    type: integer
+                  body:
+                    type: string
+                  is_deleted:
+                    type: boolean
+                  updater_id:
+                    type: integer
         '403':
           description: Access Denied
           content:
@@ -25673,9 +25795,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[ip_addr]'
           in: query
           description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
@@ -26411,9 +26535,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - in: query
           name: 'search[creator_name]'
           description: You must be Janitor+.
@@ -27014,9 +27140,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -27434,9 +27562,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -27744,7 +27874,7 @@ paths:
                     type: string
                     enum:
                       - not found
-  '/upload_whitelists/{id}/is_allowed.json':
+  /upload_whitelists/is_allowed.json:
     get:
       summary: Check If URL Is Allowed
       operationId: checkIfUrlIsAllowed
@@ -27753,12 +27883,6 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the upload whitelist.
-          schema:
-            type: integer
         - name: url
           in: query
           schema:
@@ -27856,9 +27980,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[ip_addr]'
           in: query
           description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
@@ -27968,94 +28094,267 @@ paths:
                         is_verified:
                           type: boolean
                     - allOf:
-                        - type: object
-                          required:
-                            - id
-                            - created_at
-                            - name
-                            - level
-                            - base_upload_limit
-                            - post_upload_count
-                            - post_update_count
-                            - note_update_count
-                            - is_banned
-                            - can_approve_posts
-                            - can_upload_free
-                            - level_string
-                            - avatar_id
-                          properties:
-                            id:
-                              type: integer
-                            created_at:
-                              type: string
-                              format: date-time
-                            name:
-                              type: string
-                            level:
-                              type: integer
-                            base_upload_limit:
-                              type: integer
-                            post_upload_count:
-                              type: integer
-                            post_update_count:
-                              type: integer
-                            note_update_count:
-                              type: integer
-                            is_banned:
-                              type: boolean
-                            can_approve_posts:
-                              type: boolean
-                            can_upload_free:
-                              type: boolean
-                            level_string:
-                              type: string
-                            avatar_id:
-                              type: integer
-                              nullable: true
-                            is_verified:
-                              type: boolean
-                        - type: object
-                          required:
-                            - wiki_page_version_count
-                            - artist_version_count
-                            - pool_version_count
-                            - forum_post_count
-                            - comment_count
-                            - flag_count
-                            - favorite_count
-                            - positive_feedback_count
-                            - neutral_feedback_count
-                            - negative_feedback_count
-                            - upload_limit
-                            - profile_about
-                            - profile_artinfo
-                          properties:
-                            wiki_page_version_count:
-                              type: integer
-                            artist_version_count:
-                              type: integer
-                            pool_version_count:
-                              type: integer
-                            forum_post_count:
-                              type: integer
-                            comment_count:
-                              type: integer
-                            flag_count:
-                              type: integer
-                            favorite_count:
-                              type: integer
-                            positive_feedback_count:
-                              type: integer
-                            neutral_feedback_count:
-                              type: integer
-                            negative_feedback_count:
-                              type: integer
-                            upload_limit:
-                              type: integer
-                            profile_about:
-                              type: string
-                            profile_artinfo:
-                              type: string
+                        - allOf:
+                            - type: object
+                              required:
+                                - id
+                                - created_at
+                                - name
+                                - level
+                                - base_upload_limit
+                                - post_upload_count
+                                - post_update_count
+                                - note_update_count
+                                - is_banned
+                                - can_approve_posts
+                                - can_upload_free
+                                - level_string
+                                - avatar_id
+                              properties:
+                                id:
+                                  type: integer
+                                created_at:
+                                  type: string
+                                  format: date-time
+                                name:
+                                  type: string
+                                level:
+                                  type: integer
+                                base_upload_limit:
+                                  type: integer
+                                post_upload_count:
+                                  type: integer
+                                post_update_count:
+                                  type: integer
+                                note_update_count:
+                                  type: integer
+                                is_banned:
+                                  type: boolean
+                                can_approve_posts:
+                                  type: boolean
+                                can_upload_free:
+                                  type: boolean
+                                level_string:
+                                  type: string
+                                avatar_id:
+                                  type: integer
+                                  nullable: true
+                                is_verified:
+                                  type: boolean
+                            - type: object
+                              required:
+                                - blacklist_users
+                                - description_collapsed_initially
+                                - hide_comments
+                                - show_hidden_comments
+                                - show_post_statistics
+                                - receive_email_notifications
+                                - enable_keyboard_navigation
+                                - enable_privacy_mode
+                                - style_usernames
+                                - enable_auto_complete
+                                - disable_cropped_thumbnails
+                                - enable_safe_mode
+                                - disable_responsive_mode
+                                - no_flagging
+                                - disable_user_dmails
+                                - enable_compact_uploader
+                                - replacements_beta
+                                - updated_at
+                                - email
+                                - last_logged_in_at
+                                - last_forum_read_at
+                                - recent_tags
+                                - comment_threshold
+                                - default_image_size
+                                - favorite_tags
+                                - blacklisted_tags
+                                - time_zone
+                                - per_page
+                                - custom_style
+                                - favorite_count
+                                - api_regen_multiplier
+                                - api_burst_limit
+                                - remaining_api_limit
+                                - statement_timeout
+                                - favorite_limit
+                                - tag_query_limit
+                                - has_mail
+                                - forum_notification_dot
+                              properties:
+                                blacklist_users:
+                                  type: boolean
+                                description_collapsed_initially:
+                                  type: boolean
+                                hide_comments:
+                                  type: boolean
+                                show_hidden_comments:
+                                  type: boolean
+                                show_post_statistics:
+                                  type: boolean
+                                receive_email_notifications:
+                                  type: boolean
+                                enable_keyboard_navigation:
+                                  type: boolean
+                                enable_privacy_mode:
+                                  type: boolean
+                                style_usernames:
+                                  type: boolean
+                                enable_auto_complete:
+                                  type: boolean
+                                can_approve_posts:
+                                  type: boolean
+                                disable_cropped_thumbnails:
+                                  type: boolean
+                                enable_safe_mode:
+                                  type: boolean
+                                disable_responsive_mode:
+                                  type: boolean
+                                no_flagging:
+                                  type: boolean
+                                disable_user_dmails:
+                                  type: boolean
+                                enable_compact_uploader:
+                                  type: boolean
+                                replacements_beta:
+                                  type: boolean
+                                updated_at:
+                                  type: string
+                                  format: date-time
+                                email:
+                                  type: string
+                                last_logged_in_at:
+                                  type: string
+                                last_forum_read_at:
+                                  type: string
+                                recent_tags:
+                                  type: string
+                                comment_threshold:
+                                  type: integer
+                                default_image_size:
+                                  type: string
+                                  enum:
+                                    - large
+                                    - fit
+                                    - fitv
+                                    - original
+                                favorite_tags:
+                                  type: string
+                                blacklisted_tags:
+                                  type: string
+                                time_zone:
+                                  type: string
+                                per_page:
+                                  type: integer
+                                custom_style:
+                                  type: string
+                                favorite_count:
+                                  type: integer
+                                api_regen_multiplier:
+                                  type: integer
+                                api_burst_limit:
+                                  type: integer
+                                remaining_api_limit:
+                                  type: integer
+                                statement_timeout:
+                                  type: integer
+                                favorite_limit:
+                                  type: integer
+                                tag_query_limit:
+                                  type: integer
+                                has_mail:
+                                  type: boolean
+                                forum_notification_dot:
+                                  type: boolean
+                        - allOf:
+                            - type: object
+                              required:
+                                - id
+                                - created_at
+                                - name
+                                - level
+                                - base_upload_limit
+                                - post_upload_count
+                                - post_update_count
+                                - note_update_count
+                                - is_banned
+                                - can_approve_posts
+                                - can_upload_free
+                                - level_string
+                                - avatar_id
+                              properties:
+                                id:
+                                  type: integer
+                                created_at:
+                                  type: string
+                                  format: date-time
+                                name:
+                                  type: string
+                                level:
+                                  type: integer
+                                base_upload_limit:
+                                  type: integer
+                                post_upload_count:
+                                  type: integer
+                                post_update_count:
+                                  type: integer
+                                note_update_count:
+                                  type: integer
+                                is_banned:
+                                  type: boolean
+                                can_approve_posts:
+                                  type: boolean
+                                can_upload_free:
+                                  type: boolean
+                                level_string:
+                                  type: string
+                                avatar_id:
+                                  type: integer
+                                  nullable: true
+                                is_verified:
+                                  type: boolean
+                            - type: object
+                              required:
+                                - wiki_page_version_count
+                                - artist_version_count
+                                - pool_version_count
+                                - forum_post_count
+                                - comment_count
+                                - flag_count
+                                - favorite_count
+                                - positive_feedback_count
+                                - neutral_feedback_count
+                                - negative_feedback_count
+                                - upload_limit
+                                - profile_about
+                                - profile_artinfo
+                              properties:
+                                wiki_page_version_count:
+                                  type: integer
+                                artist_version_count:
+                                  type: integer
+                                pool_version_count:
+                                  type: integer
+                                forum_post_count:
+                                  type: integer
+                                comment_count:
+                                  type: integer
+                                flag_count:
+                                  type: integer
+                                favorite_count:
+                                  type: integer
+                                positive_feedback_count:
+                                  type: integer
+                                neutral_feedback_count:
+                                  type: integer
+                                negative_feedback_count:
+                                  type: integer
+                                upload_limit:
+                                  type: integer
+                                profile_about:
+                                  type: string
+                                profile_artinfo:
+                                  type: string
   /users/me.json:
     get:
       summary: Get Current User
@@ -28391,9 +28690,11 @@ paths:
         - name: idOrName
           in: path
           required: true
-          description: An ID that can be either an integer or a name.
           schema:
-            type: string
+            oneOf:
+              - type: integer
+              - type: string
+          description: An ID that can be either an integer or a name.
       responses:
         '200':
           description: Success
@@ -28777,9 +29078,11 @@ paths:
         - name: idOrName
           in: path
           required: true
-          description: An ID that can be either an integer or a name.
           schema:
-            type: string
+            oneOf:
+              - type: integer
+              - type: string
+          description: An ID that can be either an integer or a name.
       security:
         - basicAuth: []
       requestBody:
@@ -28899,9 +29202,11 @@ paths:
         - name: idOrName
           in: path
           required: true
-          description: An ID that can be either an integer or a name.
           schema:
-            type: string
+            oneOf:
+              - type: integer
+              - type: string
+          description: An ID that can be either an integer or a name.
       responses:
         '200':
           description: Success
@@ -29287,9 +29592,11 @@ paths:
         - name: idOrName
           in: path
           required: true
-          description: An ID that can be either an integer or a name.
           schema:
-            type: string
+            oneOf:
+              - type: integer
+              - type: string
+          description: An ID that can be either an integer or a name.
       security:
         - basicAuth: []
       responses:
@@ -29329,8 +29636,8 @@ paths:
                       - not found
   '/users/{idOrName}/fix_counts.json':
     get:
-      summary: Fix Specific User Counts
-      operationId: fixSpecificUserCounts
+      summary: Staff Fix User Counts
+      operationId: staffFixUserCounts
       tags:
         - Users
       description: You must be Janitor+.
@@ -29338,9 +29645,11 @@ paths:
         - name: idOrName
           in: path
           required: true
-          description: An ID that can be either an integer or a name.
           schema:
-            type: string
+            oneOf:
+              - type: integer
+              - type: string
+          description: An ID that can be either an integer or a name.
       security:
         - basicAuth: []
       responses:
@@ -29391,9 +29700,11 @@ paths:
         - name: idOrName
           in: path
           required: true
-          description: An ID that can be either an integer or a name.
           schema:
-            type: string
+            oneOf:
+              - type: integer
+              - type: string
+          description: An ID that can be either an integer or a name.
       security:
         - basicAuth: []
       responses:
@@ -29442,9 +29753,11 @@ paths:
         - name: idOrName
           in: path
           required: true
-          description: An ID that can be either an integer or a name.
           schema:
-            type: string
+            oneOf:
+              - type: integer
+              - type: string
+          description: An ID that can be either an integer or a name.
       security:
         - basicAuth: []
       requestBody:
@@ -29800,9 +30113,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -30342,9 +30657,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -30608,9 +30925,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
@@ -31196,9 +31515,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[ip_addr]'
           in: query
           description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
@@ -33140,7 +33461,7 @@ paths:
   '/moderator/post/posts/{id}/ai_check.json':
     get:
       summary: AI Check Post
-      operationId: aiChecPost
+      operationId: aiCheckPost
       tags:
         - Posts
       security:
@@ -33228,6 +33549,13 @@ paths:
       responses:
         '201':
           description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                minProperties: 0
+                maxProperties: 0
+                additionalProperties: false
         '204':
           description: Failure
         '403':
@@ -33342,9 +33670,11 @@ paths:
             maximum: 750
         - name: 'search[id]'
           in: query
-          description: Search for a specific id.
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
         - name: 'search[order]'
           in: query
           schema:
