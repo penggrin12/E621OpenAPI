@@ -65,4 +65,4 @@ responses:
           items:
             oneOf:
               - $ref: "../../components/schemas/user.yaml"
-              - $ref: "../../components/schemas/fullUser.yaml"
+              - $ref: "../../components/schemas/fullCurrentUser.yaml"

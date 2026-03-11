@@ -15,9 +15,7 @@ responses:
     content:
       application/json:
         schema:
-          type: array
-          items:
-            $ref: "../../components/schemas/staffNote.yaml"
+          $ref: "../../components/schemas/staffNote.yaml"
   403:
     $ref: "../../components/responses/accessDenied.yaml"
   404:

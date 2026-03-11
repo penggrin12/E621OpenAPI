@@ -32,12 +32,8 @@ requestBody:
           avoid_posting[artist_attributes][linked_user_id]:
             type: integer
 responses:
-  200:
+  204:
     description: Success
-    content:
-      application/json:
-        schema:
-          $ref: "../../components/schemas/avoidPosting.yaml"
   403:
     $ref: "../../components/responses/accessDenied.yaml"
   404:

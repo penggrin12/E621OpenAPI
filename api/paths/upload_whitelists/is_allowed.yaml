@@ -5,12 +5,6 @@ tags:
 security:
   - basicAuth: []
 parameters:
-  - name: id
-    in: path
-    required: true
-    description: The ID of the upload whitelist.
-    schema:
-      type: integer
   - name: url
     in: query
     schema:

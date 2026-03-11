@@ -1,7 +1,7 @@
-summary: Search Tag Versions
-operationId: searchTagVersions
+summary: Search Tag Type Versions
+operationId: searchTagTypeVersions
 tags:
-  - Tag Versions
+  - Tag Type Versions
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"

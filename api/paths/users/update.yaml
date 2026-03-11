@@ -3,12 +3,7 @@ operationId: editCurrentUser
 tags:
   - Users
 parameters:
-  - name: idOrName
-    in: path
-    required: true
-    description: An ID that can be either an integer or a name.
-    schema:
-      type: string
+  - $ref: "../../components/parameters/idOrName.yaml"
 security:
   - basicAuth: []
 requestBody:

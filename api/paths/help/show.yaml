@@ -8,7 +8,9 @@ parameters:
     required: true
     description: The ID or name of the help page.
     schema:
-      type: string
+      oneOf:
+        - type: integer
+        - type: string
 responses:
   200:
     description: Success

@@ -19,6 +19,13 @@ requestBody:
 responses:
   201:
     description: Success
+    content:
+      application/json:
+        schema:
+          type: object
+          minProperties: 0
+          maxProperties: 0
+          additionalProperties: false
   204:
     description: Failure
   403:

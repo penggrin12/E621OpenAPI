@@ -15,11 +15,6 @@ responses:
     content:
       application/json:
         schema:
-          type: object
-          required:
-            - post
-          properties:
-            post:
-              $ref: "../../components/schemas/tagCorrection.yaml"
+          $ref: "../../components/schemas/tagCorrection.yaml"
   404:
     $ref: "../../components/responses/notFound.yaml"

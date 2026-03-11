@@ -21,12 +21,8 @@ requestBody:
           blip[body]:
             type: string
 responses:
-  200:
+  204:
     description: Success
-    content:
-      application/json:
-        schema:
-          $ref: "../../components/schemas/blip.yaml"
   403:
     $ref: "../../components/responses/accessDenied.yaml"
   404:

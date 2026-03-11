@@ -1,21 +1,19 @@
-summary: Get Blip
-operationId: getBlip
+summary: Undo Post Version
+operationId: undoPostVersion
 tags:
-  - Blips
+  - Post Versions
+security:
+  - basicAuth: []
 parameters:
   - name: id
     in: path
-    description: The ID of the blip to get.
     required: true
+    description: The ID of the post version.
     schema:
       type: integer
 responses:
-  200:
+  204:
     description: Success
-    content:
-      application/json:
-        schema:
-          $ref: "../../components/schemas/blip.yaml"
   403:
     $ref: "../../components/responses/accessDenied.yaml"
   404:

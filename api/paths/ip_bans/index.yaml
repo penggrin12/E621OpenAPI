@@ -1,5 +1,5 @@
 summary: List IP Bans
-operationId: listIPBans
+operationId: listIpBans
 tags:
   - IP Bans
 security:

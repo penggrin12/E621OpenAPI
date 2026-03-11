@@ -18,7 +18,7 @@ requestBody:
             type: string
           pool[category]:
             $ref: "../../components/schemas/poolCategories.yaml"
-          ipool[s_active]:
+          pool[is_active]:
             type: boolean
           pool[post_ids_string]:
             type: string

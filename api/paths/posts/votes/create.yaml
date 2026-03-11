@@ -10,7 +10,7 @@ parameters:
     required: true
     description: The ID of the post.
     schema:
-      type: string
+      type: integer
   - name: score
     in: query
     required: true

@@ -17,8 +17,6 @@ requestBody:
             type: string
           avoid_posting[is_active]:
             type: boolean
-          avoid_posting[artist_attributes][id]:
-            type: integer
           avoid_posting[artist_attributes][name]:
             type: string
             description: If provided and the artist does not exist, an artist will be created.

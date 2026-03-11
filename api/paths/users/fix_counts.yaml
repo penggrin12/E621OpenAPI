@@ -1,15 +1,10 @@
-summary: Fix Specific User Counts
-operationId: fixSpecificUserCounts
+summary: Staff Fix User Counts
+operationId: staffFixUserCounts
 tags:
   - Users
 description: You must be Janitor+.
 parameters:
-  - name: idOrName
-    in: path
-    required: true
-    description: An ID that can be either an integer or a name.
-    schema:
-      type: string
+  - $ref: "../../components/parameters/idOrName.yaml"
 security:
   - basicAuth: []
 responses:

@@ -22,6 +22,8 @@ requestBody:
         properties:
           commit:
             type: string
+            enum:
+              - Fix
             description: If not set, nothing will happen.
 responses:
   302:

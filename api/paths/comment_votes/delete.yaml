@@ -1,4 +1,4 @@
-summary: Delete Comment Vote
+summary: Delete Comment Votes
 operationId: deleteCommentVotes
 tags:
   - Comment Votes

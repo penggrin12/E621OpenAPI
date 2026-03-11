@@ -1,5 +1,5 @@
 summary: Query IQDB
-operationId: queryIQDPost
+operationId: queryIqdbPost
 tags:
   - IQDB
 requestBody:
@@ -37,13 +37,8 @@ responses:
     content:
       application/json:
         schema:
-          type: object
-          required:
-            - posts
-          properties:
-            posts:
-              type: array
-              items:
-                $ref: "../../../components/schemas/iqdbResponse.yaml"
+          type: array
+          items:
+            $ref: "../../../components/schemas/iqdbResponse.yaml"
   403:
     $ref: "../../../components/responses/accessDenied.yaml"

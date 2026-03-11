@@ -6,12 +6,7 @@ description: |
   You must be Janitor+.
   This endpoint will return HTML when disabling uploads (due to a reason being required), this endpoint should only be used for reenabling. Use [Disable User Uploads](#operation-Users-disableUserUploads) to disable uploads.
 parameters:
-  - name: idOrName
-    in: path
-    required: true
-    description: An ID that can be either an integer or a name.
-    schema:
-      type: string
+  - $ref: "../../components/parameters/idOrName.yaml"
 security:
   - basicAuth: []
 responses:

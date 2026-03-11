@@ -10,7 +10,7 @@ parameters:
     required: true
     description: The ID of the comment.
     schema:
-      type: string
+      type: integer
 responses:
   204:
     description: Success

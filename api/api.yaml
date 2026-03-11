@@ -77,7 +77,7 @@ components:
       $ref: "./components/schemas/ticketStatuses.yaml"
     Artist:
       $ref: "./components/schemas/artist.yaml"
-    ArtistURL:
+    ArtistUrl:
       $ref: "./components/schemas/artistUrl.yaml"
     ArtistVersion:
       $ref: "./components/schemas/artistVersion.yaml"
@@ -117,11 +117,11 @@ components:
       $ref: "./components/schemas/fullUser.yaml"
     Help:
       $ref: "./components/schemas/help.yaml"
-    IPBan:
+    IpBan:
       $ref: "./components/schemas/ipBan.yaml"
-    IQDBPost:
+    IqdbPost:
       $ref: "./components/schemas/iqdbPost.yaml"
-    IQDBResponse:
+    IqdbResponse:
       $ref: "./components/schemas/iqdbResponse.yaml"
     Mascot:
       $ref: "./components/schemas/mascot.yaml"
@@ -193,6 +193,8 @@ components:
       $ref: "./components/schemas/editHistory.yaml"
     UserAvatarMenu:
       $ref: "./components/schemas/userAvatarMenu.yaml"
+    TagCorrection:
+      $ref: "./components/schemas/tagCorrection.yaml"
   responses:
     NotFound:
       $ref: "./components/responses/notFound.yaml"
@@ -667,6 +669,9 @@ paths:
   /post_versions/{id}/unhide.json:
     put:
       $ref: "./paths/post_versions/unhide.yaml"
+  /post_versions/{id}/undo.json:
+    put:
+      $ref: "./paths/post_versions/undo.yaml"
 
   /post_votes/lock.json:
     post:
@@ -816,7 +821,7 @@ paths:
       $ref: "./paths/upload_whitelists/update.yaml"
     delete:
       $ref: "./paths/upload_whitelists/destroy.yaml"
-  /upload_whitelists/{id}/is_allowed.json:
+  /upload_whitelists/is_allowed.json:
     get:
       $ref: "./paths/upload_whitelists/is_allowed.yaml"
 

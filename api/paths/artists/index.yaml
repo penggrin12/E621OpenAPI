@@ -47,11 +47,11 @@ parameters:
   - name: search[creator_id]
     in: query
     schema:
-      type: string
+      type: integer
   - name: search[has_tag]
     in: query
     schema:
-      type: string
+      type: boolean
   - name: search[is_linked]
     in: query
     schema:
