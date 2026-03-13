@@ -48,7 +48,7 @@ properties:
   category:
     $ref: "./poolCategories.yaml"
   version:
-    type: number
+    type: integer
   added_post_ids:
     type: array
     items:

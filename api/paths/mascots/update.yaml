@@ -3,15 +3,10 @@ operationId: editMascot
 tags:
   - Mascots
 security:
-  - basicAuth: [ ]
+  - basicAuth: []
 description: You must be Admin+.
 parameters:
-  - name: id
-    in: path
-    required: true
-    description: The ID of the mascot.
-    schema:
-      type: integer
+  - $ref: "../../components/parameters/path/id.yaml"
 requestBody:
   content:
     multipart/form-data:

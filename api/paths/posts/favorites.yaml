@@ -3,12 +3,7 @@ operationId: listPostFavorites
 tags:
   - Posts
 parameters:
-  - name: id
-    in: path
-    required: true
-    description: The ID of the post.
-    schema:
-      type: integer
+  - $ref: "../../components/parameters/path/id.yaml"
   - name: limit
     in: query
     description: The maximum number of results to return. Between 1 and 100.
@@ -16,7 +11,7 @@ parameters:
       type: integer
       minimum: 1
       maximum: 100
-  - $ref: "../../components/parameters/page.yaml"
+  - $ref: "../../components/parameters/query/page.yaml"
 description: You must be the user or Moderator+ to see users that have their favorites hidden.
 responses:
   200:

@@ -7,7 +7,7 @@ security:
 description: |
   You must be an Admin+ to delete an artist.
 parameters:
-  - $ref: "../../components/parameters/idOrName.yaml"
+  - $ref: "../../components/parameters/path/idOrName.yaml"
 responses:
   204:
     description: Success

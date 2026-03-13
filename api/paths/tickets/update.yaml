@@ -6,12 +6,7 @@ description: You must be Moderator+.
 security:
   - basicAuth: []
 parameters:
-  - name: id
-    in: path
-    required: true
-    description: The ID of the ticket.
-    schema:
-      type: integer
+  - $ref: "../../components/parameters/path/id.yaml"
 requestBody:
   content:
     application/x-www-form-urlencoded:

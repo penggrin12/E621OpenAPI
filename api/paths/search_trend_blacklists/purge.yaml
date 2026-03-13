@@ -6,7 +6,7 @@ security:
   - basicAuth: []
 description: You must be Admin+.
 parameters:
-  - $ref: "../../components/parameters/id.yaml"
+  - $ref: "../../components/parameters/query/id.yaml"
 responses:
   200:
     description: Success

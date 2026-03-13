@@ -77,7 +77,7 @@ properties:
   description_changed:
     type: boolean
   version:
-    type: number
+    type: integer
   obsolete_added_tags:
     type: string
   obsolete_removed_tags:

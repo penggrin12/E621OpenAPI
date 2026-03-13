@@ -6,12 +6,7 @@ security:
   - basicAuth: []
 description: Will error if no body is provided.
 parameters:
-  - name: id
-    in: path
-    required: true
-    description: The ID of the post.
-    schema:
-      type: integer
+  - $ref: "../../components/parameters/path/id.yaml"
 requestBody:
   content:
     application/json:

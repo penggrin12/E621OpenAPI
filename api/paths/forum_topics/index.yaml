@@ -3,9 +3,9 @@ operationId: searchForumTopics
 tags:
   - Forum Topics
 parameters:
-  - $ref: "../../components/parameters/limit.yaml"
-  - $ref: "../../components/parameters/page.yaml"
-  - $ref: "../../components/parameters/id.yaml"
+  - $ref: "../../components/parameters/query/limit.yaml"
+  - $ref: "../../components/parameters/query/page.yaml"
+  - $ref: "../../components/parameters/query/id.yaml"
   - name: search[order]
     in: query
     schema:

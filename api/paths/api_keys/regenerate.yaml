@@ -7,12 +7,7 @@ security:
     csrfToken: []
 description: Requires [browser authentication](#operations-Sessions-login) (username & password), as well as hourly password confirmations (reauthentication).
 parameters:
-  - name: id
-    in: path
-    description: The ID of the api key.
-    required: true
-    schema:
-      type: integer
+  - $ref: "../../components/parameters/path/id.yaml"
 requestBody:
   content:
     application/x-www-form-urlencoded:

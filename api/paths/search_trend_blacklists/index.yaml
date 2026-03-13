@@ -6,9 +6,9 @@ security:
   - basicAuth: []
 description: You must be Admin+.
 parameters:
-  - $ref: "../../components/parameters/limit.yaml"
-  - $ref: "../../components/parameters/page.yaml"
-  - $ref: "../../components/parameters/order.yaml"
+  - $ref: "../../components/parameters/query/limit.yaml"
+  - $ref: "../../components/parameters/query/page.yaml"
+  - $ref: "../../components/parameters/query/order.yaml"
   - in: query
     name: tag
     schema:

@@ -4,12 +4,7 @@ tags:
   - Post Sets
 description: You must be Moderator+ if the set is not public.
 parameters:
-  - name: id
-    in: path
-    required: true
-    description: The ID of the post set.
-    schema:
-      type: integer
+  - $ref: "../../components/parameters/path/id.yaml"
 responses:
   200:
     description: Success

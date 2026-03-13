@@ -4,7 +4,7 @@ tags:
   - Users
 description: You must be Janitor+.
 parameters:
-  - $ref: "../../components/parameters/idOrName.yaml"
+  - $ref: "../../components/parameters/path/idOrName.yaml"
 security:
   - basicAuth: []
 responses:

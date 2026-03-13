@@ -3,7 +3,7 @@ operationId: editCurrentUser
 tags:
   - Users
 parameters:
-  - $ref: "../../components/parameters/idOrName.yaml"
+  - $ref: "../../components/parameters/path/idOrName.yaml"
 security:
   - basicAuth: []
 requestBody:
@@ -13,7 +13,7 @@ requestBody:
         type: object
         properties:
           user[comment_threshold]:
-            type: number
+            type: integer
           user[default_image_size]:
             type: string
             enum:

@@ -7,12 +7,7 @@ security:
 description: |
   You must be the creator of the comment, or Admin+ to edit. Marked comments cannot be edited.
 parameters:
-  - name: id
-    in: path
-    required: true
-    description: The ID of the comment.
-    schema:
-      type: integer
+  - $ref: "../../components/parameters/path/id.yaml"
 requestBody:
   content:
     application/x-www-form-urlencoded:

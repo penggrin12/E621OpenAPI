@@ -33,7 +33,7 @@ properties:
   body:
     type: string
   version:
-    type: number
+    type: integer
   is_active:
     type: boolean
   note_id:

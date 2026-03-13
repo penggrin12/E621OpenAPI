@@ -4,9 +4,9 @@ tags:
   - Tickets
 description: You must be Janitor+ to see tickets you did not create.
 parameters:
-  - $ref: "../../components/parameters/limit.yaml"
-  - $ref: "../../components/parameters/page.yaml"
-  - $ref: "../../components/parameters/id.yaml"
+  - $ref: "../../components/parameters/query/limit.yaml"
+  - $ref: "../../components/parameters/query/page.yaml"
+  - $ref: "../../components/parameters/query/id.yaml"
   - in: query
     name: search[creator_name]
     description: You must be Janitor+.

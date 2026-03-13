@@ -4,12 +4,7 @@ tags:
   - User Feedbacks
 description: You must be Janitor+ if the feedback is deleted.
 parameters:
-  - name: id
-    in: path
-    required: true
-    description: The ID of the feedback.
-    schema:
-      type: integer
+  - $ref: "../../components/parameters/path/id.yaml"
 responses:
   200:
     description: Success

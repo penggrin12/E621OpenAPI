@@ -12,7 +12,7 @@ requestBody:
             type: string
             format: binary
           search[score_cutoff]:
-            type: number
+            type: integer
           search[url]:
             type: string
           search[post_id]:

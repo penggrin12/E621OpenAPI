@@ -6,8 +6,7 @@ security:
   - basicAuth: []
 description: You must be Janitor+ if the wiki page is locked.
 parameters:
-  - name: id
-    in: path
+  - $ref: "../../components/parameters/path/id.yaml"
     required: true
     description: The ID of the wiki page.
     schema:

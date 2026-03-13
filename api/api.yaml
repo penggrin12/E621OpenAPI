@@ -38,18 +38,20 @@ components:
       name: authenticity_token
       description: "Retrieved via scraping html for the `csrf-token` meta tag."
   parameters:
-    id:
-      $ref: "./components/parameters/id.yaml"
-    idOrName:
-      $ref: "./components/parameters/idOrName.yaml"
-    limit:
-      $ref: "./components/parameters/limit.yaml"
-    page:
-      $ref: "./components/parameters/page.yaml"
-    ip_addr:
-      $ref: "./components/parameters/ipAddr.yaml"
-    order:
-      $ref: "./components/parameters/order.yaml"
+    idQuery:
+      $ref: "./components/parameters/query/id.yaml"
+    limitQuery:
+      $ref: "./components/parameters/query/limit.yaml"
+    pageQuery:
+      $ref: "./components/parameters/query/page.yaml"
+    ipAddrQuery:
+      $ref: "./components/parameters/query/ipAddr.yaml"
+    orderQuery:
+      $ref: "./components/parameters/query/order.yaml"
+    idPath:
+      $ref: "./components/parameters/path/id.yaml"
+    idOrNamePath:
+      $ref: "./components/parameters/path/idOrName.yaml"
   schemas:
     AccessDeniedResponse:
       $ref: "./components/schemas/accessDenied.yaml"

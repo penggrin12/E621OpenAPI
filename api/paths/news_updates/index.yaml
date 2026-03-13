@@ -3,8 +3,8 @@ operationId: listNewsUpdates
 tags:
   - News Updates
 parameters:
-  - $ref: "../../components/parameters/limit.yaml"
-  - $ref: "../../components/parameters/page.yaml"
+  - $ref: "../../components/parameters/query/limit.yaml"
+  - $ref: "../../components/parameters/query/page.yaml"
 responses:
   200:
     description: Success

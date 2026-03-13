@@ -7,7 +7,7 @@ security:
 description: |
   If an artist is locked, you must be Janitor+ to revert them.
 parameters:
-  - $ref: "../../components/parameters/idOrName.yaml"
+  - $ref: "../../components/parameters/path/idOrName.yaml"
   - name: version_id
     in: query
     required: true

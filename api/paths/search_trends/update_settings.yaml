@@ -19,6 +19,7 @@ requestBody:
             type: integer
           trends_min_ratio:
             type: number
+            format: float
           trends_ip_limit:
             type: integer
           trends_ip_window:

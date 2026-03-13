@@ -180,7 +180,7 @@ properties:
     items:
       type: string
   change_seq:
-    type: number
+    type: integer
   flags:
     type: object
     required:
@@ -249,6 +249,7 @@ properties:
     type: boolean
   duration:
     type: number
+    format: float
     nullable: true
   uploader_name:
     type: string

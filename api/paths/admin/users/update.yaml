@@ -6,12 +6,7 @@ security:
   - basicAuth: []
 description: You must be Admin+. If editing an Admin+, you must be Owner+.
 parameters:
-  - name: id
-    in: path
-    required: true
-    description: The ID of the user.
-    schema:
-      type: integer
+  - $ref: "../../../components/parameters/path/id.yaml"
 requestBody:
   content:
     application/x-www-form-urlencoded:
@@ -31,7 +26,7 @@ requestBody:
           user[profile_artinfo]:
             type: string
           user[base_upload_limit]:
-            type: number
+            type: integer
           user[enable_privacy_mode]:
             type: boolean
           user[email]:

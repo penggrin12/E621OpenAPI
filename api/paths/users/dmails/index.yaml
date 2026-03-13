@@ -6,8 +6,8 @@ security:
   - basicAuth: []
 description: Must have the bd auditor user flag.
 parameters:
-  - $ref: "../../../components/parameters/limit.yaml"
-  - $ref: "../../../components/parameters/page.yaml"
+  - $ref: "../../../components/parameters/query/limit.yaml"
+  - $ref: "../../../components/parameters/query/page.yaml"
   - name: user_id
     in: path
     required: true

@@ -3,11 +3,11 @@ operationId: searchAvoidPostingVersions
 tags:
   - Avoid Posting Versions
 parameters:
-  - $ref: "../../components/parameters/limit.yaml"
-  - $ref: "../../components/parameters/page.yaml"
-  - $ref: "../../components/parameters/id.yaml"
-  - $ref: "../../components/parameters/ipAddr.yaml"
-  - $ref: "../../components/parameters/order.yaml"
+  - $ref: "../../components/parameters/query/limit.yaml"
+  - $ref: "../../components/parameters/query/page.yaml"
+  - $ref: "../../components/parameters/query/id.yaml"
+  - $ref: "../../components/parameters/query/ipAddr.yaml"
+  - $ref: "../../components/parameters/query/order.yaml"
   - name: search[updater_name]
     in: query
     description: The name of the updater of the avoid posting entry.

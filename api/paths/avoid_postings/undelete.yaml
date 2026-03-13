@@ -6,7 +6,7 @@ security:
   - basicAuth: []
 description: Must have the bd staff user flag.
 parameters:
-  - $ref: "../../components/parameters/idOrName.yaml"
+  - $ref: "../../components/parameters/path/idOrName.yaml"
 responses:
   204:
     description: Success

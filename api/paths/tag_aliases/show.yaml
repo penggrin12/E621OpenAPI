@@ -3,12 +3,7 @@ operationId: getTagAlias
 tags:
   - Tag Aliases
 parameters:
-  - name: id
-    in: path
-    required: true
-    description: The ID of the tag alias.
-    schema:
-      type: integer
+  - $ref: "../../components/parameters/path/id.yaml"
 responses:
   200:
     description: Success

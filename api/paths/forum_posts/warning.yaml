@@ -7,12 +7,7 @@ security:
 description: |
   You must be Moderator+.
 parameters:
-  - name: id
-    in: path
-    required: true
-    description: The ID of the forum post.
-    schema:
-      type: integer
+  - $ref: "../../components/parameters/path/id.yaml"
 requestBody:
   $ref: "../../components/requestBodies/warning.yaml"
 responses:

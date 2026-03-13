@@ -4,10 +4,10 @@ tags:
   - Comments
 description: For searching comments, group_by=comment must be set.
 parameters:
-  - $ref: "../../components/parameters/limit.yaml"
-  - $ref: "../../components/parameters/page.yaml"
-  - $ref: "../../components/parameters/id.yaml"
-  - $ref: "../../components/parameters/ipAddr.yaml"
+  - $ref: "../../components/parameters/query/limit.yaml"
+  - $ref: "../../components/parameters/query/page.yaml"
+  - $ref: "../../components/parameters/query/id.yaml"
+  - $ref: "../../components/parameters/query/ipAddr.yaml"
   - name: search[order]
     in: query
     schema:

@@ -18,13 +18,17 @@ responses:
               items:
                 oneOf:
                   - type: string
-                  - type: number
+                  - type: integer
+                example:
+                  - ["my_set", 1]
             Maintained:
               type: array
               items:
                 oneOf:
                   - type: string
-                  - type: number
+                  - type: integer
+                example:
+                  - ["my_set", 1]
   403:
     $ref: "../../components/responses/accessDenied.yaml"
   422:

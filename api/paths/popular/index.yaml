@@ -3,7 +3,7 @@ operationId: listPopular
 tags:
   - Popular
 parameters:
-  - $ref: "../../components/parameters/limit.yaml"
+  - $ref: "../../components/parameters/query/limit.yaml"
   - name: date
     in: query
     description: The date to list popular uploads for. Only The day, month, and year are considered.

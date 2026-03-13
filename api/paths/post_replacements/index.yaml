@@ -4,9 +4,9 @@ tags:
   - Post Replacements
 description: Rejected replacements can only be seen by staff.
 parameters:
-  - $ref: "../../components/parameters/limit.yaml"
-  - $ref: "../../components/parameters/page.yaml"
-  - $ref: "../../components/parameters/id.yaml"
+  - $ref: "../../components/parameters/query/limit.yaml"
+  - $ref: "../../components/parameters/query/page.yaml"
+  - $ref: "../../components/parameters/query/id.yaml"
   - in: query
     name: search[file_ext]
     schema:

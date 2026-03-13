@@ -11,7 +11,7 @@ properties:
     type: integer
   score:
     type: number
-    format: "float"
+    format: float
     minimum: 0
     maximum: 100
   post:

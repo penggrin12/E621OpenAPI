@@ -6,9 +6,11 @@ parameters:
   - name: id
     in: path
     required: true
-    description: The ID or name of the wiki page.
     schema:
-      type: integer
+      oneOf:
+        - type: integer
+        - type: string
+    description: An ID that can be either an integer or a name.
 responses:
   200:
     description: Success

@@ -3,10 +3,10 @@ operationId: searchUploads
 tags:
   - Uploads
 parameters:
-  - $ref: "../../components/parameters/limit.yaml"
-  - $ref: "../../components/parameters/page.yaml"
-  - $ref: "../../components/parameters/id.yaml"
-  - $ref: "../../components/parameters/order.yaml"
+  - $ref: "../../components/parameters/query/limit.yaml"
+  - $ref: "../../components/parameters/query/page.yaml"
+  - $ref: "../../components/parameters/query/id.yaml"
+  - $ref: "../../components/parameters/query/order.yaml"
   - in: query
     name: search[uploader_id]
     schema:

@@ -4,12 +4,7 @@ tags:
   - Bulk Update Requests
 description: Must be Admin+.
 parameters:
-  - name: id
-    in: path
-    required: true
-    description: The ID of the bulk update request.
-    schema:
-      type: integer
+  - $ref: "../../components/parameters/path/id.yaml"
 responses:
   204:
     description: Success

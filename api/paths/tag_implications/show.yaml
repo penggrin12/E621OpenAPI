@@ -3,12 +3,7 @@ operationId: getTagImplication
 tags:
   - Tag Implications
 parameters:
-  - name: id
-    in: path
-    required: true
-    description: The ID of the tag implication.
-    schema:
-      type: integer
+  - $ref: "../../components/parameters/path/id.yaml"
 responses:
   200:
     description: Success

@@ -4,12 +4,7 @@ tags:
   - Uploads
 description: You must be Janitor+.
 parameters:
-  - name: id
-    in: path
-    required: true
-    description: The ID of the upload.
-    schema:
-      type: integer
+  - $ref: "../../components/parameters/path/id.yaml"
 responses:
   200:
     description: Success

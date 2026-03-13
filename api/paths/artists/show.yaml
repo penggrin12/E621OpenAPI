@@ -3,7 +3,7 @@ operationId: getArtist
 tags:
   - Artists
 parameters:
-  - $ref: "../../components/parameters/idOrName.yaml"
+  - $ref: "../../components/parameters/path/idOrName.yaml"
 responses:
   200:
     description: Success
@@ -25,7 +25,7 @@ responses:
                     items:
                       oneOf:
                         - type: string
-                        - type: number
+                        - type: integer
                 urls:
                   type: array
                   items:

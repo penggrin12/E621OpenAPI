@@ -26,9 +26,9 @@ responses:
             - favorite_count
           properties:
             post_id:
-              type: number
+              type: integer
             favorite_count:
-              type: number
+              type: integer
   403:
     $ref: "../../components/responses/accessDenied.yaml"
   404:

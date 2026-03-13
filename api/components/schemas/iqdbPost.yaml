@@ -133,7 +133,7 @@ properties:
   has_active_children:
     type: boolean
   bit_flags:
-    type: number
+    type: integer
   tag_count_meta:
     type: integer
   locked_tags:

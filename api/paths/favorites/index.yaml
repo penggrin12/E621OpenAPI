@@ -3,8 +3,8 @@ operationId: listFavorites
 tags:
   - Favorites
 parameters:
-  - $ref: "../../components/parameters/limit.yaml"
-  - $ref: "../../components/parameters/page.yaml"
+  - $ref: "../../components/parameters/query/limit.yaml"
+  - $ref: "../../components/parameters/query/page.yaml"
   - in: query
     name: user_id
     description: You must be the user or Moderator+ if the user has their favorites hidden.

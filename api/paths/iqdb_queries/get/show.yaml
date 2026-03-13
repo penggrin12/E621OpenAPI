@@ -6,7 +6,7 @@ parameters:
   - name: search[score_cutoff]
     in: query
     schema:
-      type: number
+      type: integer
   - name: search[url]
     in: query
     schema:

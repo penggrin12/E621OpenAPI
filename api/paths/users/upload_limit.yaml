@@ -5,7 +5,7 @@ tags:
 security:
   - basicAuth: []
 parameters:
-  - $ref: "../../components/parameters/idOrName.yaml"
+  - $ref: "../../components/parameters/path/idOrName.yaml"
 responses:
   200:
     $ref: "../../components/responses/user.yaml"

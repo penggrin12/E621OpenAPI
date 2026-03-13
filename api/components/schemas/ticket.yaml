@@ -20,7 +20,7 @@ properties:
   reason:
     type: string
   disp_id:
-    type: number
+    type: integer
   qtype:
     $ref: "./ticketTypes.yaml"
   status:
