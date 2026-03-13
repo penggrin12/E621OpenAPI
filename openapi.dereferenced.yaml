@@ -12,7 +12,7 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: 26cc2e0
+  version: 801731c
 servers:
   - url: 'https://e621.net'
     description: E621 (production)
@@ -25326,12 +25326,6 @@ paths:
       operationId: listRisingSearchTrends
       tags:
         - Search Trends
-      parameters:
-        - in: query
-          name: day
-          schema:
-            type: string
-            format: date
       responses:
         '200':
           description: Success
