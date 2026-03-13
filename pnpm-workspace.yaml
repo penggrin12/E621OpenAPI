@@ -1,0 +1,9 @@
+onlyBuiltDependencies:
+  - '@scarf/scarf'
+  - '@tree-sitter-grammars/tree-sitter-yaml'
+  - core-js
+  - core-js-pure
+  - protobufjs
+  - sharp
+  - tree-sitter
+  - tree-sitter-json
