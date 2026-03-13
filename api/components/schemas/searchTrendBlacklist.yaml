@@ -1,0 +1,23 @@
+type: object
+required:
+  - id
+  - tag
+  - reason
+  - creator_id
+  - created_at
+  - updated_at
+properties:
+  id:
+    type: integer
+  tag:
+    type: string
+  reason:
+    type: string
+  creator_id:
+    type: integer
+  created_at:
+    type: string
+    format: date-time
+  updated_at:
+    type: string
+    format: date-time

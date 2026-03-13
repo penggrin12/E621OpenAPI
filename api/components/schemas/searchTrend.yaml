@@ -1,0 +1,13 @@
+type: object
+required:
+  - tag
+  - count
+  - day
+properties:
+  tag:
+    type: string
+  count:
+    type: integer
+  day:
+    type: string
+    format: date

@@ -89,6 +89,7 @@ enum:
   - staff_note_update
   - staff_note_delete
   - staff_note_undelete
+  - search_trend_blacklist_purge
   # legacy
   - created_positive_record
   - created_neutral_record

@@ -6,13 +6,7 @@ parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
   - $ref: "../../components/parameters/id.yaml"
-  - name: search[order]
-    in: query
-    schema:
-      type: string
-      enum:
-        - id_asc
-        - id_desc
+  - $ref: "../../components/parameters/order.yaml"
   - name: search[creator_id]
     in: query
     schema:

@@ -7,14 +7,7 @@ parameters:
   - $ref: "../../components/parameters/page.yaml"
   - $ref: "../../components/parameters/id.yaml"
   - $ref: "../../components/parameters/ipAddr.yaml"
-  - name: search[order]
-    in: query
-    description: The order of the results.
-    schema:
-      type: string
-      enum:
-        - id_asc
-        - id_desc
+  - $ref: "../../components/parameters/order.yaml"
   - name: search[updater_name]
     in: query
     description: The name of the updater of the avoid posting entry.

@@ -1,0 +1,25 @@
+summary: Purge Search Trend Blacklist
+operationId: purgeSearchTrendBlacklist
+tags:
+  - Search Trend Blacklists
+security:
+  - basicAuth: []
+description: You must be Admin+.
+parameters:
+  - $ref: "../../components/parameters/id.yaml"
+responses:
+  200:
+    description: Success
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - deleted_count
+          properties:
+            deleted_count:
+              type: integer
+  403:
+    $ref: "../../components/responses/accessDenied.yaml"
+  404:
+    $ref: "../../components/responses/notFound.yaml"

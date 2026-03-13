@@ -1,0 +1,8 @@
+name: search[order]
+in: query
+description: The order of the results.
+schema:
+  type: string
+  enum:
+    - id_asc
+    - id_desc

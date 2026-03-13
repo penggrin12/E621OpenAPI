@@ -1,0 +1,12 @@
+summary: Clear Search Trends Cache
+operationId: clearSearchTrendsCache
+tags:
+  - Search Trends
+security:
+  - basicAuth: []
+description: You must be Admin+.
+responses:
+  200:
+    $ref: "../../components/responses/messageSuccess.yaml"
+  403:
+    $ref: "../../components/responses/accessDenied.yaml"

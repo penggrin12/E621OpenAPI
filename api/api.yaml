@@ -48,6 +48,8 @@ components:
       $ref: "./components/parameters/page.yaml"
     ip_addr:
       $ref: "./components/parameters/ipAddr.yaml"
+    order:
+      $ref: "./components/parameters/order.yaml"
   schemas:
     AccessDeniedResponse:
       $ref: "./components/schemas/accessDenied.yaml"
@@ -195,6 +197,16 @@ components:
       $ref: "./components/schemas/userAvatarMenu.yaml"
     TagCorrection:
       $ref: "./components/schemas/tagCorrection.yaml"
+    SearchTrend:
+      $ref: "./components/schemas/searchTrend.yaml"
+    RisingSearchTrend:
+      $ref: "./components/schemas/risingSearchTrend.yaml"
+    SearchTrendBlacklist:
+      $ref: "./components/schemas/searchTrendBlacklist.yaml"
+    MessageErrorResponse:
+      $ref: "./components/schemas/messageError.yaml"
+    MessageSuccessResponse:
+      $ref: "./components/schemas/messageSuccess.yaml"
   responses:
     NotFound:
       $ref: "./components/responses/notFound.yaml"
@@ -202,6 +214,8 @@ components:
       $ref: "./components/responses/accessDenied.yaml"
     ExpectedError:
       $ref: "./components/responses/expectedError.yaml"
+    MessageSuccess:
+      $ref: "./components/responses/messageSuccess.yaml"
     MessageError:
       $ref: "./components/responses/messageError.yaml"
     UserResponse:
@@ -740,6 +754,31 @@ paths:
   /related_tag/bulk.json:
     post:
       $ref: "./paths/related_tags/bulk.yaml"
+
+  /search_trends.json:
+    get:
+      $ref: "./paths/search_trends/index.yaml"
+  /search_trends/rising.json:
+    get:
+      $ref: "./paths/search_trends/rising.yaml"
+  /search_trends/clear_cache.json:
+    post:
+      $ref: "./paths/search_trends/clear_cache.yaml"
+  /search_trends/update_settings.json:
+    post:
+      $ref: "./paths/search_trends/update_settings.yaml"
+
+  /search_trend_blacklists.json:
+    get:
+      $ref: "./paths/search_trend_blacklists/index.yaml"
+    post:
+      $ref: "./paths/search_trend_blacklists/create.yaml"
+  /search_trend_blacklists/{id}.json:
+    delete:
+      $ref: "./paths/search_trend_blacklists/destroy.yaml"
+  /search_trend_blacklists/purge.json:
+    delete:
+      $ref: "./paths/search_trend_blacklists/purge.yaml"
 
   /session.json:
     post:

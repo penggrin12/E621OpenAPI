@@ -1,25 +1,20 @@
-summary: List IP Bans
-operationId: listIpBans
+summary: List Search Trend Blacklists
+operationId: listSearchTrendBlacklists
 tags:
-  - IP Bans
+  - Search Trend Blacklists
 security:
   - basicAuth: []
+description: You must be Admin+.
 parameters:
   - $ref: "../../components/parameters/limit.yaml"
   - $ref: "../../components/parameters/page.yaml"
-  - $ref: "../../components/parameters/id.yaml"
-  - $ref: "../../components/parameters/ipAddr.yaml"
   - $ref: "../../components/parameters/order.yaml"
   - in: query
-    name: search[banner_id]
-    schema:
-      type: integer
-  - in: query
-    name: search[banner_name]
+    name: tag
     schema:
       type: string
   - in: query
-    name: search[reason]
+    name: reason
     schema:
       type: string
 responses:
@@ -30,4 +25,6 @@ responses:
         schema:
           type: array
           items:
-            $ref: "../../components/schemas/ipBan.yaml"
+            $ref: "../../components/schemas/searchTrendBlacklist.yaml"
+  403:
+    $ref: "../../components/responses/accessDenied.yaml"
