@@ -778,7 +778,7 @@ paths:
   /search_trend_blacklists/{id}.json:
     delete:
       $ref: "./paths/search_trend_blacklists/destroy.yaml"
-  /search_trend_blacklists/purge.json:
+  /search_trend_blacklists/{id}/purge.json:
     delete:
       $ref: "./paths/search_trend_blacklists/purge.yaml"
 

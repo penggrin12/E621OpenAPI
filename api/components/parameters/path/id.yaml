@@ -1,6 +1,6 @@
 name: id
 in: path
-description: The ID of the item to get.
+description: The ID of the item.
 required: true
 schema:
   type: integer
