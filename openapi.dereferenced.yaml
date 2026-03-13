@@ -12,7 +12,7 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: ad47c1f
+  version: 26cc2e0
 servers:
   - url: 'https://e621.net'
     description: E621 (production)
@@ -33,7 +33,7 @@ components:
       name: authenticity_token
       description: Retrieved via scraping html for the `csrf-token` meta tag.
   parameters:
-    id:
+    idQuery:
       name: 'search[id]'
       in: query
       description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
@@ -41,7 +41,45 @@ components:
         oneOf:
           - type: integer
           - type: string
-    idOrName:
+    limitQuery:
+      name: limit
+      in: query
+      description: The maximum number of results to return. Between 0 and 320.
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 320
+    pageQuery:
+      name: page
+      in: query
+      description: The page number of results to get. Between 1 and 750.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 750
+    ipAddrQuery:
+      name: 'search[ip_addr]'
+      in: query
+      description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+      schema:
+        type: string
+    orderQuery:
+      name: 'search[order]'
+      in: query
+      description: The order of the results.
+      schema:
+        type: string
+        enum:
+          - id_asc
+          - id_desc
+    idPath:
+      name: id
+      in: path
+      description: The ID of the item to get.
+      required: true
+      schema:
+        type: integer
+    idOrNamePath:
       name: idOrName
       in: path
       required: true
@@ -50,28 +88,6 @@ components:
           - type: integer
           - type: string
       description: An ID that can be either an integer or a name.
-    limit:
-      name: limit
-      in: query
-      description: The maximum number of results to return. Between 0 and 320.
-      schema:
-        type: integer
-        minimum: 0
-        maximum: 320
-    page:
-      name: page
-      in: query
-      description: The page number of results to get. Between 1 and 750.
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 750
-    ip_addr:
-      name: 'search[ip_addr]'
-      in: query
-      description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
-      schema:
-        type: string
   schemas:
     AccessDeniedResponse:
       type: object
@@ -201,6 +217,7 @@ components:
         - staff_note_update
         - staff_note_delete
         - staff_note_undelete
+        - search_trend_blacklist_purge
         - created_positive_record
         - created_neutral_record
         - created_negative_record
@@ -1728,7 +1745,7 @@ components:
         has_active_children:
           type: boolean
         bit_flags:
-          type: number
+          type: integer
         tag_count_meta:
           type: integer
         locked_tags:
@@ -1946,7 +1963,7 @@ components:
                 has_active_children:
                   type: boolean
                 bit_flags:
-                  type: number
+                  type: integer
                 tag_count_meta:
                   type: integer
                 locked_tags:
@@ -2162,6 +2179,7 @@ components:
             - staff_note_update
             - staff_note_delete
             - staff_note_undelete
+            - search_trend_blacklist_purge
             - created_positive_record
             - created_neutral_record
             - created_negative_record
@@ -2237,7 +2255,7 @@ components:
         height:
           type: integer
         version:
-          type: number
+          type: integer
         is_active:
           type: boolean
         post_id:
@@ -2282,7 +2300,7 @@ components:
         body:
           type: string
         version:
-          type: number
+          type: integer
         is_active:
           type: boolean
         note_id:
@@ -2389,7 +2407,7 @@ components:
             - collection
             - series
         version:
-          type: number
+          type: integer
         added_post_ids:
           type: array
           items:
@@ -2696,7 +2714,7 @@ components:
           items:
             type: string
         change_seq:
-          type: number
+          type: integer
         flags:
           type: object
           required:
@@ -2769,6 +2787,7 @@ components:
           type: boolean
         duration:
           type: number
+          format: float
           nullable: true
         uploader_name:
           type: string
@@ -3120,7 +3139,7 @@ components:
         description_changed:
           type: boolean
         version:
-          type: number
+          type: integer
         obsolete_added_tags:
           type: string
         obsolete_removed_tags:
@@ -3470,7 +3489,7 @@ components:
         reason:
           type: string
         disp_id:
-          type: number
+          type: integer
         qtype:
           type: string
           enum:
@@ -4043,6 +4062,76 @@ components:
             updated_at:
               type: string
               format: date-time
+    SearchTrend:
+      type: object
+      required:
+        - tag
+        - count
+        - day
+      properties:
+        tag:
+          type: string
+        count:
+          type: integer
+        day:
+          type: string
+          format: date
+    RisingSearchTrend:
+      type: object
+      required:
+        - tag
+      properties:
+        tag:
+          type: string
+    SearchTrendBlacklist:
+      type: object
+      required:
+        - id
+        - tag
+        - reason
+        - creator_id
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+        tag:
+          type: string
+        reason:
+          type: string
+        creator_id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    MessageErrorResponse:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        code:
+          type: string
+          nullable: true
+    MessageSuccessResponse:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          enum:
+            - true
+        message:
+          type: string
   responses:
     NotFound:
       description: Not Found
@@ -4093,6 +4182,22 @@ components:
                 type: array
                 items:
                   type: string
+    MessageSuccess:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - success
+              - message
+            properties:
+              success:
+                type: boolean
+                enum:
+                  - true
+              message:
+                type: string
     MessageError:
       description: Error
       content:
@@ -4774,7 +4879,7 @@ paths:
       parameters:
         - name: id
           in: path
-          description: The ID of the api key.
+          description: The ID of the item to get.
           required: true
           schema:
             type: integer
@@ -4826,7 +4931,7 @@ paths:
       parameters:
         - name: id
           in: path
-          description: The ID of the api key.
+          description: The ID of the item to get.
           required: true
           schema:
             type: integer
@@ -5306,7 +5411,7 @@ paths:
                           items:
                             oneOf:
                               - type: string
-                              - type: number
+                              - type: integer
                       urls:
                         type: array
                         items:
@@ -5910,6 +6015,7 @@ paths:
             type: string
         - name: 'search[order]'
           in: query
+          description: The order of the results.
           schema:
             type: string
             enum:
@@ -6648,7 +6754,7 @@ paths:
       parameters:
         - name: id
           in: path
-          description: The ID of the ban to get.
+          description: The ID of the item to get.
           required: true
           schema:
             type: integer
@@ -6935,7 +7041,7 @@ paths:
       parameters:
         - name: id
           in: path
-          description: The ID of the blip to get.
+          description: The ID of the item to get.
           required: true
           schema:
             type: integer
@@ -7030,7 +7136,7 @@ paths:
       parameters:
         - name: id
           in: path
-          description: The ID of the blip.
+          description: The ID of the item to get.
           required: true
           schema:
             type: integer
@@ -7106,8 +7212,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the blip.
           schema:
             type: integer
       responses:
@@ -7158,8 +7264,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the blip.
           schema:
             type: integer
       responses:
@@ -7255,8 +7361,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the blip.
           schema:
             type: integer
       responses:
@@ -7351,8 +7457,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the blip.
           schema:
             type: integer
       requestBody:
@@ -7744,8 +7850,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the bulk update request.
           schema:
             type: integer
       responses:
@@ -7825,8 +7931,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the bulk update request.
           schema:
             type: integer
       requestBody:
@@ -7906,8 +8012,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the bulk update request.
           schema:
             type: integer
       responses:
@@ -7955,8 +8061,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the bulk update request.
           schema:
             type: integer
       responses:
@@ -8284,8 +8390,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the comment.
           schema:
             type: integer
       responses:
@@ -8394,8 +8500,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the comment.
           schema:
             type: integer
       requestBody:
@@ -8476,8 +8582,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the comment.
           schema:
             type: integer
       responses:
@@ -8528,8 +8634,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the comment.
           schema:
             type: integer
       responses:
@@ -8639,8 +8745,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the comment.
           schema:
             type: integer
       responses:
@@ -8749,8 +8855,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the comment.
           schema:
             type: integer
       requestBody:
@@ -8902,8 +9008,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the comment.
           schema:
             type: integer
         - name: score
@@ -8992,8 +9098,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the comment.
           schema:
             type: integer
       responses:
@@ -9276,8 +9382,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the dmail.
           schema:
             type: integer
       responses:
@@ -9370,8 +9476,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the dmail.
           schema:
             type: integer
       responses:
@@ -9420,8 +9526,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the dmail.
           schema:
             type: integer
       responses:
@@ -9470,8 +9576,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the dmail.
           schema:
             type: integer
       responses:
@@ -9701,6 +9807,7 @@ paths:
             type: string
         - name: 'search[order]'
           in: query
+          description: The order of the results.
           schema:
             type: string
             enum:
@@ -9807,8 +9914,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The versionable id.
           schema:
             type: integer
         - name: type
@@ -10033,8 +10140,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the email blacklist.
           schema:
             type: integer
       responses:
@@ -10408,7 +10515,7 @@ paths:
                           items:
                             type: string
                         change_seq:
-                          type: number
+                          type: integer
                         flags:
                           type: object
                           required:
@@ -10481,6 +10588,7 @@ paths:
                           type: boolean
                         duration:
                           type: number
+                          format: float
                           nullable: true
                         uploader_name:
                           type: string
@@ -10545,9 +10653,9 @@ paths:
                   - favorite_count
                 properties:
                   post_id:
-                    type: number
+                    type: integer
                   favorite_count:
-                    type: number
+                    type: integer
         '403':
           description: Access Denied
           content:
@@ -10608,6 +10716,7 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
           schema:
             type: integer
@@ -10623,9 +10732,9 @@ paths:
                   - favorite_count
                 properties:
                   post_id:
-                    type: number
+                    type: integer
                   favorite_count:
-                    type: number
+                    type: integer
         '403':
           description: Access Denied
           content:
@@ -10705,6 +10814,7 @@ paths:
               - type: string
         - name: 'search[order]'
           in: query
+          description: The order of the results.
           schema:
             type: string
             enum:
@@ -10895,8 +11005,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the forum post.
           schema:
             type: integer
       responses:
@@ -10988,8 +11098,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the forum post.
           schema:
             type: integer
       requestBody:
@@ -11063,8 +11173,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the forum post.
           schema:
             type: integer
       responses:
@@ -11114,8 +11224,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the forum post.
           schema:
             type: integer
       responses:
@@ -11208,8 +11318,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the forum post.
           schema:
             type: integer
       responses:
@@ -11303,8 +11413,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the forum post.
           schema:
             type: integer
       requestBody:
@@ -11456,8 +11566,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the forum post.
           schema:
             type: integer
       requestBody:
@@ -11565,8 +11675,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the forum post.
           schema:
             type: integer
       responses:
@@ -11846,8 +11956,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the forum topic.
           schema:
             type: integer
       responses:
@@ -11936,8 +12046,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the forum topic.
           schema:
             type: integer
       requestBody:
@@ -12025,8 +12135,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the forum topic.
           schema:
             type: integer
       responses:
@@ -12076,8 +12186,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the forum topic.
           schema:
             type: integer
       responses:
@@ -12168,8 +12278,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the forum topic.
           schema:
             type: integer
       responses:
@@ -12259,8 +12369,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the forum topic.
           schema:
             type: integer
       responses:
@@ -12350,8 +12460,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the forum topic.
           schema:
             type: integer
       responses:
@@ -12609,11 +12719,11 @@ paths:
         - name: id
           in: path
           required: true
-          description: The ID or name of the help page.
           schema:
             oneOf:
               - type: integer
               - type: string
+          description: An ID that can be either an integer or a name.
       responses:
         '200':
           description: Success
@@ -12689,8 +12799,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the help page.
           schema:
             type: integer
       requestBody:
@@ -12771,8 +12881,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the help page.
           schema:
             type: integer
       responses:
@@ -12847,6 +12957,7 @@ paths:
             type: string
         - name: 'search[order]'
           in: query
+          description: The order of the results.
           schema:
             type: string
             enum:
@@ -12986,8 +13097,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the ip ban.
           schema:
             type: integer
       responses:
@@ -13035,7 +13146,7 @@ paths:
         - name: 'search[score_cutoff]'
           in: query
           schema:
-            type: number
+            type: integer
         - name: 'search[url]'
           in: query
           schema:
@@ -13217,7 +13328,7 @@ paths:
                             has_active_children:
                               type: boolean
                             bit_flags:
-                              type: number
+                              type: integer
                             tag_count_meta:
                               type: integer
                             locked_tags:
@@ -13304,7 +13415,7 @@ paths:
                   type: string
                   format: binary
                 'search[score_cutoff]':
-                  type: number
+                  type: integer
                 'search[url]':
                   type: string
                 'search[post_id]':
@@ -13492,7 +13603,7 @@ paths:
                             has_active_children:
                               type: boolean
                             bit_flags:
-                              type: number
+                              type: integer
                             tag_count_meta:
                               type: integer
                             locked_tags:
@@ -13785,8 +13896,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the mascot.
           schema:
             type: integer
       requestBody:
@@ -13876,8 +13987,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the mascot.
           schema:
             type: integer
       responses:
@@ -14059,6 +14170,7 @@ paths:
               - staff_note_update
               - staff_note_delete
               - staff_note_undelete
+              - search_trend_blacklist_purge
               - created_positive_record
               - created_neutral_record
               - created_negative_record
@@ -14192,6 +14304,7 @@ paths:
                         - staff_note_update
                         - staff_note_delete
                         - staff_note_undelete
+                        - search_trend_blacklist_purge
                         - created_positive_record
                         - created_neutral_record
                         - created_negative_record
@@ -14216,8 +14329,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the mod action.
           schema:
             type: integer
       responses:
@@ -14336,6 +14449,7 @@ paths:
                       - staff_note_update
                       - staff_note_delete
                       - staff_note_undelete
+                      - search_trend_blacklist_purge
                       - created_positive_record
                       - created_neutral_record
                       - created_negative_record
@@ -14527,8 +14641,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the news update.
           schema:
             type: integer
       requestBody:
@@ -14604,8 +14718,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the news update.
           schema:
             type: integer
       responses:
@@ -14673,6 +14787,7 @@ paths:
               - type: string
         - name: 'search[order]'
           in: query
+          description: The order of the results.
           schema:
             type: string
             enum:
@@ -14753,7 +14868,7 @@ paths:
                     height:
                       type: integer
                     version:
-                      type: number
+                      type: integer
                     is_active:
                       type: boolean
                     post_id:
@@ -14839,7 +14954,7 @@ paths:
                       height:
                         type: integer
                       version:
-                        type: number
+                        type: integer
                       is_active:
                         type: boolean
                       post_id:
@@ -14897,8 +15012,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the note.
           schema:
             type: integer
       responses:
@@ -14942,7 +15057,7 @@ paths:
                   height:
                     type: integer
                   version:
-                    type: number
+                    type: integer
                   is_active:
                     type: boolean
                   post_id:
@@ -14977,8 +15092,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the note.
           schema:
             type: integer
       requestBody:
@@ -15059,8 +15174,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the note.
           schema:
             type: integer
       responses:
@@ -15109,8 +15224,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the note.
           schema:
             type: integer
         - name: version_id
@@ -15279,7 +15394,7 @@ paths:
                     body:
                       type: string
                     version:
-                      type: number
+                      type: integer
                     is_active:
                       type: boolean
                     note_id:
@@ -15529,8 +15644,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the pool.
           schema:
             type: integer
       responses:
@@ -15608,8 +15723,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the pool.
           schema:
             type: integer
       requestBody:
@@ -15700,8 +15815,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the pool.
           schema:
             type: integer
       responses:
@@ -15750,8 +15865,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the pool.
           schema:
             type: integer
         - name: version_id
@@ -16098,7 +16213,7 @@ paths:
                         - collection
                         - series
                     version:
-                      type: number
+                      type: integer
                     added_post_ids:
                       type: array
                       items:
@@ -16446,7 +16561,7 @@ paths:
                           items:
                             type: string
                         change_seq:
-                          type: number
+                          type: integer
                         flags:
                           type: object
                           required:
@@ -16519,6 +16634,7 @@ paths:
                           type: boolean
                         duration:
                           type: number
+                          format: float
                           nullable: true
                         uploader_name:
                           type: string
@@ -16865,7 +16981,7 @@ paths:
                           items:
                             type: string
                         change_seq:
-                          type: number
+                          type: integer
                         flags:
                           type: object
                           required:
@@ -16938,6 +17054,7 @@ paths:
                           type: boolean
                         duration:
                           type: number
+                          format: float
                           nullable: true
                         uploader_name:
                           type: string
@@ -17260,7 +17377,7 @@ paths:
                         items:
                           type: string
                       change_seq:
-                        type: number
+                        type: integer
                       flags:
                         type: object
                         required:
@@ -17333,6 +17450,7 @@ paths:
                         type: boolean
                       duration:
                         type: number
+                        format: float
                         nullable: true
                       uploader_name:
                         type: string
@@ -17361,8 +17479,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post.
           schema:
             type: integer
       responses:
@@ -17673,7 +17791,7 @@ paths:
                         items:
                           type: string
                       change_seq:
-                        type: number
+                        type: integer
                       flags:
                         type: object
                         required:
@@ -17746,6 +17864,7 @@ paths:
                         type: boolean
                       duration:
                         type: number
+                        format: float
                         nullable: true
                       uploader_name:
                         type: string
@@ -17776,8 +17895,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post.
           schema:
             type: integer
       requestBody:
@@ -18156,7 +18275,7 @@ paths:
                     items:
                       type: string
                   change_seq:
-                    type: number
+                    type: integer
                   flags:
                     type: object
                     required:
@@ -18229,6 +18348,7 @@ paths:
                     type: boolean
                   duration:
                     type: number
+                    format: float
                     nullable: true
                   uploader_name:
                     type: string
@@ -18293,8 +18413,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post.
           schema:
             type: integer
       responses:
@@ -18605,7 +18725,7 @@ paths:
                         items:
                           type: string
                       change_seq:
-                        type: number
+                        type: integer
                       flags:
                         type: object
                         required:
@@ -18678,6 +18798,7 @@ paths:
                         type: boolean
                       duration:
                         type: number
+                        format: float
                         nullable: true
                       uploader_name:
                         type: string
@@ -18742,8 +18863,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post.
           schema:
             type: integer
       requestBody:
@@ -19064,7 +19185,7 @@ paths:
                         items:
                           type: string
                       change_seq:
-                        type: number
+                        type: integer
                       flags:
                         type: object
                         required:
@@ -19137,6 +19258,7 @@ paths:
                         type: boolean
                       duration:
                         type: number
+                        format: float
                         nullable: true
                       uploader_name:
                         type: string
@@ -19200,8 +19322,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post.
           schema:
             type: integer
       requestBody:
@@ -19277,8 +19399,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post.
           schema:
             type: integer
         - name: version_id
@@ -19348,8 +19470,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post.
           schema:
             type: integer
         - name: seq
@@ -19668,7 +19790,7 @@ paths:
                         items:
                           type: string
                       change_seq:
-                        type: number
+                        type: integer
                       flags:
                         type: object
                         required:
@@ -19741,6 +19863,7 @@ paths:
                         type: boolean
                       duration:
                         type: number
+                        format: float
                         nullable: true
                       uploader_name:
                         type: string
@@ -19805,8 +19928,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post.
           schema:
             type: integer
       requestBody:
@@ -19862,8 +19985,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post.
           schema:
             type: integer
         - name: limit
@@ -20186,7 +20309,7 @@ paths:
                       items:
                         type: string
                     change_seq:
-                      type: number
+                      type: integer
                     flags:
                       type: object
                       required:
@@ -20259,6 +20382,7 @@ paths:
                       type: boolean
                     duration:
                       type: number
+                      format: float
                       nullable: true
                     uploader_name:
                       type: string
@@ -20305,8 +20429,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post.
           schema:
             type: integer
         - name: score
@@ -20401,8 +20525,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post.
           schema:
             type: integer
       responses:
@@ -20691,8 +20815,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post set.
           schema:
             type: integer
       responses:
@@ -20784,8 +20908,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post sets.
           schema:
             type: integer
       requestBody:
@@ -20867,8 +20991,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post set.
           schema:
             type: integer
       responses:
@@ -20918,8 +21042,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post set.
           schema:
             type: integer
       requestBody:
@@ -21039,8 +21163,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post set.
           schema:
             type: integer
       requestBody:
@@ -21163,8 +21287,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post set.
           schema:
             type: integer
       requestBody:
@@ -21297,13 +21421,19 @@ paths:
                     items:
                       oneOf:
                         - type: string
-                        - type: number
+                        - type: integer
+                      example:
+                        - - my_set
+                          - 1
                   Maintained:
                     type: array
                     items:
                       oneOf:
                         - type: string
-                        - type: number
+                        - type: integer
+                      example:
+                        - - my_set
+                          - 1
         '403':
           description: Access Denied
           content:
@@ -21367,6 +21497,7 @@ paths:
               - type: string
         - name: 'search[order]'
           in: query
+          description: The order of the results.
           schema:
             type: string
             enum:
@@ -21448,6 +21579,7 @@ paths:
               - type: string
         - name: 'search[order]'
           in: query
+          description: The order of the results.
           schema:
             type: string
             enum:
@@ -21585,6 +21717,7 @@ paths:
             type: string
         - name: 'search[order]'
           in: query
+          description: The order of the results.
           schema:
             type: string
             enum:
@@ -21789,8 +21922,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post flag.
           schema:
             type: integer
       responses:
@@ -21867,8 +22000,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post flag.
           schema:
             type: integer
       responses:
@@ -22211,8 +22344,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post replacement.
           schema:
             type: integer
       responses:
@@ -22262,8 +22395,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post replacement.
           schema:
             type: integer
       responses:
@@ -22330,8 +22463,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post replacement.
           schema:
             type: integer
       responses:
@@ -22398,8 +22531,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post replacement.
           schema:
             type: integer
       responses:
@@ -22710,7 +22843,7 @@ paths:
                         items:
                           type: string
                       change_seq:
-                        type: number
+                        type: integer
                       flags:
                         type: object
                         required:
@@ -22783,6 +22916,7 @@ paths:
                         type: boolean
                       duration:
                         type: number
+                        format: float
                         nullable: true
                       uploader_name:
                         type: string
@@ -22847,8 +22981,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post replacement.
           schema:
             type: integer
       responses:
@@ -23111,7 +23245,7 @@ paths:
                     description_changed:
                       type: boolean
                     version:
-                      type: number
+                      type: integer
                     obsolete_added_tags:
                       type: string
                     obsolete_removed_tags:
@@ -23134,8 +23268,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post version.
           schema:
             type: integer
       responses:
@@ -23185,8 +23319,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post version.
           schema:
             type: integer
       responses:
@@ -23235,8 +23369,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post version.
           schema:
             type: integer
       responses:
@@ -23515,8 +23649,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID or name of the tag.
           schema:
             type: integer
       responses:
@@ -23597,8 +23731,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the tag.
           schema:
             type: integer
       requestBody:
@@ -23684,8 +23818,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the tag.
           schema:
             type: integer
       responses:
@@ -23734,8 +23868,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the tag.
           schema:
             type: integer
       responses:
@@ -23851,8 +23985,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the tag.
           schema:
             type: integer
       requestBody:
@@ -24246,8 +24380,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the tag alias.
           schema:
             type: integer
       responses:
@@ -24337,8 +24471,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the tag alias.
           schema:
             type: integer
       requestBody:
@@ -24416,8 +24550,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the tag alias.
           schema:
             type: integer
       responses:
@@ -24467,8 +24601,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the tag alias.
           schema:
             type: integer
       responses:
@@ -24748,8 +24882,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the tag implication.
           schema:
             type: integer
       responses:
@@ -24839,8 +24973,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the tag implication.
           schema:
             type: integer
       requestBody:
@@ -24918,8 +25052,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the tag implication.
           schema:
             type: integer
       responses:
@@ -24969,8 +25103,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the tag implication.
           schema:
             type: integer
       responses:
@@ -25153,6 +25287,454 @@ paths:
                     type: string
                     enum:
                       - Access Denied
+  /search_trends.json:
+    get:
+      summary: List Search Trends
+      operationId: listSearchTrends
+      tags:
+        - Search Trends
+      parameters:
+        - in: query
+          name: day
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - tag
+                    - count
+                    - day
+                  properties:
+                    tag:
+                      type: string
+                    count:
+                      type: integer
+                    day:
+                      type: string
+                      format: date
+  /search_trends/rising.json:
+    get:
+      summary: List Rising Search Trends
+      operationId: listRisingSearchTrends
+      tags:
+        - Search Trends
+      parameters:
+        - in: query
+          name: day
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - tag
+                  properties:
+                    tag:
+                      type: string
+  /search_trends/clear_cache.json:
+    post:
+      summary: Clear Search Trends Cache
+      operationId: clearSearchTrendsCache
+      tags:
+        - Search Trends
+      security:
+        - basicAuth: []
+      description: You must be Admin+.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - message
+                properties:
+                  success:
+                    type: boolean
+                    enum:
+                      - true
+                  message:
+                    type: string
+        '403':
+          description: Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - Access Denied
+  /search_trends/update_settings.json:
+    post:
+      summary: Update Search Trends Settings
+      operationId: updateSearchTrendsSettings
+      tags:
+        - Search Trends
+      security:
+        - basicAuth: []
+      description: You must be Admin+.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                trends_enabled:
+                  type: boolean
+                trends_min_today:
+                  type: integer
+                trends_min_dleta:
+                  type: integer
+                trends_min_ratio:
+                  type: number
+                  format: float
+                trends_ip_limit:
+                  type: integer
+                trends_ip_window:
+                  type: integer
+                trends_tag_limit:
+                  type: integer
+                trends_tag_window:
+                  type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - message
+                properties:
+                  success:
+                    type: boolean
+                    enum:
+                      - true
+                  message:
+                    type: string
+        '403':
+          description: Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - Access Denied
+  /search_trend_blacklists.json:
+    get:
+      summary: List Search Trend Blacklists
+      operationId: listSearchTrendBlacklists
+      tags:
+        - Search Trend Blacklists
+      security:
+        - basicAuth: []
+      description: You must be Admin+.
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of results to return. Between 0 and 320.
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 320
+        - name: page
+          in: query
+          description: The page number of results to get. Between 1 and 750.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 750
+        - name: 'search[order]'
+          in: query
+          description: The order of the results.
+          schema:
+            type: string
+            enum:
+              - id_asc
+              - id_desc
+        - in: query
+          name: tag
+          schema:
+            type: string
+        - in: query
+          name: reason
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - tag
+                    - reason
+                    - creator_id
+                    - created_at
+                    - updated_at
+                  properties:
+                    id:
+                      type: integer
+                    tag:
+                      type: string
+                    reason:
+                      type: string
+                    creator_id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+        '403':
+          description: Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - Access Denied
+    post:
+      summary: Create Search Trend Blacklist
+      operationId: createSearchTrendBlacklist
+      tags:
+        - Search Trend Blacklists
+      security:
+        - basicAuth: []
+      description: You must be Admin+.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tag
+                - reason
+              properties:
+                tag:
+                  type: string
+                reason:
+                  type: string
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - tag
+                  - reason
+                  - creator_id
+                  - created_at
+                  - updated_at
+                properties:
+                  id:
+                    type: integer
+                  tag:
+                    type: string
+                  reason:
+                    type: string
+                  creator_id:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '403':
+          description: Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - Access Denied
+        '422':
+          description: Invalid Input Data
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - errors
+                example:
+                  - errors:
+                      key:
+                        - the error
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+  '/search_trend_blacklists/{id}.json':
+    delete:
+      summary: Delete Search Trend Blacklist
+      operationId: deleteSearchTrendBlacklist
+      tags:
+        - Search Trend Blacklists
+      security:
+        - basicAuth: []
+      description: You must be Admin+.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the item to get.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Success
+        '403':
+          description: Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - Access Denied
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - not found
+  /search_trend_blacklists/purge.json:
+    delete:
+      summary: Purge Search Trend Blacklist
+      operationId: purgeSearchTrendBlacklist
+      tags:
+        - Search Trend Blacklists
+      security:
+        - basicAuth: []
+      description: You must be Admin+.
+      parameters:
+        - name: 'search[id]'
+          in: query
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
+          schema:
+            oneOf:
+              - type: integer
+              - type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - deleted_count
+                properties:
+                  deleted_count:
+                    type: integer
+        '403':
+          description: Access Denied
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - Access Denied
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - not found
   /session.json:
     post:
       summary: Login
@@ -25238,6 +25820,7 @@ paths:
               - type: string
         - name: 'search[order]'
           in: query
+          description: The order of the results.
           schema:
             type: string
             enum:
@@ -25426,7 +26009,7 @@ paths:
       parameters:
         - name: id
           in: path
-          description: The ID of the staff note to get.
+          description: The ID of the item to get.
           required: true
           schema:
             type: integer
@@ -25508,7 +26091,7 @@ paths:
       parameters:
         - name: id
           in: path
-          description: The ID of the staff note.
+          description: The ID of the item to get.
           required: true
           schema:
             type: integer
@@ -25617,8 +26200,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the staff note.
           schema:
             type: integer
       responses:
@@ -25701,8 +26284,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the staff note.
           schema:
             type: integer
       responses:
@@ -26038,8 +26621,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the takedown.
           schema:
             type: integer
       responses:
@@ -26107,8 +26690,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the takedown.
           schema:
             type: integer
       requestBody:
@@ -26191,8 +26774,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the takedown.
           schema:
             type: integer
       responses:
@@ -26242,8 +26825,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the takedown.
           schema:
             type: integer
       requestBody:
@@ -26317,8 +26900,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the takedown.
           schema:
             type: integer
       requestBody:
@@ -26392,8 +26975,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the takedown.
           schema:
             type: integer
       requestBody:
@@ -26462,8 +27045,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the takedown.
           schema:
             type: integer
       requestBody:
@@ -26635,7 +27218,7 @@ paths:
                     reason:
                       type: string
                     disp_id:
-                      type: number
+                      type: integer
                     qtype:
                       type: string
                       enum:
@@ -26704,8 +27287,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the ticket.
           schema:
             type: integer
       responses:
@@ -26736,7 +27319,7 @@ paths:
                   reason:
                     type: string
                   disp_id:
-                    type: number
+                    type: integer
                   qtype:
                     type: string
                     enum:
@@ -26820,8 +27403,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the ticket.
           schema:
             type: integer
       requestBody:
@@ -26893,8 +27476,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the ticket.
           schema:
             type: integer
       security:
@@ -26927,7 +27510,7 @@ paths:
                   reason:
                     type: string
                   disp_id:
-                    type: number
+                    type: integer
                   qtype:
                     type: string
                     enum:
@@ -27010,8 +27593,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the ticket.
           schema:
             type: integer
       security:
@@ -27044,7 +27627,7 @@ paths:
                   reason:
                     type: string
                   disp_id:
-                    type: number
+                    type: integer
                   qtype:
                     type: string
                     enum:
@@ -27147,6 +27730,7 @@ paths:
               - type: string
         - name: 'search[order]'
           in: query
+          description: The order of the results.
           schema:
             type: string
             enum:
@@ -27413,8 +27997,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the upload.
           schema:
             type: integer
       responses:
@@ -27752,8 +28336,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the upload whitelist entry.
           schema:
             type: integer
       requestBody:
@@ -27835,8 +28419,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the upload whitelist.
           schema:
             type: integer
       responses:
@@ -29092,7 +29676,7 @@ paths:
               type: object
               properties:
                 'user[comment_threshold]':
-                  type: number
+                  type: integer
                 'user[default_image_size]':
                   type: string
                   enum:
@@ -29936,8 +30520,8 @@ paths:
             type: integer
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the DMail.
           schema:
             type: integer
       responses:
@@ -30120,6 +30704,7 @@ paths:
               - type: string
         - name: 'search[order]'
           in: query
+          description: The order of the results.
           schema:
             type: string
             enum:
@@ -30320,8 +30905,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the feedback.
           schema:
             type: integer
       responses:
@@ -30409,8 +30994,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the feedback.
           schema:
             type: integer
       requestBody:
@@ -30490,8 +31075,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the feedback.
           schema:
             type: integer
       responses:
@@ -30541,8 +31126,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the feedback.
           schema:
             type: integer
       responses:
@@ -30592,8 +31177,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the feedback.
           schema:
             type: integer
       responses:
@@ -30664,6 +31249,7 @@ paths:
               - type: string
         - name: 'search[order]'
           in: query
+          description: The order of the results.
           schema:
             type: string
             enum:
@@ -30793,8 +31379,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the name change request.
           schema:
             type: integer
       responses:
@@ -30879,8 +31465,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the name change request.
           schema:
             type: integer
       responses:
@@ -31182,9 +31768,11 @@ paths:
         - name: id
           in: path
           required: true
-          description: The ID or name of the wiki page.
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
+          description: An ID that can be either an integer or a name.
       responses:
         '200':
           description: Success
@@ -31274,8 +31862,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the wiki page.
           schema:
             type: integer
       requestBody:
@@ -31380,8 +31968,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the wiki page.
           schema:
             type: integer
       responses:
@@ -31430,8 +32018,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the wiki page.
           schema:
             type: integer
         - name: version_id
@@ -31527,6 +32115,7 @@ paths:
             type: string
         - name: 'search[order]'
           in: query
+          description: The order of the results.
           schema:
             type: string
             enum:
@@ -31622,8 +32211,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the wiki page version.
           schema:
             type: integer
       responses:
@@ -31737,8 +32326,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the user.
           schema:
             type: integer
       requestBody:
@@ -31760,7 +32349,7 @@ paths:
                 'user[profile_artinfo]':
                   type: string
                 'user[base_upload_limit]':
-                  type: number
+                  type: integer
                 'user[enable_privacy_mode]':
                   type: boolean
                 'user[email]':
@@ -31855,8 +32444,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the user.
           schema:
             type: integer
       responses:
@@ -31892,8 +32481,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post.
           schema:
             type: integer
       requestBody:
@@ -31983,8 +32572,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post.
           schema:
             type: integer
       responses:
@@ -32295,7 +32884,7 @@ paths:
                         items:
                           type: string
                       change_seq:
-                        type: number
+                        type: integer
                       flags:
                         type: object
                         required:
@@ -32368,6 +32957,7 @@ paths:
                         type: boolean
                       duration:
                         type: number
+                        format: float
                         nullable: true
                       uploader_name:
                         type: string
@@ -32432,8 +33022,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post.
           schema:
             type: integer
       responses:
@@ -32744,7 +33334,7 @@ paths:
                         items:
                           type: string
                       change_seq:
-                        type: number
+                        type: integer
                       flags:
                         type: object
                         required:
@@ -32817,6 +33407,7 @@ paths:
                         type: boolean
                       duration:
                         type: number
+                        format: float
                         nullable: true
                       uploader_name:
                         type: string
@@ -32881,8 +33472,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post.
           schema:
             type: integer
       responses:
@@ -32949,8 +33540,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post.
           schema:
             type: integer
       requestBody:
@@ -33269,7 +33860,7 @@ paths:
                         items:
                           type: string
                       change_seq:
-                        type: number
+                        type: integer
                       flags:
                         type: object
                         required:
@@ -33342,6 +33933,7 @@ paths:
                         type: boolean
                       duration:
                         type: number
+                        format: float
                         nullable: true
                       uploader_name:
                         type: string
@@ -33406,8 +33998,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post.
           schema:
             type: integer
       requestBody:
@@ -33470,8 +34062,8 @@ paths:
       parameters:
         - name: id
           in: path
+          description: The ID of the item to get.
           required: true
-          description: The ID of the post.
           schema:
             type: integer
       responses:

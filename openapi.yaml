@@ -12,7 +12,7 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: ad47c1f
+  version: 26cc2e0
 servers:
   - url: 'https://e621.net'
     description: E621 (production)
@@ -33,7 +33,7 @@ components:
       name: authenticity_token
       description: Retrieved via scraping html for the `csrf-token` meta tag.
   parameters:
-    id:
+    idQuery:
       name: 'search[id]'
       in: query
       description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
@@ -41,7 +41,45 @@ components:
         oneOf:
           - type: integer
           - type: string
-    idOrName:
+    limitQuery:
+      name: limit
+      in: query
+      description: The maximum number of results to return. Between 0 and 320.
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 320
+    pageQuery:
+      name: page
+      in: query
+      description: The page number of results to get. Between 1 and 750.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 750
+    ipAddrQuery:
+      name: 'search[ip_addr]'
+      in: query
+      description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+      schema:
+        type: string
+    orderQuery:
+      name: 'search[order]'
+      in: query
+      description: The order of the results.
+      schema:
+        type: string
+        enum:
+          - id_asc
+          - id_desc
+    idPath:
+      name: id
+      in: path
+      description: The ID of the item to get.
+      required: true
+      schema:
+        type: integer
+    idOrNamePath:
       name: idOrName
       in: path
       required: true
@@ -50,28 +88,6 @@ components:
           - type: integer
           - type: string
       description: An ID that can be either an integer or a name.
-    limit:
-      name: limit
-      in: query
-      description: The maximum number of results to return. Between 0 and 320.
-      schema:
-        type: integer
-        minimum: 0
-        maximum: 320
-    page:
-      name: page
-      in: query
-      description: The page number of results to get. Between 1 and 750.
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 750
-    ip_addr:
-      name: 'search[ip_addr]'
-      in: query
-      description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
-      schema:
-        type: string
   schemas:
     AccessDeniedResponse:
       type: object
@@ -201,6 +217,7 @@ components:
         - staff_note_update
         - staff_note_delete
         - staff_note_undelete
+        - search_trend_blacklist_purge
         - created_positive_record
         - created_neutral_record
         - created_negative_record
@@ -1266,7 +1283,7 @@ components:
         has_active_children:
           type: boolean
         bit_flags:
-          type: number
+          type: integer
         tag_count_meta:
           type: integer
         locked_tags:
@@ -1476,7 +1493,7 @@ components:
         height:
           type: integer
         version:
-          type: number
+          type: integer
         is_active:
           type: boolean
         post_id:
@@ -1521,7 +1538,7 @@ components:
         body:
           type: string
         version:
-          type: number
+          type: integer
         is_active:
           type: boolean
         note_id:
@@ -1622,7 +1639,7 @@ components:
         category:
           $ref: '#/components/schemas/PoolCategories'
         version:
-          type: number
+          type: integer
         added_post_ids:
           type: array
           items:
@@ -1814,7 +1831,7 @@ components:
           items:
             type: string
         change_seq:
-          type: number
+          type: integer
         flags:
           type: object
           required:
@@ -1883,6 +1900,7 @@ components:
           type: boolean
         duration:
           type: number
+          format: float
           nullable: true
         uploader_name:
           type: string
@@ -2206,7 +2224,7 @@ components:
         description_changed:
           type: boolean
         version:
-          type: number
+          type: integer
         obsolete_added_tags:
           type: string
         obsolete_removed_tags:
@@ -2495,7 +2513,7 @@ components:
         reason:
           type: string
         disp_id:
-          type: number
+          type: integer
         qtype:
           $ref: '#/components/schemas/TicketTypes'
         status:
@@ -2974,6 +2992,76 @@ components:
           $ref: '#/components/schemas/TagCategories'
         tag:
           $ref: '#/components/schemas/Tag'
+    SearchTrend:
+      type: object
+      required:
+        - tag
+        - count
+        - day
+      properties:
+        tag:
+          type: string
+        count:
+          type: integer
+        day:
+          type: string
+          format: date
+    RisingSearchTrend:
+      type: object
+      required:
+        - tag
+      properties:
+        tag:
+          type: string
+    SearchTrendBlacklist:
+      type: object
+      required:
+        - id
+        - tag
+        - reason
+        - creator_id
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+        tag:
+          type: string
+        reason:
+          type: string
+        creator_id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    MessageErrorResponse:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        code:
+          type: string
+          nullable: true
+    MessageSuccessResponse:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          enum:
+            - true
+        message:
+          type: string
   responses:
     NotFound:
       description: Not Found
@@ -3004,23 +3092,18 @@ components:
                 type: array
                 items:
                   type: string
+    MessageSuccess:
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MessageSuccessResponse'
     MessageError:
       description: Error
       content:
         application/json:
           schema:
-            type: object
-            required:
-              - success
-              - message
-            properties:
-              success:
-                type: boolean
-              message:
-                type: string
-              code:
-                type: string
-                nullable: true
+            $ref: '#/components/schemas/MessageErrorResponse'
     UserResponse:
       description: Success
       content:
@@ -3046,9 +3129,9 @@ paths:
         - browserAuth: []
       description: 'Requires [browser authentication](#operations-Sessions-login) (username & password), as well as hourly password confirmations (reauthentication).'
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - name: 'search[order]'
           in: query
           schema:
@@ -3149,12 +3232,7 @@ paths:
           csrfToken: []
       description: 'Requires [browser authentication](#operations-Sessions-login) (username & password), as well as hourly password confirmations (reauthentication).'
       parameters:
-        - name: id
-          in: path
-          description: The ID of the api key.
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -3173,12 +3251,7 @@ paths:
           csrfToken: []
       description: 'Requires [browser authentication](#operations-Sessions-login) (username & password), as well as hourly password confirmations (reauthentication).'
       parameters:
-        - name: id
-          in: path
-          description: The ID of the api key.
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -3208,9 +3281,9 @@ paths:
       tags:
         - Artists
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - name: 'search[order]'
           in: query
           schema:
@@ -3345,7 +3418,7 @@ paths:
       tags:
         - Artists
       parameters:
-        - $ref: '#/components/parameters/idOrName'
+        - $ref: '#/components/parameters/idOrNamePath'
       responses:
         '200':
           description: Success
@@ -3369,7 +3442,7 @@ paths:
                           items:
                             oneOf:
                               - type: string
-                              - type: number
+                              - type: integer
                       urls:
                         type: array
                         items:
@@ -3390,7 +3463,7 @@ paths:
         Individual `other_names` are silently truncated to 100 characters.
         If an artist is on the avoid posting list, you must have the bd staff user flag to edit name, other_names, or group_name.
       parameters:
-        - $ref: '#/components/parameters/idOrName'
+        - $ref: '#/components/parameters/idOrNamePath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -3438,7 +3511,7 @@ paths:
       description: |
         You must be an Admin+ to delete an artist.
       parameters:
-        - $ref: '#/components/parameters/idOrName'
+        - $ref: '#/components/parameters/idOrNamePath'
       responses:
         '204':
           description: Success
@@ -3457,7 +3530,7 @@ paths:
       description: |
         If an artist is locked, you must be Janitor+ to revert them.
       parameters:
-        - $ref: '#/components/parameters/idOrName'
+        - $ref: '#/components/parameters/idOrNamePath'
         - name: version_id
           in: query
           required: true
@@ -3480,10 +3553,10 @@ paths:
       tags:
         - Artist Versions
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - $ref: '#/components/parameters/ip_addr'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/ipAddrQuery'
         - name: 'search[order]'
           in: query
           description: The order of the results.
@@ -3529,9 +3602,9 @@ paths:
       tags:
         - Artist URLs
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - name: 'search[order]'
           in: query
           description: The order of the results.
@@ -3622,17 +3695,11 @@ paths:
       tags:
         - Avoid Posting Entries
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - $ref: '#/components/parameters/ip_addr'
-        - name: 'search[order]'
-          in: query
-          schema:
-            type: string
-            enum:
-              - id_asc
-              - id_desc
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/ipAddrQuery'
+        - $ref: '#/components/parameters/orderQuery'
         - name: 'search[creator_name]'
           in: query
           schema:
@@ -3736,7 +3803,7 @@ paths:
       tags:
         - Avoid Posting Entries
       parameters:
-        - $ref: '#/components/parameters/idOrName'
+        - $ref: '#/components/parameters/idOrNamePath'
       responses:
         '200':
           description: Success
@@ -3755,7 +3822,7 @@ paths:
         - basicAuth: []
       description: Must have the bd staff user flag.
       parameters:
-        - $ref: '#/components/parameters/idOrName'
+        - $ref: '#/components/parameters/idOrNamePath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -3798,7 +3865,7 @@ paths:
         - basicAuth: []
       description: Must have the bd staff user flag.
       parameters:
-        - $ref: '#/components/parameters/idOrName'
+        - $ref: '#/components/parameters/idOrNamePath'
       responses:
         '204':
           description: Success
@@ -3816,7 +3883,7 @@ paths:
         - basicAuth: []
       description: Must have the bd staff user flag.
       parameters:
-        - $ref: '#/components/parameters/idOrName'
+        - $ref: '#/components/parameters/idOrNamePath'
       responses:
         '204':
           description: Success
@@ -3834,7 +3901,7 @@ paths:
         - basicAuth: []
       description: Must have the bd staff user flag.
       parameters:
-        - $ref: '#/components/parameters/idOrName'
+        - $ref: '#/components/parameters/idOrNamePath'
       responses:
         '204':
           description: Success
@@ -3849,18 +3916,11 @@ paths:
       tags:
         - Avoid Posting Versions
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - $ref: '#/components/parameters/ip_addr'
-        - name: 'search[order]'
-          in: query
-          description: The order of the results.
-          schema:
-            type: string
-            enum:
-              - id_asc
-              - id_desc
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/ipAddrQuery'
+        - $ref: '#/components/parameters/orderQuery'
         - name: 'search[updater_name]'
           in: query
           description: The name of the updater of the avoid posting entry.
@@ -3917,9 +3977,9 @@ paths:
       tags:
         - Bans
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - name: 'search[order]'
           in: query
           description: The order of the results.
@@ -3975,12 +4035,7 @@ paths:
       tags:
         - Bans
       parameters:
-        - name: id
-          in: path
-          description: The ID of the ban to get.
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -3997,10 +4052,10 @@ paths:
       tags:
         - Blips
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - $ref: '#/components/parameters/ip_addr'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/ipAddrQuery'
         - name: 'search[order]'
           in: query
           schema:
@@ -4074,12 +4129,7 @@ paths:
       tags:
         - Blips
       parameters:
-        - name: id
-          in: path
-          description: The ID of the blip to get.
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -4100,12 +4150,7 @@ paths:
         - basicAuth: []
       description: 'Unless Admin+, blips cannot be edited after 5 minutes. Marked blips cannot be edited.'
       parameters:
-        - name: id
-          in: path
-          description: The ID of the blip.
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -4133,12 +4178,7 @@ paths:
       description: |
         You must be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the blip.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -4157,12 +4197,7 @@ paths:
       description: |
         You must be the creator or Moderator+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the blip.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '201':
           description: Success
@@ -4185,12 +4220,7 @@ paths:
       description: |
         You must be Moderator+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the blip.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '201':
           description: Success
@@ -4212,12 +4242,7 @@ paths:
         - basicAuth: []
       description: You must be Moderator+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the blip.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         $ref: '#/components/requestBodies/warning'
       responses:
@@ -4238,9 +4263,9 @@ paths:
       tags:
         - Bulk Update Requests
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - name: 'search[order]'
           in: query
           schema:
@@ -4347,12 +4372,7 @@ paths:
       tags:
         - Bulk Update Requests
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the bulk update request.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -4371,12 +4391,7 @@ paths:
         - basicAuth: []
       description: 'You must be the creator of the BUR, or Admin+.'
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the bulk update request.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -4409,12 +4424,7 @@ paths:
         - basicAuth: []
       description: 'You must be the creator of the BUR, or Admin+.'
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the bulk update request.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -4430,12 +4440,7 @@ paths:
         - Bulk Update Requests
       description: Must be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the bulk update request.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -4451,10 +4456,10 @@ paths:
         - Comments
       description: 'For searching comments, group_by=comment must be set.'
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - $ref: '#/components/parameters/ip_addr'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/ipAddrQuery'
         - name: 'search[order]'
           in: query
           schema:
@@ -4570,12 +4575,7 @@ paths:
         - Comments
       description: 'If the comment is hidden, you must be the creator or Janitor+ to see it.'
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the comment.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -4597,12 +4597,7 @@ paths:
       description: |
         You must be the creator of the comment, or Admin+ to edit. Marked comments cannot be edited.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the comment.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -4636,12 +4631,7 @@ paths:
       description: |
         You must be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the comment.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -4660,12 +4650,7 @@ paths:
       description: |
         You must be the creator or Moderator+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the comment.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '201':
           description: Success
@@ -4688,12 +4673,7 @@ paths:
       description: |
         You must be Moderator+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the comment.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '201':
           description: Success
@@ -4715,12 +4695,7 @@ paths:
         - basicAuth: []
       description: You must be Moderator+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the comment.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         $ref: '#/components/requestBodies/warning'
       responses:
@@ -4743,12 +4718,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the comment.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
         - name: score
           in: query
           required: true
@@ -4790,12 +4760,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the comment.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -4860,9 +4825,9 @@ paths:
       tags:
         - DMails
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - in: query
           name: 'search[title_matches]'
           schema:
@@ -4916,12 +4881,7 @@ paths:
         - DMails
       description: Fetching a dmail will not mark it as read.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the dmail.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -4942,12 +4902,7 @@ paths:
         - basicAuth: []
       description: Deleting simply hides your copy of the dmail.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the dmail.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -4964,12 +4919,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the dmail.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -4986,12 +4936,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the dmail.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -5051,17 +4996,11 @@ paths:
         - basicAuth: []
       description: You must be Moderator+.
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - $ref: '#/components/parameters/ip_addr'
-        - name: 'search[order]'
-          in: query
-          schema:
-            type: string
-            enum:
-              - id_asc
-              - id_desc
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/ipAddrQuery'
+        - $ref: '#/components/parameters/orderQuery'
         - in: query
           name: 'search[body_matches]'
           schema:
@@ -5111,12 +5050,7 @@ paths:
         - basicAuth: []
       description: You must be Moderator+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The versionable id.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
         - name: type
           in: query
           required: true
@@ -5145,9 +5079,9 @@ paths:
       tags:
         - Email Blacklists
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - name: 'search[order]'
           in: query
           schema:
@@ -5214,12 +5148,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the email blacklist.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -5234,8 +5163,8 @@ paths:
       tags:
         - Favorites
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
         - in: query
           name: user_id
           description: You must be the user or Moderator+ if the user has their favorites hidden.
@@ -5288,9 +5217,9 @@ paths:
                   - favorite_count
                 properties:
                   post_id:
-                    type: number
+                    type: integer
                   favorite_count:
-                    type: number
+                    type: integer
         '403':
           $ref: '#/components/responses/AccessDenied'
         '404':
@@ -5306,11 +5235,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -5323,9 +5248,9 @@ paths:
                   - favorite_count
                 properties:
                   post_id:
-                    type: number
+                    type: integer
                   favorite_count:
-                    type: number
+                    type: integer
         '403':
           $ref: '#/components/responses/AccessDenied'
         '404':
@@ -5339,16 +5264,10 @@ paths:
       tags:
         - Forum Posts
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - name: 'search[order]'
-          in: query
-          schema:
-            type: string
-            enum:
-              - id_asc
-              - id_desc
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/orderQuery'
         - in: query
           name: 'search[creator_id]'
           schema:
@@ -5425,12 +5344,7 @@ paths:
         - Forum Posts
       description: 'If the forum post is hidden, you must be the creator or Moderator+ to see it.'
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the forum post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -5451,12 +5365,7 @@ paths:
         - basicAuth: []
       description: 'You must be the creator of the forum post, or Admin+ to edit. Marked forum posts cannot be edited.'
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the forum post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -5483,12 +5392,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the forum post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -5506,12 +5410,7 @@ paths:
         - basicAuth: []
       description: You must be the creator or Moderator+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the forum post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '201':
           description: Success
@@ -5533,12 +5432,7 @@ paths:
         - basicAuth: []
       description: You must be Moderator+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the forum post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '201':
           description: Success
@@ -5561,12 +5455,7 @@ paths:
       description: |
         You must be Moderator+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the forum post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         $ref: '#/components/requestBodies/warning'
       responses:
@@ -5589,12 +5478,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the forum post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -5630,12 +5514,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the forum post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -5652,9 +5531,9 @@ paths:
       tags:
         - Forum Topics
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - name: 'search[order]'
           in: query
           schema:
@@ -5747,12 +5626,7 @@ paths:
         - Forum Topics
       description: 'If the forum topic is hidden, you must be the creator or Moderator+ to see it.'
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the forum topic.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -5772,12 +5646,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the forum topic.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -5818,12 +5687,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the forum topic.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -5841,12 +5705,7 @@ paths:
         - basicAuth: []
       description: You must be the creator or Moderator+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the forum topic.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '201':
           description: Success
@@ -5868,12 +5727,7 @@ paths:
         - basicAuth: []
       description: You must be Moderator+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the forum topic.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '201':
           description: Success
@@ -5894,12 +5748,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the forum topic.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '201':
           description: Success
@@ -5920,12 +5769,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the forum topic.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '201':
           description: Success
@@ -6023,11 +5867,11 @@ paths:
         - name: id
           in: path
           required: true
-          description: The ID or name of the help page.
           schema:
             oneOf:
               - type: integer
               - type: string
+          description: An ID that can be either an integer or a name.
       responses:
         '200':
           description: Success
@@ -6048,12 +5892,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the help page.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -6087,12 +5926,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the help page.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -6109,17 +5943,11 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - $ref: '#/components/parameters/ip_addr'
-        - name: 'search[order]'
-          in: query
-          schema:
-            type: string
-            enum:
-              - id_asc
-              - id_desc
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/ipAddrQuery'
+        - $ref: '#/components/parameters/orderQuery'
         - in: query
           name: 'search[banner_id]'
           schema:
@@ -6183,12 +6011,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the ip ban.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -6206,7 +6029,7 @@ paths:
         - name: 'search[score_cutoff]'
           in: query
           schema:
-            type: number
+            type: integer
         - name: 'search[url]'
           in: query
           schema:
@@ -6245,7 +6068,7 @@ paths:
                   type: string
                   format: binary
                 'search[score_cutoff]':
-                  type: number
+                  type: integer
                 'search[url]':
                   type: string
                 'search[post_id]':
@@ -6282,9 +6105,9 @@ paths:
       tags:
         - Mascots
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
       responses:
         '200':
           description: Success
@@ -6353,12 +6176,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the mascot.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           multipart/form-data:
@@ -6401,12 +6219,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the mascot.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -6428,9 +6241,9 @@ paths:
         * `post_move_favorites`, `post_delete`, `post_undelete`, `post_destroy`, `post_rating_lock`, `post_unapprove`
         * `post_replacement_accept`, `post_replacement_reject`, `post_replacement_delete`
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - name: 'search[order]'
           in: query
           schema:
@@ -6466,12 +6279,7 @@ paths:
       tags:
         - Mod Actions
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the mod action.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -6490,8 +6298,8 @@ paths:
       tags:
         - News Updates
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
       responses:
         '200':
           description: Success
@@ -6540,12 +6348,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the news update.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -6574,12 +6377,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the news update.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -6594,16 +6392,10 @@ paths:
       tags:
         - Notes
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - name: 'search[order]'
-          in: query
-          schema:
-            type: string
-            enum:
-              - id_asc
-              - id_desc
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/orderQuery'
         - in: query
           name: 'search[body_matches]'
           schema:
@@ -6706,12 +6498,7 @@ paths:
       tags:
         - Notes
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the note.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -6729,12 +6516,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the note.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -6768,12 +6550,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the note.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -6790,12 +6567,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the note.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
         - name: version_id
           in: query
           required: true
@@ -6818,18 +6590,11 @@ paths:
       tags:
         - Note Versions
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - $ref: '#/components/parameters/ip_addr'
-        - name: 'search[order]'
-          in: query
-          description: The order of the results.
-          schema:
-            type: string
-            enum:
-              - id_asc
-              - id_desc
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/ipAddrQuery'
+        - $ref: '#/components/parameters/orderQuery'
         - in: query
           name: 'search[updater_id]'
           schema:
@@ -6870,9 +6635,9 @@ paths:
       tags:
         - Pools
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - name: 'search[order]'
           in: query
           schema:
@@ -6965,12 +6730,7 @@ paths:
       tags:
         - Pools
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the pool.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -6988,12 +6748,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the pool.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -7034,12 +6789,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the pool.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -7056,12 +6806,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the pool.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
         - name: version_id
           in: query
           required: true
@@ -7186,18 +6931,11 @@ paths:
       tags:
         - Pool Versions
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - $ref: '#/components/parameters/ip_addr'
-        - name: 'search[order]'
-          in: query
-          description: The order of the results.
-          schema:
-            type: string
-            enum:
-              - id_asc
-              - id_desc
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/ipAddrQuery'
+        - $ref: '#/components/parameters/orderQuery'
         - in: query
           name: 'search[updater_id]'
           schema:
@@ -7226,7 +6964,7 @@ paths:
       tags:
         - Popular
       parameters:
-        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/limitQuery'
         - name: date
           in: query
           description: 'The date to list popular uploads for. Only The day, month, and year are considered.'
@@ -7263,8 +7001,8 @@ paths:
       tags:
         - Posts
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
         - in: query
           name: tags
           schema:
@@ -7323,12 +7061,7 @@ paths:
       tags:
         - Posts
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -7352,12 +7085,7 @@ paths:
         - basicAuth: []
       description: Most errors are silently swallowed.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -7446,12 +7174,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -7480,12 +7203,7 @@ paths:
         - basicAuth: []
       description: Will error if no body is provided.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/json:
@@ -7523,12 +7241,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/json:
@@ -7557,12 +7270,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
         - name: version_id
           in: query
           required: true
@@ -7585,12 +7293,7 @@ paths:
       tags:
         - Posts
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
         - name: seq
           in: query
           description: The direction to move in the sequence.
@@ -7627,12 +7330,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -7656,12 +7354,7 @@ paths:
       tags:
         - Posts
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
         - name: limit
           in: query
           description: The maximum number of results to return. Between 1 and 100.
@@ -7669,7 +7362,7 @@ paths:
             type: integer
             minimum: 1
             maximum: 100
-        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/pageQuery'
       description: You must be the user or Moderator+ to see users that have their favorites hidden.
       responses:
         '200':
@@ -7693,12 +7386,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
         - name: score
           in: query
           required: true
@@ -7746,12 +7434,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -7768,9 +7451,9 @@ paths:
       tags:
         - Post Sets
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - name: 'search[order]'
           in: query
           schema:
@@ -7868,12 +7551,7 @@ paths:
         - Post Sets
       description: You must be Moderator+ if the set is not public.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post set.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -7894,12 +7572,7 @@ paths:
         - basicAuth: []
       description: 'You must be the owner of the set, or Admin+.'
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post sets.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -7934,12 +7607,7 @@ paths:
         - basicAuth: []
       description: 'You must be the owner of the set, or Admin+.'
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post set.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -7957,12 +7625,7 @@ paths:
         - basicAuth: []
       description: 'You must be the owner of the set, a maintainer (if public), or Admin+.'
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post set.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -7996,12 +7659,7 @@ paths:
         - basicAuth: []
       description: 'You must be the owner of the set, a maintainer (if public), or Admin+.'
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post set.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -8038,12 +7696,7 @@ paths:
         - basicAuth: []
       description: 'You must be the owner of the set, a maintainer (if public), or Admin+.'
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post set.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -8092,13 +7745,19 @@ paths:
                     items:
                       oneOf:
                         - type: string
-                        - type: number
+                        - type: integer
+                      example:
+                        - - my_set
+                          - 1
                   Maintained:
                     type: array
                     items:
                       oneOf:
                         - type: string
-                        - type: number
+                        - type: integer
+                      example:
+                        - - my_set
+                          - 1
         '403':
           $ref: '#/components/responses/AccessDenied'
         '422':
@@ -8110,16 +7769,10 @@ paths:
       tags:
         - Post Approvals
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - name: 'search[order]'
-          in: query
-          schema:
-            type: string
-            enum:
-              - id_asc
-              - id_desc
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/orderQuery'
         - name: 'search[post_tags_match]'
           in: query
           schema:
@@ -8154,16 +7807,10 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - name: 'search[order]'
-          in: query
-          schema:
-            type: string
-            enum:
-              - id_asc
-              - id_desc
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/orderQuery'
         - in: query
           name: 'search[post_id]'
           schema:
@@ -8201,17 +7848,11 @@ paths:
       tags:
         - Post Flags
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - $ref: '#/components/parameters/ip_addr'
-        - name: 'search[order]'
-          in: query
-          schema:
-            type: string
-            enum:
-              - id_asc
-              - id_desc
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/ipAddrQuery'
+        - $ref: '#/components/parameters/orderQuery'
         - in: query
           name: 'search[reason_matches]'
           schema:
@@ -8302,12 +7943,7 @@ paths:
       tags:
         - Post Flags
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post flag.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -8327,12 +7963,7 @@ paths:
         - basicAuth: []
       description: You must be Janitor+
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post flag.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '201':
           description: Success
@@ -8352,9 +7983,9 @@ paths:
         - Post Replacements
       description: Rejected replacements can only be seen by staff.
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - in: query
           name: 'search[file_ext]'
           schema:
@@ -8485,12 +8116,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post replacement.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -8508,10 +8134,9 @@ paths:
         - basicAuth: []
       description: You must have the "Approve Posts" permission.
       parameters:
-        - name: id
-          in: path
+        - $ref: '#/components/parameters/idPath'
           required: true
-          description: The ID of the post replacement.
+          description: The ID of the post flag.
           schema:
             type: integer
       responses:
@@ -8533,12 +8158,7 @@ paths:
         - basicAuth: []
       description: You must have the "Approve Posts" permission.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post replacement.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -8558,12 +8178,7 @@ paths:
         - basicAuth: []
       description: You must have the "Approve Posts" permission.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post replacement.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '201':
           description: Success
@@ -8592,12 +8207,7 @@ paths:
         - basicAuth: []
       description: You must have the "Approve Posts" permission.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post replacement.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -8614,7 +8224,7 @@ paths:
       tags:
         - Post Versions
       parameters:
-        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/limitQuery'
         - name: page
           in: query
           description: 'The page number of results to get. Between 1 and 750. Note that for post versions specifically, you can only go through the 10,000 most recent results with page numbers.'
@@ -8622,7 +8232,7 @@ paths:
             type: integer
             minimum: 1
             maximum: 750
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/idQuery'
         - in: query
           name: 'search[updater_name]'
           schema:
@@ -8727,12 +8337,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post version.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '302':
           description: Success
@@ -8750,12 +8355,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post version.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '302':
           description: Success
@@ -8772,12 +8372,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post version.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -8838,9 +8433,9 @@ paths:
       tags:
         - Tags
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - name: 'search[order]'
           in: query
           schema:
@@ -8896,12 +8491,7 @@ paths:
       tags:
         - Tags
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID or name of the tag.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -8920,12 +8510,7 @@ paths:
         - basicAuth: []
       description: Must be Admin+ if the tag is locked or post count is >100.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the tag.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -8955,12 +8540,7 @@ paths:
         - basicAuth: []
       description: You must have the bd staff user flag.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the tag.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -8977,12 +8557,7 @@ paths:
       tags:
         - Tags
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the tag.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -9001,12 +8576,7 @@ paths:
         - basicAuth: []
       description: You must be Janitor+. `commit=Fix` must be set.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the tag.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -9064,9 +8634,9 @@ paths:
       tags:
         - Tag Type Versions
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - name: 'search[tag]'
           in: query
           schema:
@@ -9095,9 +8665,9 @@ paths:
       tags:
         - Tag Aliases
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - name: 'search[order]'
           in: query
           schema:
@@ -9165,12 +8735,7 @@ paths:
       tags:
         - Tag Aliases
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the tag alias.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -9189,12 +8754,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the tag alias.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -9225,12 +8785,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the tag alias.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -9248,12 +8803,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the tag alias.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -9305,9 +8855,9 @@ paths:
       tags:
         - Tag Implications
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - name: 'search[order]'
           in: query
           schema:
@@ -9375,12 +8925,7 @@ paths:
       tags:
         - Tag Implications
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the tag implication.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -9399,12 +8944,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the tag implication.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -9435,12 +8975,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the tag implication.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -9458,12 +8993,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the tag implication.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -9540,6 +9070,208 @@ paths:
                         category_id: 0
         '403':
           $ref: '#/components/responses/AccessDenied'
+  /search_trends.json:
+    get:
+      summary: List Search Trends
+      operationId: listSearchTrends
+      tags:
+        - Search Trends
+      parameters:
+        - in: query
+          name: day
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SearchTrend'
+  /search_trends/rising.json:
+    get:
+      summary: List Rising Search Trends
+      operationId: listRisingSearchTrends
+      tags:
+        - Search Trends
+      parameters:
+        - in: query
+          name: day
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RisingSearchTrend'
+  /search_trends/clear_cache.json:
+    post:
+      summary: Clear Search Trends Cache
+      operationId: clearSearchTrendsCache
+      tags:
+        - Search Trends
+      security:
+        - basicAuth: []
+      description: You must be Admin+.
+      responses:
+        '200':
+          $ref: '#/components/responses/MessageSuccess'
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+  /search_trends/update_settings.json:
+    post:
+      summary: Update Search Trends Settings
+      operationId: updateSearchTrendsSettings
+      tags:
+        - Search Trends
+      security:
+        - basicAuth: []
+      description: You must be Admin+.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                trends_enabled:
+                  type: boolean
+                trends_min_today:
+                  type: integer
+                trends_min_dleta:
+                  type: integer
+                trends_min_ratio:
+                  type: number
+                  format: float
+                trends_ip_limit:
+                  type: integer
+                trends_ip_window:
+                  type: integer
+                trends_tag_limit:
+                  type: integer
+                trends_tag_window:
+                  type: integer
+      responses:
+        '200':
+          $ref: '#/components/responses/MessageSuccess'
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+  /search_trend_blacklists.json:
+    get:
+      summary: List Search Trend Blacklists
+      operationId: listSearchTrendBlacklists
+      tags:
+        - Search Trend Blacklists
+      security:
+        - basicAuth: []
+      description: You must be Admin+.
+      parameters:
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/orderQuery'
+        - in: query
+          name: tag
+          schema:
+            type: string
+        - in: query
+          name: reason
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SearchTrendBlacklist'
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+    post:
+      summary: Create Search Trend Blacklist
+      operationId: createSearchTrendBlacklist
+      tags:
+        - Search Trend Blacklists
+      security:
+        - basicAuth: []
+      description: You must be Admin+.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tag
+                - reason
+              properties:
+                tag:
+                  type: string
+                reason:
+                  type: string
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchTrendBlacklist'
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '422':
+          $ref: '#/components/responses/ExpectedError'
+  '/search_trend_blacklists/{id}.json':
+    delete:
+      summary: Delete Search Trend Blacklist
+      operationId: deleteSearchTrendBlacklist
+      tags:
+        - Search Trend Blacklists
+      security:
+        - basicAuth: []
+      description: You must be Admin+.
+      parameters:
+        - $ref: '#/components/parameters/idPath'
+      responses:
+        '204':
+          description: Success
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /search_trend_blacklists/purge.json:
+    delete:
+      summary: Purge Search Trend Blacklist
+      operationId: purgeSearchTrendBlacklist
+      tags:
+        - Search Trend Blacklists
+      security:
+        - basicAuth: []
+      description: You must be Admin+.
+      parameters:
+        - $ref: '#/components/parameters/idQuery'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - deleted_count
+                properties:
+                  deleted_count:
+                    type: integer
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /session.json:
     post:
       summary: Login
@@ -9588,16 +9320,10 @@ paths:
       tags:
         - Staff Notes
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - name: 'search[order]'
-          in: query
-          schema:
-            type: string
-            enum:
-              - id_asc
-              - id_desc
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/orderQuery'
         - name: 'search[creator_id]'
           in: query
           schema:
@@ -9680,12 +9406,7 @@ paths:
       tags:
         - Staff Notes
       parameters:
-        - name: id
-          in: path
-          description: The ID of the staff note to get.
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -9706,12 +9427,7 @@ paths:
         - basicAuth: []
       description: You must be the creator or Admin+.
       parameters:
-        - name: id
-          in: path
-          description: The ID of the staff note.
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -9744,12 +9460,7 @@ paths:
       description: |
         You must be the creator or Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the staff note.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '201':
           description: Success
@@ -9772,12 +9483,7 @@ paths:
       description: |
         You must be the creator or Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the staff note.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '201':
           description: Success
@@ -9796,10 +9502,10 @@ paths:
       tags:
         - Takedowns
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - $ref: '#/components/parameters/ip_addr'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/ipAddrQuery'
         - in: query
           name: 'search[order]'
           schema:
@@ -9940,12 +9646,7 @@ paths:
       tags:
         - Takedowns
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the takedown.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -9964,12 +9665,7 @@ paths:
         - basicAuth: []
       description: You must have the bd staff user flag.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the takedown.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -10005,12 +9701,7 @@ paths:
         - basicAuth: []
       description: You must have the bd staff user flag.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the takedown.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -10028,12 +9719,7 @@ paths:
         - basicAuth: []
       description: You must have the bd staff user flag.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the takedown.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -10075,12 +9761,7 @@ paths:
         - basicAuth: []
       description: You must have the bd staff user flag.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the takedown.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -10122,12 +9803,7 @@ paths:
         - basicAuth: []
       description: You must have the bd staff user flag.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the takedown.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -10164,12 +9840,7 @@ paths:
         - basicAuth: []
       description: You must have the bd staff user flag.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the takedown.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -10195,9 +9866,9 @@ paths:
         - Tickets
       description: You must be Janitor+ to see tickets you did not create.
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - in: query
           name: 'search[creator_name]'
           description: You must be Janitor+.
@@ -10273,12 +9944,7 @@ paths:
         - basicAuth: []
       description: You must be Janitor+ to see tickets you did not create.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the ticket.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -10299,12 +9965,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the ticket.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -10340,12 +10001,7 @@ paths:
         - Tickets
       description: You must be Moderator+. Errors are quietly swallowed and shown as notices in html.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the ticket.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       security:
         - basicAuth: []
       responses:
@@ -10367,12 +10023,7 @@ paths:
         - Tickets
       description: You must be Moderator+. Errors are quietly swallowed and shown as notices in html.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the ticket.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       security:
         - basicAuth: []
       responses:
@@ -10393,16 +10044,10 @@ paths:
       tags:
         - Uploads
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - name: 'search[order]'
-          in: query
-          schema:
-            type: string
-            enum:
-              - id_asc
-              - id_desc
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/orderQuery'
         - in: query
           name: 'search[uploader_id]'
           schema:
@@ -10542,12 +10187,7 @@ paths:
         - Uploads
       description: You must be Janitor+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the upload.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -10566,9 +10206,9 @@ paths:
       tags:
         - Upload Whitelists
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - name: 'search[order]'
           in: query
           schema:
@@ -10655,12 +10295,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the upload whitelist entry.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -10695,12 +10330,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the upload whitelist.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -10755,10 +10385,10 @@ paths:
       tags:
         - Users
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - $ref: '#/components/parameters/ip_addr'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/ipAddrQuery'
         - name: 'search[order]'
           in: query
           schema:
@@ -10858,7 +10488,7 @@ paths:
       tags:
         - Users
       parameters:
-        - $ref: '#/components/parameters/idOrName'
+        - $ref: '#/components/parameters/idOrNamePath'
       responses:
         '200':
           $ref: '#/components/responses/UserResponse'
@@ -10870,7 +10500,7 @@ paths:
       tags:
         - Users
       parameters:
-        - $ref: '#/components/parameters/idOrName'
+        - $ref: '#/components/parameters/idOrNamePath'
       security:
         - basicAuth: []
       requestBody:
@@ -10880,7 +10510,7 @@ paths:
               type: object
               properties:
                 'user[comment_threshold]':
-                  type: number
+                  type: integer
                 'user[default_image_size]':
                   type: string
                   enum:
@@ -10958,7 +10588,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - $ref: '#/components/parameters/idOrName'
+        - $ref: '#/components/parameters/idOrNamePath'
       responses:
         '200':
           $ref: '#/components/responses/UserResponse'
@@ -10972,7 +10602,7 @@ paths:
         - Users
       description: You must be Admin+.
       parameters:
-        - $ref: '#/components/parameters/idOrName'
+        - $ref: '#/components/parameters/idOrNamePath'
       security:
         - basicAuth: []
       responses:
@@ -10990,7 +10620,7 @@ paths:
         - Users
       description: You must be Janitor+.
       parameters:
-        - $ref: '#/components/parameters/idOrName'
+        - $ref: '#/components/parameters/idOrNamePath'
       security:
         - basicAuth: []
       responses:
@@ -11010,7 +10640,7 @@ paths:
         You must be Janitor+.
         This endpoint will return HTML when disabling uploads (due to a reason being required), this endpoint should only be used for reenabling. Use [Disable User Uploads](#operation-Users-disableUserUploads) to disable uploads.
       parameters:
-        - $ref: '#/components/parameters/idOrName'
+        - $ref: '#/components/parameters/idOrNamePath'
       security:
         - basicAuth: []
       responses:
@@ -11028,7 +10658,7 @@ paths:
         - Users
       description: You must be Janitor+.
       parameters:
-        - $ref: '#/components/parameters/idOrName'
+        - $ref: '#/components/parameters/idOrNamePath'
       security:
         - basicAuth: []
       requestBody:
@@ -11060,8 +10690,8 @@ paths:
         - basicAuth: []
       description: Must have the bd auditor user flag.
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
         - name: user_id
           in: path
           required: true
@@ -11097,12 +10727,7 @@ paths:
           description: The ID of the user.
           schema:
             type: integer
-        - name: id
-          in: path
-          required: true
-          description: The ID of the DMail.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -11164,16 +10789,10 @@ paths:
       tags:
         - User Feedbacks
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - name: 'search[order]'
-          in: query
-          schema:
-            type: string
-            enum:
-              - id_asc
-              - id_desc
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/orderQuery'
         - in: query
           name: 'search[deleted]'
           description: You must be Janitor+.
@@ -11260,12 +10879,7 @@ paths:
         - User Feedbacks
       description: You must be Janitor+ if the feedback is deleted.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the feedback.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -11286,12 +10900,7 @@ paths:
         - basicAuth: []
       description: You must be Moderator+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the feedback.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -11320,12 +10929,7 @@ paths:
         - basicAuth: []
       description: 'You must be Admin+, or the creator and Moderator+.'
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the feedback.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -11343,12 +10947,7 @@ paths:
         - basicAuth: []
       description: You must be Moderator+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the feedback.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -11366,12 +10965,7 @@ paths:
         - basicAuth: []
       description: You must be Moderator+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the feedback.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -11389,16 +10983,10 @@ paths:
         - basicAuth: []
       description: You must be Moderator+.
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - name: 'search[order]'
-          in: query
-          schema:
-            type: string
-            enum:
-              - id_asc
-              - id_desc
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/orderQuery'
         - in: query
           name: 'search[current_id]'
           schema:
@@ -11460,12 +11048,7 @@ paths:
         - basicAuth: []
       description: You must be the creator of the request or Moderator+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the name change request.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -11486,12 +11069,7 @@ paths:
         - basicAuth: []
       description: You must be Moderator+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the name change request.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '302':
           description: Success
@@ -11504,9 +11082,9 @@ paths:
       tags:
         - Wiki Pages
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - name: 'search[order]'
           in: query
           schema:
@@ -11620,9 +11198,11 @@ paths:
         - name: id
           in: path
           required: true
-          description: The ID or name of the wiki page.
           schema:
-            type: integer
+            oneOf:
+              - type: integer
+              - type: string
+          description: An ID that can be either an integer or a name.
       responses:
         '200':
           description: Success
@@ -11641,8 +11221,7 @@ paths:
         - basicAuth: []
       description: You must be Janitor+ if the wiki page is locked.
       parameters:
-        - name: id
-          in: path
+        - $ref: '#/components/parameters/idPath'
           required: true
           description: The ID of the wiki page.
           schema:
@@ -11695,12 +11274,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the wiki page.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -11717,12 +11291,7 @@ paths:
       security:
         - basicAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the wiki page.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
         - name: version_id
           in: query
           required: true
@@ -11745,17 +11314,11 @@ paths:
       tags:
         - Wiki Page Versions
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
-        - $ref: '#/components/parameters/ip_addr'
-        - name: 'search[order]'
-          in: query
-          schema:
-            type: string
-            enum:
-              - id_asc
-              - id_desc
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/ipAddrQuery'
+        - $ref: '#/components/parameters/orderQuery'
         - in: query
           name: 'search[updater_id]'
           schema:
@@ -11800,12 +11363,7 @@ paths:
       tags:
         - Wiki Page Versions
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the wiki page version.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
@@ -11857,12 +11415,7 @@ paths:
         - basicAuth: []
       description: 'You must be Admin+. If editing an Admin+, you must be Owner+.'
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the user.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -11882,7 +11435,7 @@ paths:
                 'user[profile_artinfo]':
                   type: string
                 'user[base_upload_limit]':
-                  type: number
+                  type: integer
                 'user[enable_privacy_mode]':
                   type: boolean
                 'user[email]':
@@ -11917,12 +11470,7 @@ paths:
         - basicAuth: []
       description: You must have the bd staff user flag. Cannot be used on staff.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the user.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '302':
           description: |
@@ -11940,12 +11488,7 @@ paths:
         - basicAuth: []
       description: You must have the "Approve Posts" permission. `commit=Delete` must be set.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -11988,12 +11531,7 @@ paths:
         - basicAuth: []
       description: You must have the "Approve Posts" permission.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '201':
           description: Success
@@ -12022,12 +11560,7 @@ paths:
         - basicAuth: []
       description: You must be Janitor+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '201':
           description: Success
@@ -12056,12 +11589,7 @@ paths:
         - basicAuth: []
       description: You must be Janitor+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '204':
           description: Success
@@ -12081,12 +11609,7 @@ paths:
         - basicAuth: []
       description: You must have the "Approve Posts" permission and be Admin+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -12123,12 +11646,7 @@ paths:
         - basicAuth: []
       description: You must have the "Approve Posts" permission. `commit=Submit`` must be set.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -12159,12 +11677,7 @@ paths:
         - basicAuth: []
       description: You must be Janitor+.
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The ID of the post.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/idPath'
       responses:
         '302':
           description: Success
@@ -12246,9 +11759,9 @@ paths:
         - basicAuth: []
       description: You must have the "Approve Posts" permission.
       parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
         - name: 'search[order]'
           in: query
           schema:
