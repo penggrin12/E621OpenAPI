@@ -12,7 +12,7 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: 801731c
+  version: dfa164b
 servers:
   - url: 'https://e621.net'
     description: E621 (production)
@@ -75,7 +75,7 @@ components:
     idPath:
       name: id
       in: path
-      description: The ID of the item to get.
+      description: The ID of the item.
       required: true
       schema:
         type: integer
@@ -9159,8 +9159,8 @@ paths:
           $ref: '#/components/responses/AccessDenied'
   /search_trend_blacklists.json:
     get:
-      summary: List Search Trend Blacklists
-      operationId: listSearchTrendBlacklists
+      summary: Search Search Trend Blacklists
+      operationId: searchSearchTrendBlacklists
       tags:
         - Search Trend Blacklists
       security:
@@ -9239,7 +9239,7 @@ paths:
           $ref: '#/components/responses/AccessDenied'
         '404':
           $ref: '#/components/responses/NotFound'
-  /search_trend_blacklists/purge.json:
+  '/search_trend_blacklists/{id}/purge.json':
     delete:
       summary: Purge Search Trend Blacklist
       operationId: purgeSearchTrendBlacklist
@@ -9249,7 +9249,7 @@ paths:
         - basicAuth: []
       description: You must be Admin+.
       parameters:
-        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/idPath'
       responses:
         '200':
           description: Success
