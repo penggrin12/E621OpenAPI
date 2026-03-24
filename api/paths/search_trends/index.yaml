@@ -8,6 +8,8 @@ parameters:
     schema:
       type: string
       format: date
+  - $ref: "../../components/parameters/query/limit.yaml"
+  - $ref: "../../components/parameters/query/page.yaml"
 responses:
   200:
     description: Success
