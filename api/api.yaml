@@ -17,10 +17,14 @@ info:
     url: https://e621.net/forum_topics/46279
   version: "e8200da"
   x-e621ng-commit: "__E621NG_COMMIT__"
+  x-e621ng-master-behind-by: "__E621NG_MASTER_BEHIND_BY__"
+  x-e621ng-master-compare-url: "__E621NG_MASTER_COMPARE_URL__"
 
 servers:
   - url: https://e621.net
-    description: E621 (production)
+    description: E621 (Production)
+  - url: https://e926.net
+    description: E621 (Safe)
   - url: http://localhost:3000
     description: E621 (Development)
 
