@@ -1,6 +1,15 @@
 type: object
 required:
-  - tag
+  - name
+  - pretty_name
+  - post_count
+  - category
 properties:
-  tag:
+  name:
     type: string
+  pretty_name:
+    type: string
+  post_count:
+    type: integer
+  category:
+    $ref: "./tagCategories.yaml"
