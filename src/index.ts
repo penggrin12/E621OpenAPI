@@ -2,11 +2,11 @@ import SwaggerUI from "swagger-ui";
 import "swagger-ui/dist/swagger-ui.css";
 import "swagger-themes/themes/dark.css";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-declare function plausible(event: string, properties?: { props: Record<string, string>; }): void;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, unused-imports/no-unused-vars
+declare function plausible(event: string, properties?: { props: Record<string, string> }): void;
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, unicorn/prefer-module
-const spec = require("../openapi.yaml");
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const spec = require("../openapi.yaml") as Record<string, unknown>;
 
 function addEvent(selector: string, event: string, properties: (element: Element) => Record<string, string>): void {
     const items = Array.from(document.querySelectorAll(selector));
@@ -20,7 +20,7 @@ function addEvent(selector: string, event: string, properties: (element: Element
 }
 
 function renderE621ngStatus(): void {
-    const info = spec.info as Record<string, string | undefined>;
+    const info = (spec as { info: Record<string, string | undefined> }).info;
     const commit = info["x-e621ng-commit"];
     const compareUrl = info["x-e621ng-master-compare-url"] ?? "https://github.com/e621ng/e621ng";
     const behindBy = Number.parseInt(info["x-e621ng-master-behind-by"] ?? "", 10);
@@ -30,7 +30,7 @@ function renderE621ngStatus(): void {
         "display:flex",
         "justify-content:center",
         "padding:16px 16px 0",
-        "font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace"
+        "font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace",
     ].join(";");
 
     const badge = document.createElement("a");
@@ -48,7 +48,7 @@ function renderE621ngStatus(): void {
         "color:#f3f7fb",
         "text-decoration:none",
         "font-size:13px",
-        "line-height:1"
+        "line-height:1",
     ].join(";");
 
     const statusDot = document.createElement("span");
@@ -56,7 +56,7 @@ function renderE621ngStatus(): void {
         "width:10px",
         "height:10px",
         "border-radius:999px",
-        `background:${Number.isNaN(behindBy) ? "#7f8c8d" : behindBy === 0 ? "#2ecc71" : behindBy < 10 ? "#f1c40f" : "#e67e22"}`
+        `background:${Number.isNaN(behindBy) ? "#7f8c8d" : behindBy === 0 ? "#2ecc71" : behindBy < 10 ? "#f1c40f" : "#e67e22"}`,
     ].join(";");
 
     const text = document.createElement("span");
@@ -82,7 +82,7 @@ SwaggerUI({
         addEvent(".json-schema-2020-12-accordion", "Toggle Schema", element => ({ schema: element.querySelector(".json-schema-2020-12__title")!.textContent! }));
         addEvent(".json-schema-2020-12-expand-deep-button", "Toggle Schema", element => ({ schema: element.parentNode!.querySelector(".json-schema-2020-12__title")!.textContent! }));
     },
-    tryItOutEnabled:        false,
+    tryItOutEnabled: false,
     supportedSubmitMethods: [],
-    validatorUrl:           "none"
+    validatorUrl: "none",
 });
