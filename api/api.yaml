@@ -588,7 +588,7 @@ paths:
     get:
       $ref: "./paths/posts/update_iqdb.yaml"
   /posts/{id}/mark_as_translated.json:
-    post:
+    put:
       $ref: "./paths/posts/mark_as_translated.yaml"
   /posts/{id}/copy_notes.json:
     put:
