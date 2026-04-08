@@ -12,7 +12,7 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: c0f3ce5
+  version: f55f6ba
 servers:
   - url: 'https://e621.net'
     description: E621 (production)
@@ -4149,6 +4149,69 @@ components:
             - true
         message:
           type: string
+    PostRecommendation:
+      type: object
+      required:
+        - post_id
+        - score
+        - explanation
+      properties:
+        post_id:
+          type: integer
+        score:
+          description: |
+            Currently hardcoded as 1, https://github.com/e621ng/e621ng/blob/5f83e77329d4074c5462c7516c3850f33125f441/app/controllers/posts_controller.rb#L177
+            The feature seems incomplete, and this will likely change in the future.
+          type: integer
+          enum:
+            - 1
+        explanation:
+          description: |
+            Currently hardcoded as null, https://github.com/e621ng/e621ng/blob/5f83e77329d4074c5462c7516c3850f33125f441/app/controllers/posts_controller.rb#L178
+            The feature seems incomplete, and this will likely change in the future.
+          type: string
+          enum:
+            - null
+          nullable: true
+    RecommendedPosts:
+      type: object
+      required:
+        - post_id
+        - model_version
+        - results
+      properties:
+        post_id:
+          type: integer
+        model_version:
+          type: string
+          enum:
+            - opensearch
+        results:
+          type: array
+          items:
+            type: object
+            required:
+              - post_id
+              - score
+              - explanation
+            properties:
+              post_id:
+                type: integer
+              score:
+                description: |
+                  Currently hardcoded as 1, https://github.com/e621ng/e621ng/blob/5f83e77329d4074c5462c7516c3850f33125f441/app/controllers/posts_controller.rb#L177
+                  The feature seems incomplete, and this will likely change in the future.
+                type: integer
+                enum:
+                  - 1
+              explanation:
+                description: |
+                  Currently hardcoded as null, https://github.com/e621ng/e621ng/blob/5f83e77329d4074c5462c7516c3850f33125f441/app/controllers/posts_controller.rb#L178
+                  The feature seems incomplete, and this will likely change in the future.
+                type: string
+                enum:
+                  - null
+                nullable: true
   responses:
     NotFound:
       description: Not Found
@@ -20593,6 +20656,79 @@ paths:
                     type: array
                     items:
                       type: string
+  '/posts/{id}/recommended.json':
+    get:
+      summary: Get Recommended Posts
+      operationId: getRecommendedPosts
+      tags:
+        - Posts
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the item.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - post_id
+                  - model_version
+                  - results
+                properties:
+                  post_id:
+                    type: integer
+                  model_version:
+                    type: string
+                    enum:
+                      - opensearch
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - post_id
+                        - score
+                        - explanation
+                      properties:
+                        post_id:
+                          type: integer
+                        score:
+                          description: |
+                            Currently hardcoded as 1, https://github.com/e621ng/e621ng/blob/5f83e77329d4074c5462c7516c3850f33125f441/app/controllers/posts_controller.rb#L177
+                            The feature seems incomplete, and this will likely change in the future.
+                          type: integer
+                          enum:
+                            - 1
+                        explanation:
+                          description: |
+                            Currently hardcoded as null, https://github.com/e621ng/e621ng/blob/5f83e77329d4074c5462c7516c3850f33125f441/app/controllers/posts_controller.rb#L178
+                            The feature seems incomplete, and this will likely change in the future.
+                          type: string
+                          enum:
+                            - null
+                          nullable: true
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - reason
+                properties:
+                  success:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum:
+                      - not found
   /post_sets.json:
     get:
       summary: Search Post Sets
