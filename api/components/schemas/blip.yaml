@@ -6,7 +6,7 @@ required:
   - response_to
   - created_at
   - updated_at
-  - is_hidden
+  - is_deleted
   - warning_type
   - warning_user_id
   - updater_id
@@ -25,8 +25,7 @@ properties:
     format: date-time
   updated_at:
     type: string
-    format: date-time
-  is_hidden:
+  is_deleted:
     type: boolean
   warning_type:
     $ref: "./warningTypes.yaml"
