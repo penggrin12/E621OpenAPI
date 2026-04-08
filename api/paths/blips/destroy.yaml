@@ -1,5 +1,5 @@
-summary: Delete Blip
-operationId: deleteBlip
+summary: Destroy Blip
+operationId: destroyBlip
 tags:
   - Blips
 security:

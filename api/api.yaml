@@ -303,12 +303,12 @@ paths:
       $ref: "./paths/blips/update.yaml"
     delete:
       $ref: "./paths/blips/destroy.yaml"
-  /blips/{id}/hide.json:
+  /blips/{id}/delete.json:
     post:
-      $ref: "./paths/blips/hide.yaml"
-  /blips/{id}/unhide.json:
+      $ref: "./paths/blips/delete.yaml"
+  /blips/{id}/undelete.json:
     post:
-      $ref: "./paths/blips/unhide.yaml"
+      $ref: "./paths/blips/undelete.yaml"
   /blips/{id}/warning.json:
     post:
       $ref: "./paths/blips/warning.yaml"

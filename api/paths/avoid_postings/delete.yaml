@@ -4,7 +4,7 @@ tags:
   - Avoid Posting Entries
 security:
   - basicAuth: []
-description: Must have the bd staff user flag.
+description: Soft deletion. Must have the bd staff user flag.
 parameters:
   - $ref: "../../components/parameters/path/idOrName.yaml"
 responses:

@@ -1,5 +1,5 @@
-summary: Unhide Blip
-operationId: unhideBlip
+summary: Undelete Blip
+operationId: undeleteBlip
 tags:
   - Blips
 security:

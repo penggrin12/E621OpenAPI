@@ -1,11 +1,11 @@
-summary: Hide Blip
-operationId: hideBlip
+summary: Delete Blip
+operationId: deleteBlip
 tags:
   - Blips
 security:
   - basicAuth: []
 description: |
-  You must be the creator or Moderator+.
+  Soft deletion. You must be the creator or Moderator+.
 parameters:
   - $ref: "../../components/parameters/path/id.yaml"
 responses:
