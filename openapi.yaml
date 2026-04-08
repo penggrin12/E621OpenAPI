@@ -12,7 +12,7 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: 53131bb
+  version: 6207c38
 servers:
   - url: 'https://e621.net'
     description: E621 (production)
@@ -138,9 +138,9 @@ components:
         - avoid_posting_delete
         - avoid_posting_undelete
         - avoid_posting_destroy
+        - blip_destroy
         - blip_delete
-        - blip_hide
-        - blip_unhide
+        - blip_undelete
         - blip_update
         - comment_delete
         - comment_hide
@@ -533,7 +533,7 @@ components:
         - response_to
         - created_at
         - updated_at
-        - is_hidden
+        - is_deleted
         - warning_type
         - warning_user_id
         - updater_id
@@ -552,8 +552,7 @@ components:
           format: date-time
         updated_at:
           type: string
-          format: date-time
-        is_hidden:
+        is_deleted:
           type: boolean
         warning_type:
           $ref: '#/components/schemas/WarningTypes'
@@ -3881,7 +3880,7 @@ paths:
         - Avoid Posting Entries
       security:
         - basicAuth: []
-      description: Must have the bd staff user flag.
+      description: Soft deletion. Must have the bd staff user flag.
       parameters:
         - $ref: '#/components/parameters/idOrNamePath'
       responses:
@@ -4169,8 +4168,8 @@ paths:
         '422':
           $ref: '#/components/responses/ExpectedError'
     delete:
-      summary: Delete Blip
-      operationId: deleteBlip
+      summary: Destroy Blip
+      operationId: destroyBlip
       tags:
         - Blips
       security:
@@ -4186,16 +4185,16 @@ paths:
           $ref: '#/components/responses/AccessDenied'
         '404':
           $ref: '#/components/responses/NotFound'
-  '/blips/{id}/hide.json':
+  '/blips/{id}/delete.json':
     post:
-      summary: Hide Blip
-      operationId: hideBlip
+      summary: Delete Blip
+      operationId: deleteBlip
       tags:
         - Blips
       security:
         - basicAuth: []
       description: |
-        You must be the creator or Moderator+.
+        Soft deletion. You must be the creator or Moderator+.
       parameters:
         - $ref: '#/components/parameters/idPath'
       responses:
@@ -4209,10 +4208,10 @@ paths:
           $ref: '#/components/responses/AccessDenied'
         '404':
           $ref: '#/components/responses/NotFound'
-  '/blips/{id}/unhide.json':
+  '/blips/{id}/undelete.json':
     post:
-      summary: Unhide Blip
-      operationId: unhideBlip
+      summary: Undelete Blip
+      operationId: undeleteBlip
       tags:
         - Blips
       security:
@@ -4365,7 +4364,7 @@ paths:
           $ref: '#/components/responses/AccessDenied'
         '422':
           $ref: '#/components/responses/ExpectedError'
-  '/bulk_update_request/{id}.json':
+  '/bulk_update_requests/{id}.json':
     get:
       summary: Get Bulk Update Request
       operationId: getBulkUpdateRequest
@@ -4432,7 +4431,7 @@ paths:
           $ref: '#/components/responses/AccessDenied'
         '404':
           $ref: '#/components/responses/NotFound'
-  '/bulk_update_request/{id}/approve.json':
+  '/bulk_update_requests/{id}/approve.json':
     post:
       summary: Approve Bulk Update Request
       operationId: approveBulkUpdateRequest
@@ -6559,7 +6558,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
   '/notes/{id}/revert.json':
-    post:
+    put:
       summary: Revert Note
       operationId: revertNote
       tags:
@@ -7194,7 +7193,7 @@ paths:
         '422':
           $ref: '#/components/responses/ExpectedError'
   '/posts/{id}/mark_as_translated.json':
-    post:
+    put:
       summary: Mark Post As Translated
       operationId: markPostAsTranslated
       tags:
@@ -7262,7 +7261,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
   '/posts/{id}/revert.json':
-    post:
+    put:
       summary: Revert Post
       operationId: revertPost
       tags:
@@ -9138,6 +9137,8 @@ paths:
               type: object
               properties:
                 trends_enabled:
+                  type: boolean
+                trends_displayed:
                   type: boolean
                 trends_min_today:
                   type: integer
@@ -11278,7 +11279,7 @@ paths:
           $ref: '#/components/responses/AccessDenied'
         '404':
           $ref: '#/components/responses/NotFound'
-  '/wiki_page/{id}/revert.json':
+  '/wiki_pages/{id}/revert.json':
     put:
       summary: Revert Wiki Page
       operationId: revertWikiPage
@@ -11401,7 +11402,7 @@ paths:
                       items:
                         type: integer
                         description: ID of suspected alt.
-  '/admins/users/{id}.json':
+  '/admin/users/{id}.json':
     patch:
       summary: Admin Edit User
       operationId: adminEditUser
@@ -11456,7 +11457,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ExpectedError'
-  '/admins/users/{id}/anonymize.json':
+  '/admin/users/{id}/anonymize.json':
     post:
       summary: Admin Anonymize User
       operationId: adminAnonymizeUser
