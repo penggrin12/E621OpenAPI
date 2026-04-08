@@ -10,10 +10,7 @@ parameters:
     in: query
     required: true
     schema:
-      type: integer
-      enum:
-        - -1
-        - 1
+      $ref: "../../../components/schemas/upDownVote.yaml"
   - name: no_unvote
     in: query
     schema:

@@ -213,6 +213,12 @@ components:
       $ref: "./components/schemas/postRecommendation.yaml"
     RecommendedPosts:
       $ref: "./components/schemas/recommendedPosts.yaml"
+    PostVote:
+      $ref: "./components/schemas/postVote.yaml"
+    UpDownVote:
+      $ref: "./components/schemas/upDownVote.yaml"
+    UpDownMehVote:
+      $ref: "./components/schemas/upDownMehVote.yaml"
 
   responses:
     NotFound:
@@ -696,6 +702,10 @@ paths:
   /post_versions/{id}/undo.json:
     put:
       $ref: "./paths/post_versions/undo.yaml"
+
+  /post_votes.json:
+    get:
+      $ref: "./paths/post_votes/index.yaml"
 
   /post_votes/lock.json:
     post:

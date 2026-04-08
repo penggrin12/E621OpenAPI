@@ -60,7 +60,7 @@ components:
     ipAddrQuery:
       name: 'search[ip_addr]'
       in: query
-      description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+      description: 'Must be Admin+ to use. See [the PostgreSQL documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
       schema:
         type: string
     orderQuery:
@@ -3111,6 +3111,41 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PostRecommendation'
+    PostVote:
+      type: object
+      required:
+        - id
+        - post_id
+        - user_id
+        - score
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+        post_id:
+          type: integer
+        user_id:
+          type: integer
+        score:
+          $ref: '#/components/schemas/UpDownVote'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    UpDownVote:
+      type: integer
+      enum:
+        - 1
+        - -1
+    UpDownMehVote:
+      type: integer
+      enum:
+        - 1
+        - 0
+        - -1
   responses:
     NotFound:
       description: Not Found
@@ -4772,10 +4807,7 @@ paths:
           in: query
           required: true
           schema:
-            type: integer
-            enum:
-              - -1
-              - 1
+            $ref: '#/components/schemas/UpDownVote'
         - name: no_unvote
           in: query
           schema:
@@ -5537,11 +5569,7 @@ paths:
                 - 'forum_post_vote[score]'
               properties:
                 'forum_post_vote[score]':
-                  type: integer
-                  enum:
-                    - -1
-                    - 0
-                    - 1
+                  $ref: '#/components/schemas/UpDownMehVote'
       responses:
         '200':
           description: Success
@@ -7440,10 +7468,7 @@ paths:
           in: query
           required: true
           schema:
-            type: integer
-            enum:
-              - -1
-              - 1
+            $ref: '#/components/schemas/UpDownVote'
         - name: no_unvote
           in: query
           schema:
@@ -8448,6 +8473,74 @@ paths:
           $ref: '#/components/responses/AccessDenied'
         '404':
           $ref: '#/components/responses/NotFound'
+  /post_votes.json:
+    get:
+      summary: Search Post Votes
+      operationId: searchPostVotes
+      tags:
+        - Post Votes
+      security:
+        - basicAuth: []
+      description: You must be Moderator+.
+      parameters:
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - name: 'search[order]'
+          in: query
+          description: The order of the results. You must be Admin+.
+          schema:
+            type: string
+            enum:
+              - id_asc
+              - id_desc
+              - ip_addr
+        - in: query
+          name: 'search[post_id]'
+          schema:
+            type: integer
+        - in: query
+          name: 'search[user_name]'
+          schema:
+            type: string
+        - in: query
+          name: 'search[user_id]'
+          schema:
+            type: integer
+        - in: query
+          name: 'search[post_creator_name]'
+          description: 'Only usable if one of `post_id`, `user_name`, or `user_id` is also provided.'
+          schema:
+            type: string
+        - in: query
+          name: 'search[post_creator_id]'
+          description: 'Only usable if one of `post_id`, `user_name`, or `user_id` is also provided.'
+          schema:
+            type: integer
+        - in: query
+          name: 'search[user_ip_addr]'
+          description: 'You must be Admin+. Only usable if one of `post_id`, `user_name`, or `user_id` is also provided. See [the PostgreSQL documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+          schema:
+            type: string
+        - in: query
+          name: 'search[score]'
+          description: 'Only usable if one of `post_id`, `user_name`, or `user_id` is also provided.'
+          schema:
+            $ref: '#/components/schemas/UpDownVote'
+        - in: query
+          name: 'search[duplicates_only]'
+          description: 'You must be Admin+. Only usable if one of `post_id`, `user_name`, or `user_id` is also provided.'
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostVote'
   /post_votes/lock.json:
     post:
       summary: Lock Post Votes

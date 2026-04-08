@@ -15,11 +15,7 @@ requestBody:
           - forum_post_vote[score]
         properties:
           forum_post_vote[score]:
-            type: integer
-            enum:
-              - -1
-              - 0
-              - 1
+            $ref: "../../../components/schemas/upDownMehVote.yaml"
 responses:
   200:
     description: Success
