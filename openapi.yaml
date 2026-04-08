@@ -12,7 +12,7 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: 3ccc4ce
+  version: c0f3ce5
 servers:
   - url: 'https://e621.net'
     description: E621 (production)
@@ -3008,10 +3008,19 @@ components:
     RisingSearchTrend:
       type: object
       required:
-        - tag
+        - name
+        - pretty_name
+        - post_count
+        - category
       properties:
-        tag:
+        name:
           type: string
+        pretty_name:
+          type: string
+        post_count:
+          type: integer
+        category:
+          $ref: '#/components/schemas/TagCategories'
     SearchTrendBlacklist:
       type: object
       required:
