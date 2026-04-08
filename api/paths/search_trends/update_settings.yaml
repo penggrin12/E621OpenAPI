@@ -13,6 +13,8 @@ requestBody:
         properties:
           trends_enabled:
             type: boolean
+          trends_displayed:
+            type: boolean
           trends_min_today:
             type: integer
           trends_min_dleta:
