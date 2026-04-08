@@ -12,7 +12,7 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: b613648
+  version: f24548f
 servers:
   - url: 'https://e621.net'
     description: E621 (production)
@@ -60,7 +60,7 @@ components:
     ipAddrQuery:
       name: 'search[ip_addr]'
       in: query
-      description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+      description: 'Must be Admin+ to use. See [the PostgreSQL documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
       schema:
         type: string
     orderQuery:
@@ -4212,6 +4212,44 @@ components:
                 enum:
                   - null
                 nullable: true
+    PostVote:
+      type: object
+      required:
+        - id
+        - post_id
+        - user_id
+        - score
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+        post_id:
+          type: integer
+        user_id:
+          type: integer
+        score:
+          type: integer
+          enum:
+            - 1
+            - -1
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    UpDownVote:
+      type: integer
+      enum:
+        - 1
+        - -1
+    UpDownMehVote:
+      type: integer
+      enum:
+        - 1
+        - 0
+        - -1
   responses:
     NotFound:
       description: Not Found
@@ -5800,7 +5838,7 @@ paths:
               - type: string
         - name: 'search[ip_addr]'
           in: query
-          description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+          description: 'Must be Admin+ to use. See [the PostgreSQL documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
           schema:
             type: string
         - name: 'search[order]'
@@ -6090,7 +6128,7 @@ paths:
               - type: string
         - name: 'search[ip_addr]'
           in: query
-          description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+          description: 'Must be Admin+ to use. See [the PostgreSQL documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
           schema:
             type: string
         - name: 'search[order]'
@@ -6638,7 +6676,7 @@ paths:
               - type: string
         - name: 'search[ip_addr]'
           in: query
-          description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+          description: 'Must be Admin+ to use. See [the PostgreSQL documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
           schema:
             type: string
         - name: 'search[order]'
@@ -6918,7 +6956,7 @@ paths:
               - type: string
         - name: 'search[ip_addr]'
           in: query
-          description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+          description: 'Must be Admin+ to use. See [the PostgreSQL documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
           schema:
             type: string
         - name: 'search[order]'
@@ -8206,7 +8244,7 @@ paths:
               - type: string
         - name: 'search[ip_addr]'
           in: query
-          description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+          description: 'Must be Admin+ to use. See [the PostgreSQL documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
           schema:
             type: string
         - name: 'search[order]'
@@ -9093,8 +9131,8 @@ paths:
           schema:
             type: integer
             enum:
-              - -1
               - 1
+              - -1
         - name: no_unvote
           in: query
           schema:
@@ -9877,7 +9915,7 @@ paths:
               - type: string
         - name: 'search[ip_addr]'
           in: query
-          description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+          description: 'Must be Admin+ to use. See [the PostgreSQL documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
           schema:
             type: string
         - name: 'search[order]'
@@ -11656,9 +11694,9 @@ paths:
                 'forum_post_vote[score]':
                   type: integer
                   enum:
-                    - -1
-                    - 0
                     - 1
+                    - 0
+                    - -1
       responses:
         '200':
           description: Success
@@ -13027,7 +13065,7 @@ paths:
               - type: string
         - name: 'search[ip_addr]'
           in: query
-          description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+          description: 'Must be Admin+ to use. See [the PostgreSQL documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
           schema:
             type: string
         - name: 'search[order]'
@@ -15391,7 +15429,7 @@ paths:
               - type: string
         - name: 'search[ip_addr]'
           in: query
-          description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+          description: 'Must be Admin+ to use. See [the PostgreSQL documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
           schema:
             type: string
         - name: 'search[order]'
@@ -16204,7 +16242,7 @@ paths:
               - type: string
         - name: 'search[ip_addr]'
           in: query
-          description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+          description: 'Must be Admin+ to use. See [the PostgreSQL documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
           schema:
             type: string
         - name: 'search[order]'
@@ -20514,8 +20552,8 @@ paths:
           schema:
             type: integer
             enum:
-              - -1
               - 1
+              - -1
         - name: no_unvote
           in: query
           schema:
@@ -21874,7 +21912,7 @@ paths:
               - type: string
         - name: 'search[ip_addr]'
           in: query
-          description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+          description: 'Must be Admin+ to use. See [the PostgreSQL documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
           schema:
             type: string
         - name: 'search[order]'
@@ -23570,6 +23608,120 @@ paths:
                     type: string
                     enum:
                       - not found
+  /post_votes.json:
+    get:
+      summary: Search Post Votes
+      operationId: searchPostVotes
+      tags:
+        - Post Votes
+      security:
+        - basicAuth: []
+      description: You must be Moderator+.
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of results to return. Between 0 and 320.
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 320
+        - name: page
+          in: query
+          description: The page number of results to get. Between 1 and 750.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 750
+        - name: 'search[id]'
+          in: query
+          description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
+          schema:
+            oneOf:
+              - type: integer
+              - type: string
+        - name: 'search[order]'
+          in: query
+          description: The order of the results. You must be Admin+.
+          schema:
+            type: string
+            enum:
+              - id_asc
+              - id_desc
+              - ip_addr
+        - in: query
+          name: 'search[post_id]'
+          schema:
+            type: integer
+        - in: query
+          name: 'search[user_name]'
+          schema:
+            type: string
+        - in: query
+          name: 'search[user_id]'
+          schema:
+            type: integer
+        - in: query
+          name: 'search[post_creator_name]'
+          description: 'Only usable if one of `post_id`, `user_name`, or `user_id` is also provided.'
+          schema:
+            type: string
+        - in: query
+          name: 'search[post_creator_id]'
+          description: 'Only usable if one of `post_id`, `user_name`, or `user_id` is also provided.'
+          schema:
+            type: integer
+        - in: query
+          name: 'search[user_ip_addr]'
+          description: 'You must be Admin+. Only usable if one of `post_id`, `user_name`, or `user_id` is also provided. See [the PostgreSQL documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+          schema:
+            type: string
+        - in: query
+          name: 'search[score]'
+          description: 'Only usable if one of `post_id`, `user_name`, or `user_id` is also provided.'
+          schema:
+            type: integer
+            enum:
+              - 1
+              - -1
+        - in: query
+          name: 'search[duplicates_only]'
+          description: 'You must be Admin+. Only usable if one of `post_id`, `user_name`, or `user_id` is also provided.'
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - post_id
+                    - user_id
+                    - score
+                    - created_at
+                    - updated_at
+                  properties:
+                    id:
+                      type: integer
+                    post_id:
+                      type: integer
+                    user_id:
+                      type: integer
+                    score:
+                      type: integer
+                      enum:
+                        - 1
+                        - -1
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
   /post_votes/lock.json:
     post:
       summary: Lock Post Votes
@@ -26574,7 +26726,7 @@ paths:
               - type: string
         - name: 'search[ip_addr]'
           in: query
-          description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+          description: 'Must be Admin+ to use. See [the PostgreSQL documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
           schema:
             type: string
         - in: query
@@ -28760,7 +28912,7 @@ paths:
               - type: string
         - name: 'search[ip_addr]'
           in: query
-          description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+          description: 'Must be Admin+ to use. See [the PostgreSQL documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
           schema:
             type: string
         - name: 'search[order]'
@@ -32299,7 +32451,7 @@ paths:
               - type: string
         - name: 'search[ip_addr]'
           in: query
-          description: 'Must be Admin+ to use. See [postgres'' documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+          description: 'Must be Admin+ to use. See [the PostgreSQL documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
           schema:
             type: string
         - name: 'search[order]'

@@ -12,7 +12,7 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: b613648
+  version: f24548f
 servers:
   - url: 'https://e621.net'
     description: E621 (production)
