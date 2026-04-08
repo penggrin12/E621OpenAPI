@@ -12,7 +12,7 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: f55f6ba
+  version: b613648
 servers:
   - url: 'https://e621.net'
     description: E621 (production)
@@ -7501,6 +7501,8 @@ paths:
         - Posts
       parameters:
         - $ref: '#/components/parameters/idPath'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
       responses:
         '200':
           description: Success
