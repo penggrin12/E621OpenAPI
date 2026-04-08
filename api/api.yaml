@@ -964,10 +964,10 @@ paths:
   /admin/users/alt_list.json:
     get:
       $ref: "./paths/admin/users/alt_list.yaml"
-  /admins/users/{id}.json:
+  /admin/users/{id}.json:
     patch:
       $ref: "./paths/admin/users/update.yaml"
-  /admins/users/{id}/anonymize.json:
+  /admin/users/{id}/anonymize.json:
     post:
       $ref: "./paths/admin/users/confirm_anonymize.yaml"
 
