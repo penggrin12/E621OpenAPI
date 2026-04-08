@@ -9,14 +9,10 @@ properties:
   score:
     description: |
       Currently hardcoded as 1, https://github.com/e621ng/e621ng/blob/5f83e77329d4074c5462c7516c3850f33125f441/app/controllers/posts_controller.rb#L177
-      The feature seems incomplete, and this will likely change in the future.
-    type: integer
-    enum:
-      - 1
+    type: number
+    format: float
   explanation:
     description: |
       Currently hardcoded as null, https://github.com/e621ng/e621ng/blob/5f83e77329d4074c5462c7516c3850f33125f441/app/controllers/posts_controller.rb#L178
-      The feature seems incomplete, and this will likely change in the future.
-    type: string # a type must be set, and null is not a valid type
-    enum: [null]
+    type: string
     nullable: true
