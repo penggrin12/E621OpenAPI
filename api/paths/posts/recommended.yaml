@@ -4,6 +4,8 @@ tags:
   - Posts
 parameters:
   - $ref: "../../components/parameters/path/id.yaml"
+  - $ref: "../../components/parameters/query/limit.yaml"
+  - $ref: "../../components/parameters/query/page.yaml"
 responses:
   200:
     description: Success
