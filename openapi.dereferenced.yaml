@@ -12,13 +12,15 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: e8200da
-  x-e621ng-commit: 17363d41939f0970e07efbd7aacf753eb3230c5a
+  version: 4b7c2cd
+  x-e621ng-commit: 76a023eecea450486d1f1143c4ed9cb257a2be06
   x-e621ng-master-behind-by: 0
-  x-e621ng-master-compare-url: https://github.com/e621ng/e621ng/compare/17363d41939f0970e07efbd7aacf753eb3230c5a...master
+  x-e621ng-master-compare-url: https://github.com/e621ng/e621ng/compare/76a023eecea450486d1f1143c4ed9cb257a2be06...master
 servers:
   - url: 'https://e621.net'
-    description: E621 (production)
+    description: E621 (Production)
+  - url: 'https://e926.net'
+    description: E621 (Safe)
   - url: 'http://localhost:3000'
     description: E621 (Development)
 components:
