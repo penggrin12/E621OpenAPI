@@ -3070,6 +3070,47 @@ components:
             - true
         message:
           type: string
+    PostRecommendation:
+      type: object
+      required:
+        - post_id
+        - score
+        - explanation
+      properties:
+        post_id:
+          type: integer
+        score:
+          description: |
+            Currently hardcoded as 1, https://github.com/e621ng/e621ng/blob/5f83e77329d4074c5462c7516c3850f33125f441/app/controllers/posts_controller.rb#L177
+            The feature seems incomplete, and this will likely change in the future.
+          type: integer
+          enum:
+            - 1
+        explanation:
+          description: |
+            Currently hardcoded as null, https://github.com/e621ng/e621ng/blob/5f83e77329d4074c5462c7516c3850f33125f441/app/controllers/posts_controller.rb#L178
+            The feature seems incomplete, and this will likely change in the future.
+          type: string
+          enum:
+            - null
+          nullable: true
+    RecommendedPosts:
+      type: object
+      required:
+        - post_id
+        - model_version
+        - results
+      properties:
+        post_id:
+          type: integer
+        model_version:
+          type: string
+          enum:
+            - opensearch
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostRecommendation'
   responses:
     NotFound:
       description: Not Found
@@ -7452,6 +7493,23 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ExpectedError'
+  '/posts/{id}/recommended.json':
+    get:
+      summary: Get Recommended Posts
+      operationId: getRecommendedPosts
+      tags:
+        - Posts
+      parameters:
+        - $ref: '#/components/parameters/idPath'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendedPosts'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /post_sets.json:
     get:
       summary: Search Post Sets

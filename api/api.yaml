@@ -209,6 +209,11 @@ components:
       $ref: "./components/schemas/messageError.yaml"
     MessageSuccessResponse:
       $ref: "./components/schemas/messageSuccess.yaml"
+    PostRecommendation:
+      $ref: "./components/schemas/postRecommendation.yaml"
+    RecommendedPosts:
+      $ref: "./components/schemas/recommendedPosts.yaml"
+
   responses:
     NotFound:
       $ref: "./components/responses/notFound.yaml"
@@ -610,6 +615,9 @@ paths:
       $ref: "./paths/posts/votes/create.yaml"
     delete:
       $ref: "./paths/posts/votes/destroy.yaml"
+  /posts/{id}/recommended.json:
+    get:
+      $ref: "./paths/posts/recommended.yaml"
 
   /post_sets.json:
     get:

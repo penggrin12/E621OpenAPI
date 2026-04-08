@@ -1,0 +1,15 @@
+summary: Get Recommended Posts
+operationId: getRecommendedPosts
+tags:
+  - Posts
+parameters:
+  - $ref: "../../components/parameters/path/id.yaml"
+responses:
+  200:
+    description: Success
+    content:
+      application/json:
+        schema:
+          $ref: "../../components/schemas/recommendedPosts.yaml"
+  404:
+    $ref: "../../components/responses/notFound.yaml"

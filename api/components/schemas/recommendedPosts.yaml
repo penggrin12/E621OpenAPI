@@ -1,0 +1,16 @@
+type: object
+required:
+  - post_id
+  - model_version
+  - results
+properties:
+  post_id:
+    type: integer
+  model_version:
+    type: string
+    enum:
+      - opensearch
+  results:
+    type: array
+    items:
+      $ref: "./postRecommendation.yaml"
