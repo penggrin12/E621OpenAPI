@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.commit || github.ref_name }}
+          ref: ${{ inputs.commit || github.sha }}
       - uses: ./.github/actions/pnpm
       - name: Build Webpack
         run: pnpm run build:webpack:production

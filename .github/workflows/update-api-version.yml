@@ -1,53 +1,58 @@
 name: Update API Version
 
 on:
-  workflow_call:
-    outputs:
-      commit:
-        value: ${{ jobs.update-api-version.outputs.commit }}
-  workflow_dispatch:
+    workflow_call:
+        outputs:
+            commit:
+                value: ${{ jobs.update-api-version.outputs.commit }}
+    workflow_dispatch:
 
 jobs:
-  update-api-version:
-    name: Update API Version
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    outputs:
-      commit: ${{ steps.commit.outputs.commit_hash }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: ./.github/actions/pnpm
-      - name: Set Version
-        shell: bash
-        run: |
-          SHA=$(git rev-parse --short $GITHUB_REF_NAME)
-          echo "API_VERSION=${SHA}" >> $GITHUB_ENV
-      - name: Update API Version
-        uses: mikefarah/yq@v4
-        with:
-          cmd: |
-            yq ".info.version = strenv(API_VERSION)" api/api.yaml > api/new.yaml
-            yq '.' api/api.yaml > api/noblanks.yaml
-      # https://github.com/mikefarah/yq/issues/515 - yq strips whitespace
-      # https://github.com/mikefarah/yq/issues/515#issuecomment-1050637663
-      - name: Apply Version
-        run: |
-          diff -B api/noblanks.yaml api/new.yaml > api/new.patch || true # diff exits with 1 if the files have differences
-          patch api/api.yaml api/new.patch
-      - name: Build OpenAPI
-        run: pnpm run build:openapi
-      - name: Build OpenAPI (Dereferenced)
-        run: pnpm run build:openapi:dereferenced
-      - name: Commit Changes
-        id: commit
-        uses: stefanzweifel/git-auto-commit-action@v6
-        with:
-          commit_message: "Update API Version"
-          file_pattern: "api/api.yaml openapi.yaml openapi.dereferenced.yaml"
-          disable_globbing: true
-          commit_user_name: "github-actions[bot]"
-          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
-          commit_author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+    update-api-version:
+        name: Update API Version
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        outputs:
+            commit: ${{ steps.head.outputs.commit_hash }}
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+            - uses: ./.github/actions/pnpm
+            - name: Set Version
+              shell: bash
+              run: |
+                  SHA=$(git rev-parse --short $GITHUB_REF_NAME)
+                  echo "API_VERSION=${SHA}" >> $GITHUB_ENV
+            - name: Update API Version
+              uses: mikefarah/yq@v4
+              with:
+                  cmd: |
+                      yq ".info.version = strenv(API_VERSION)" api/api.yaml > api/new.yaml
+                      yq '.' api/api.yaml > api/noblanks.yaml
+            # https://github.com/mikefarah/yq/issues/515 - yq strips whitespace
+            # https://github.com/mikefarah/yq/issues/515#issuecomment-1050637663
+            - name: Apply Version
+              run: |
+                  diff -B api/noblanks.yaml api/new.yaml > api/new.patch || true # diff exits with 1 if the files have differences
+                  patch api/api.yaml api/new.patch
+            - name: Build OpenAPI
+              run: pnpm run build:openapi
+            - name: Build OpenAPI (Dereferenced)
+              run: pnpm run build:openapi:dereferenced
+            - name: Commit Changes
+              id: commit
+              uses: stefanzweifel/git-auto-commit-action@v6
+              with:
+                  commit_message: "Update API Version"
+                  file_pattern: "api/api.yaml openapi.yaml openapi.dereferenced.yaml"
+                  disable_globbing: true
+                  commit_user_name: "github-actions[bot]"
+                  commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
+                  commit_author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+            - name: Capture Current HEAD
+              id: head
+              shell: bash
+              run: |
+                  echo "commit_hash=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
