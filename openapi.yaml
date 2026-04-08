@@ -13,6 +13,7 @@ info:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
   version: e8200da
+  x-e621ng-commit: 17363d41939f0970e07efbd7aacf753eb3230c5a
 servers:
   - url: 'https://e621.net'
     description: E621 (production)
