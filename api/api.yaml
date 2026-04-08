@@ -318,14 +318,14 @@ paths:
       $ref: "./paths/bulk_update_requests/index.yaml"
     post:
       $ref: "./paths/bulk_update_requests/create.yaml"
-  /bulk_update_request/{id}.json:
+  /bulk_update_requests/{id}.json:
     get:
       $ref: "./paths/bulk_update_requests/show.yaml"
     patch:
       $ref: "./paths/bulk_update_requests/update.yaml"
     delete:
       $ref: "./paths/bulk_update_requests/destroy.yaml"
-  /bulk_update_request/{id}/approve.json:
+  /bulk_update_requests/{id}/approve.json:
     post:
       $ref: "./paths/bulk_update_requests/approve.yaml"
 
