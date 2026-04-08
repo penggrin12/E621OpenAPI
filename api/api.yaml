@@ -536,7 +536,7 @@ paths:
     delete:
       $ref: "./paths/notes/destroy.yaml"
   /notes/{id}/revert.json:
-    post:
+    put:
       $ref: "./paths/notes/revert.yaml"
   /note_versions.json:
     get:
