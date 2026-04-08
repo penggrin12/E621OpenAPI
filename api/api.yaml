@@ -950,7 +950,7 @@ paths:
       $ref: "./paths/wiki_pages/update.yaml"
     delete:
       $ref: "./paths/wiki_pages/destroy.yaml"
-  /wiki_page/{id}/revert.json:
+  /wiki_pages/{id}/revert.json:
     put:
       $ref: "./paths/wiki_pages/revert.yaml"
 
