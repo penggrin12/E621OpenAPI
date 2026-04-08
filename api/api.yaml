@@ -594,7 +594,7 @@ paths:
     put:
       $ref: "./paths/posts/copy_notes.yaml"
   /posts/{id}/revert.json:
-    post:
+    put:
       $ref: "./paths/posts/revert.yaml"
   /posts/{id}/show_seq.json:
     get:
