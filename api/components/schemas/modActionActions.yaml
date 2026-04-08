@@ -10,9 +10,9 @@ enum:
   - avoid_posting_delete
   - avoid_posting_undelete
   - avoid_posting_destroy
+  - blip_destroy
   - blip_delete
-  - blip_hide
-  - blip_unhide
+  - blip_undelete
   - blip_update
   - comment_delete
   - comment_hide
