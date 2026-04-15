@@ -12,7 +12,7 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: be583f1
+  version: b370eac
   x-e621ng-commit: 76a023eecea450486d1f1143c4ed9cb257a2be06
   x-e621ng-master-behind-by: 28
   x-e621ng-master-compare-url: https://github.com/e621ng/e621ng/compare/76a023eecea450486d1f1143c4ed9cb257a2be06...master
