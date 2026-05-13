@@ -1,0 +1,66 @@
+summary: Search Comment Votes
+operationId: searchCommentVotes
+tags:
+  - Comment Votes
+security:
+  - basicAuth: []
+description: You must be Moderator+.
+parameters:
+  - $ref: "../../components/parameters/query/limit.yaml"
+  - $ref: "../../components/parameters/query/page.yaml"
+  - $ref: "../../components/parameters/query/id.yaml"
+  - name: search[order]
+    in: query
+    description: The order of the results. You must be Admin+.
+    schema:
+      type: string
+      enum:
+        - id_asc
+        - id_desc
+        - ip_addr
+  - in: query
+    name: search[post_id]
+    schema:
+      type: integer
+  - in: query
+    name: search[user_name]
+    schema:
+      type: string
+  - in: query
+    name: search[user_id]
+    schema:
+      type: integer
+  - in: query
+    name: search[comment_creator_name]
+    description: Only usable if one of `comment_id`, `user_name`, or `user_id` is also provided.
+    schema:
+      type: string
+  - in: query
+    name: search[comment_creator_id]
+    description: Only usable if one of `comment_id`, `user_name`, or `user_id` is also provided.
+    schema:
+      type: integer
+  - in: query
+    name: search[user_ip_addr]
+    description: You must be Admin+. Only usable if one of `comment_id`, `user_name`, or `user_id` is also provided. See [the PostgreSQL documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).
+    schema:
+      type: string
+  - in: query
+    name: search[score]
+    description: Only usable if one of `comment_id`, `user_name`, or `user_id` is also provided.
+    schema:
+      $ref: "../../components/schemas/upDownVote.yaml"
+  - in: query
+    name: search[duplicates_only]
+    description: You must be Admin+. Only usable if one of `comment_id`, `user_name`, or `user_id` is also provided.
+    schema:
+      type: boolean
+responses:
+  200:
+    description: Success
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: "../../components/schemas/commentVote.yaml"

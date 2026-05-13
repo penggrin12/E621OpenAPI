@@ -230,6 +230,8 @@ components:
       $ref: "./components/schemas/postThumbnail.yaml"
     PostData:
       $ref: "./components/schemas/postData.yaml"
+    CommentVote:
+      $ref: "./components/schemas/commentVote.yaml"
 
   responses:
     NotFound:
@@ -378,6 +380,9 @@ paths:
       $ref: "./paths/comments/votes/create.yaml"
     delete:
       $ref: "./paths/comments/votes/destroy.yaml"
+  /comment_votes.json:
+    get:
+      $ref: "./paths/comment_votes/index.yaml"
   /comment_votes/lock.json:
     post:
       $ref: "./paths/comment_votes/lock.yaml"
