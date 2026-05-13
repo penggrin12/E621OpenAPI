@@ -23,47 +23,47 @@ parameters:
       type: string
   - in: query
     name: search[source]
-    description: Must be Moderator+ to use.
+    description: Must be Moderator+ or Approver to use.
     schema:
       type: string
   - in: query
     name: search[reason]
-    description: Must be Moderator+ to use.
+    description: Must be Moderator+ or Approver to use.
     schema:
       type: string
   - in: query
     name: search[creator_id]
-    description: Must be Moderator+ to use.
+    description: Must be Moderator+ or Approver to use.
     schema:
       type: integer
   - in: query
     name: search[creator_name]
-    description: Must be Moderator+ to use.
+    description: Must be Moderator+ or Approver to use.
     schema:
       type: string
   - in: query
     name: search[reason_hidden]
-    description: Must be Moderator+ to use.
+    description: Must be Moderator+ or Approver to use.
     schema:
       type: boolean
   - in: query
     name: search[instructions]
-    description: Must be Moderator+ to use.
+    description: Must be Moderator+ or Approver to use.
     schema:
       type: string
   - in: query
-    description: Must be Moderator+ to use.
+    description: Must be Moderator+ or Approver to use.
     name: search[post_id]
     schema:
       type: integer
   - in: query
-    description: Must be Moderator+ to use.
+    description: Must be Moderator+ or Approver to use.
     name: search[notes]
     schema:
       type: string
   - in: query
     name: search[creator_logged_in]
-    description: Must be Moderator+ to use.
+    description: Must be Moderator+ or Approver to use.
     schema:
       type: boolean
   - in: query
