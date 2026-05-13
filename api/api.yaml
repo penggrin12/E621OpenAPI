@@ -1057,6 +1057,12 @@ paths:
   /admin/automod_dmails/{id}.json:
     get:
       $ref: "./paths/admin/automod_dmails/show.yaml"
+  /admin/automod_dmails/{id}/mark_as_read.json:
+    put:
+      $ref: "./paths/admin/automod_dmails/mark_as_read.yaml"
+  /admin/automod_dmails/{id}/mark_as_unread.json:
+    put:
+      $ref: "./paths/admin/automod_dmails/mark_as_unread.yaml"
 
   /admin/exceptions.json:
     get:
