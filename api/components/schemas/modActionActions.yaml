@@ -68,6 +68,7 @@ enum:
   - upload_whitelist_create
   - upload_whitelist_update
   - upload_whitelist_delete
+  - user_avatar_clear
   - user_blacklist_changed
   - user_text_change
   - user_custom_title_change

@@ -1029,6 +1029,9 @@ paths:
   /admin/users/{id}/anonymize.json:
     post:
       $ref: "./paths/admin/users/confirm_anonymize.yaml"
+  /admin/users/{id}/clear_avatar.json:
+    post:
+      $ref: "./paths/admin/users/clear_avatar.yaml"
 
   /admin/automod_dmails.json:
     get:

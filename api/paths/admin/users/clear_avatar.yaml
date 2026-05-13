@@ -1,0 +1,16 @@
+summary: Admin Clear User Avatar
+operationId: adminClearUserAvatar
+tags:
+  - Admin Users
+security:
+  - basicAuth: []
+description: You must be Admin+.
+parameters:
+  - $ref: "../../../components/parameters/path/id.yaml"
+responses:
+  302:
+    description: Success
+  403:
+    $ref: "../../../components/responses/accessDenied.yaml"
+  404:
+    $ref: "../../../components/responses/notFound.yaml"
