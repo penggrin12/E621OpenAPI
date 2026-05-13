@@ -12,10 +12,10 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: b370eac
-  x-e621ng-commit: 76a023eecea450486d1f1143c4ed9cb257a2be06
-  x-e621ng-master-behind-by: 28
-  x-e621ng-master-compare-url: https://github.com/e621ng/e621ng/compare/76a023eecea450486d1f1143c4ed9cb257a2be06...master
+  version: 5b01193
+  x-e621ng-commit: 35ab540404bf21d6ac0b4ba4b6220767fd417ddc
+  x-e621ng-master-behind-by: 0
+  x-e621ng-master-compare-url: https://github.com/e621ng/e621ng/compare/35ab540404bf21d6ac0b4ba4b6220767fd417ddc...master
 servers:
   - url: 'https://e621.net'
     description: E621 (Production)
@@ -41,7 +41,7 @@ components:
     idQuery:
       name: 'search[id]'
       in: query
-      description: 'Search for a specific id. Multiple can be separated by commas, up to 100.'
+      description: 'Search for a specific id. Multiple can be separated by commas, up to 320.'
       schema:
         oneOf:
           - type: integer
@@ -77,6 +77,22 @@ components:
         enum:
           - id_asc
           - id_desc
+    v2Query:
+      in: query
+      name: v2
+      description: Use the new V2 format. See the `v2=true` responses.
+      schema:
+        type: boolean
+    modeQuery:
+      in: query
+      name: mode
+      description: Set the mode for the V2 format. Ignored if `v2` is not set or false. See the `v2=true` responses.
+      schema:
+        type: string
+        enum:
+          - basic
+          - extended
+          - thumbnail
     idPath:
       name: id
       in: path
@@ -133,6 +149,7 @@ components:
     ModActionActions:
       type: string
       enum:
+        - admin_user_delete
         - artist_page_rename
         - artist_page_lock
         - artist_page_unlock
@@ -143,6 +160,10 @@ components:
         - avoid_posting_delete
         - avoid_posting_undelete
         - avoid_posting_destroy
+        - staff_note_create
+        - staff_note_update
+        - staff_note_delete
+        - staff_note_undelete
         - blip_destroy
         - blip_delete
         - blip_undelete
@@ -171,6 +192,10 @@ components:
         - help_update
         - ip_ban_create
         - ip_ban_delete
+        - search_trend_blacklist_create
+        - search_trend_blacklist_update
+        - search_trend_blacklist_delete
+        - search_trend_blacklist_purge
         - mascot_create
         - mascot_update
         - mascot_delete
@@ -181,6 +206,7 @@ components:
         - set_update
         - set_delete
         - set_change_visibility
+        - tag_destroy
         - tag_alias_create
         - tag_alias_update
         - tag_implication_create
@@ -188,12 +214,18 @@ components:
         - ticket_claim
         - ticket_unclaim
         - ticket_update
+        - appeal_claim
+        - appeal_unclaim
+        - appeal_update
         - upload_whitelist_create
         - upload_whitelist_update
         - upload_whitelist_delete
+        - user_avatar_clear
         - user_blacklist_changed
         - user_text_change
+        - user_custom_title_change
         - user_upload_limit_change
+        - user_uploads_toggle
         - user_flags_change
         - user_level_change
         - user_name_change
@@ -206,6 +238,7 @@ components:
         - user_feedback_delete
         - user_feedback_undelete
         - user_feedback_destroy
+        - user_flush_favorites
         - wiki_page_rename
         - wiki_page_delete
         - wiki_page_lock
@@ -214,15 +247,8 @@ components:
         - nuke_tag
         - takedown_delete
         - takedown_process
-        - user_flush_favorites
         - post_version_hide
         - post_version_unhide
-        - user_uploads_toggle
-        - staff_note_create
-        - staff_note_update
-        - staff_note_delete
-        - staff_note_undelete
-        - search_trend_blacklist_purge
         - created_positive_record
         - created_neutral_record
         - created_negative_record
@@ -1658,27 +1684,21 @@ components:
         - id
         - created_at
         - updated_at
-        - file
-        - preview
-        - sample
-        - score
-        - tags
-        - locked_tags
         - change_seq
-        - flags
-        - rating
-        - fav_count
-        - sources
-        - pools
-        - relationships
-        - approver_id
+        - files
         - uploader_id
-        - description
-        - comment_count
-        - is_favorited
-        - has_notes
-        - duration
         - uploader_name
+        - approver_id
+        - stats
+        - flags
+        - has
+        - relationships
+        - pools
+        - rating
+        - locked_tags
+        - sources
+        - description
+        - tags
       properties:
         id:
           type: integer
@@ -1688,154 +1708,127 @@ components:
         updated_at:
           type: string
           format: date-time
-        file:
-          type: object
-          required:
-            - width
-            - height
-            - ext
-            - size
-            - md5
-            - url
-          properties:
-            width:
-              type: integer
-            height:
-              type: integer
-            ext:
-              type: string
-            size:
-              type: integer
-              format: int64
-            md5:
-              type: string
-            url:
-              type: string
-              nullable: true
-        preview:
-          type: object
-          required:
-            - width
-            - height
-            - url
-          properties:
-            width:
-              type: integer
-            height:
-              type: integer
-            url:
-              type: string
-              nullable: true
-        sample:
-          type: object
-          required:
-            - has
-            - height
-            - width
-            - url
-            - alternates
-          properties:
-            has:
-              type: boolean
-            height:
-              type: integer
-              nullable: true
-            width:
-              type: integer
-              nullable: true
-            url:
-              type: string
-              nullable: true
-            alternates:
-              type: object
-              properties:
-                has:
-                  type: boolean
-                original:
-                  $ref: '#/components/schemas/PostSampleAlternate'
-                variants:
-                  type: object
-                  properties:
-                    webm:
-                      $ref: '#/components/schemas/PostSampleAlternate'
-                    mp4:
-                      $ref: '#/components/schemas/PostSampleAlternate'
-                samples:
-                  type: object
-                  properties:
-                    480p:
-                      $ref: '#/components/schemas/PostSampleAlternate'
-                    720p:
-                      $ref: '#/components/schemas/PostSampleAlternate'
-        score:
-          type: object
-          required:
-            - up
-            - down
-            - total
-          properties:
-            up:
-              type: integer
-            down:
-              type: integer
-            total:
-              type: integer
-        tags:
-          type: object
-          required:
-            - general
-            - artist
-            - copyright
-            - character
-            - species
-            - invalid
-            - meta
-            - lore
-            - contributor
-          properties:
-            general:
-              type: array
-              items:
-                type: string
-            artist:
-              type: array
-              items:
-                type: string
-            copyright:
-              type: array
-              items:
-                type: string
-            character:
-              type: array
-              items:
-                type: string
-            species:
-              type: array
-              items:
-                type: string
-            invalid:
-              type: array
-              items:
-                type: string
-            meta:
-              type: array
-              items:
-                type: string
-            lore:
-              type: array
-              items:
-                type: string
-            contributor:
-              type: array
-              items:
-                type: string
-        locked_tags:
-          type: array
-          nullable: true
-          items:
-            type: string
         change_seq:
           type: integer
+        files:
+          type: object
+          required:
+            - meta
+            - original
+            - preview
+            - sample
+          properties:
+            meta:
+              type: object
+              required:
+                - md5
+                - ext
+                - size
+                - duration
+                - has_sample
+              properties:
+                md5:
+                  type: string
+                ext:
+                  type: string
+                size:
+                  type: integer
+                  format: int64
+                duration:
+                  type: number
+                  format: float
+                  nullable: true
+                has_sample:
+                  type: boolean
+            original:
+              type: object
+              required:
+                - width
+                - height
+                - url
+              properties:
+                width:
+                  type: integer
+                height:
+                  type: integer
+                url:
+                  type: string
+                  format: uri
+                  nullable: true
+            preview:
+              type: object
+              required:
+                - width
+                - height
+                - jpg
+                - webp
+              properties:
+                width:
+                  type: integer
+                height:
+                  type: integer
+                jpg:
+                  type: string
+                  format: uri
+                  nullable: true
+                webp:
+                  type: string
+                  format: uri
+                  nullable: true
+            sample:
+              type: object
+              required:
+                - width
+                - height
+                - jpg
+                - webp
+              properties:
+                width:
+                  type: integer
+                height:
+                  type: integer
+                jpg:
+                  type: string
+                  format: uri
+                  nullable: true
+                webp:
+                  type: string
+                  format: uri
+                  nullable: true
+        uploader_id:
+          type: integer
+        uploader_name:
+          type: string
+        approver_id:
+          type: integer
+          nullable: true
+        stats:
+          type: object
+          required:
+            - score
+            - fav_count
+            - is_favorited
+            - comment_count
+          properties:
+            score:
+              type: object
+              required:
+                - up
+                - down
+                - total
+              properties:
+                up:
+                  type: integer
+                down:
+                  type: integer
+                total:
+                  type: integer
+            fav_count:
+              type: integer
+            is_favorited:
+              type: boolean
+            comment_count:
+              type: integer
         flags:
           type: object
           required:
@@ -1858,55 +1851,53 @@ components:
               type: boolean
             deleted:
               type: boolean
-        rating:
-          $ref: '#/components/schemas/Ratings'
-        fav_count:
-          type: integer
-        sources:
-          type: array
-          items:
-            type: string
-        pools:
-          type: array
-          items:
-            type: integer
+        has:
+          type: object
+          required:
+            - parent
+            - children
+            - active_children
+            - notes
+            - sample
+          properties:
+            parent:
+              type: boolean
+            children:
+              type: boolean
+            active_children:
+              type: boolean
+            notes:
+              type: boolean
+            sample:
+              type: boolean
         relationships:
           type: object
           required:
             - parent_id
-            - has_children
-            - has_active_children
             - children
           properties:
             parent_id:
               type: integer
               nullable: true
-            has_children:
-              type: boolean
-            has_active_children:
-              type: boolean
             children:
               type: array
               items:
                 type: integer
-        approver_id:
-          type: integer
-          nullable: true
-        uploader_id:
-          type: integer
+        pools:
+          type: array
+          items:
+            type: integer
+        rating:
+          $ref: '#/components/schemas/Ratings'
+        locked_tags:
+          type: array
+          items:
+            type: string
+        sources:
+          type: array
+          items:
+            type: string
         description:
-          type: string
-        comment_count:
-          type: integer
-        is_favorited:
-          type: boolean
-        has_notes:
-          type: boolean
-        duration:
-          type: number
-          format: float
-          nullable: true
-        uploader_name:
           type: string
     PostApproval:
       type: object
@@ -3085,13 +3076,9 @@ components:
         post_id:
           type: integer
         score:
-          description: |
-            Currently hardcoded as 1, https://github.com/e621ng/e621ng/blob/5f83e77329d4074c5462c7516c3850f33125f441/app/controllers/posts_controller.rb#L177
           type: number
           format: float
         explanation:
-          description: |
-            Currently hardcoded as null, https://github.com/e621ng/e621ng/blob/5f83e77329d4074c5462c7516c3850f33125f441/app/controllers/posts_controller.rb#L178
           type: string
           nullable: true
     RecommendedPosts:
@@ -3100,13 +3087,12 @@ components:
         - post_id
         - model_version
         - results
+        - post_data
       properties:
         post_id:
           type: integer
         model_version:
           type: string
-          enum:
-            - opensearch
         results:
           type: array
           items:
@@ -3146,6 +3132,549 @@ components:
         - 1
         - 0
         - -1
+    MinimalUser:
+      type: object
+      required:
+        - id
+        - name
+        - level_string
+        - favorite_count
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        level_string:
+          type: string
+        favorite_count:
+          type: integer
+    ThumbnailPost:
+      type: object
+      required:
+        - id
+        - created_at
+        - md5
+        - file_ext
+        - width
+        - height
+        - size
+        - preview_url
+        - preview_webp
+        - sample_url
+        - file_url
+        - preview_width
+        - preview_height
+        - uploader_id
+        - uploader
+        - score
+        - fav_count
+        - is_favorited
+        - comment_count
+        - flags
+        - pools
+        - rating
+        - tags
+      properties:
+        id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        md5:
+          type: string
+        file_ext:
+          type: string
+        width:
+          type: integer
+        height:
+          type: integer
+        size:
+          type: integer
+          format: int64
+        preview_url:
+          type: string
+          format: uri
+          nullable: true
+        preview_webp:
+          type: string
+          format: uri
+          nullable: true
+        sample_url:
+          type: string
+          format: uri
+          nullable: true
+        file_url:
+          type: string
+          format: uri
+          nullable: true
+        preview_width:
+          type: integer
+        preview_height:
+          type: integer
+        uploader_id:
+          type: integer
+        uploader:
+          type: string
+        score:
+          type: integer
+        fav_count:
+          type: integer
+        is_favorited:
+          type: boolean
+        comment_count:
+          type: integer
+        flags:
+          type: string
+          description: |
+            space separated list of flags:
+            - pending
+            - flagged
+            - deleted
+        pools:
+          type: string
+          description: space separated list of ids
+        rating:
+          $ref: '#/components/schemas/Ratings'
+        tags:
+          type: string
+    PostData:
+      type: object
+      required:
+        - post_data
+      properties:
+        post_data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ThumbnailPost'
+    CommentVote:
+      type: object
+      required:
+        - id
+        - comment_id
+        - user_id
+        - score
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+        comment_id:
+          type: integer
+        user_id:
+          type: integer
+        score:
+          $ref: '#/components/schemas/UpDownVote'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    LegacyPost:
+      type: object
+      required:
+        - id
+        - created_at
+        - updated_at
+        - file
+        - preview
+        - sample
+        - score
+        - tags
+        - locked_tags
+        - change_seq
+        - flags
+        - rating
+        - fav_count
+        - sources
+        - pools
+        - relationships
+        - approver_id
+        - uploader_id
+        - description
+        - comment_count
+        - is_favorited
+        - has_notes
+        - duration
+        - uploader_name
+      properties:
+        id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        file:
+          type: object
+          required:
+            - width
+            - height
+            - ext
+            - size
+            - md5
+            - url
+          properties:
+            width:
+              type: integer
+            height:
+              type: integer
+            ext:
+              type: string
+            size:
+              type: integer
+              format: int64
+            md5:
+              type: string
+            url:
+              type: string
+              nullable: true
+        preview:
+          type: object
+          required:
+            - width
+            - height
+            - url
+          properties:
+            width:
+              type: integer
+            height:
+              type: integer
+            url:
+              type: string
+              nullable: true
+        sample:
+          type: object
+          required:
+            - has
+            - height
+            - width
+            - url
+            - alternates
+          properties:
+            has:
+              type: boolean
+            height:
+              type: integer
+              nullable: true
+            width:
+              type: integer
+              nullable: true
+            url:
+              type: string
+              nullable: true
+            alternates:
+              type: object
+              properties:
+                has:
+                  type: boolean
+                original:
+                  $ref: '#/components/schemas/PostSampleAlternate'
+                variants:
+                  type: object
+                  properties:
+                    webm:
+                      $ref: '#/components/schemas/PostSampleAlternate'
+                    mp4:
+                      $ref: '#/components/schemas/PostSampleAlternate'
+                samples:
+                  type: object
+                  properties:
+                    480p:
+                      $ref: '#/components/schemas/PostSampleAlternate'
+                    720p:
+                      $ref: '#/components/schemas/PostSampleAlternate'
+        score:
+          type: object
+          required:
+            - up
+            - down
+            - total
+          properties:
+            up:
+              type: integer
+            down:
+              type: integer
+            total:
+              type: integer
+        tags:
+          type: object
+          required:
+            - general
+            - artist
+            - copyright
+            - character
+            - species
+            - invalid
+            - meta
+            - lore
+            - contributor
+          properties:
+            general:
+              type: array
+              items:
+                type: string
+            artist:
+              type: array
+              items:
+                type: string
+            copyright:
+              type: array
+              items:
+                type: string
+            character:
+              type: array
+              items:
+                type: string
+            species:
+              type: array
+              items:
+                type: string
+            invalid:
+              type: array
+              items:
+                type: string
+            meta:
+              type: array
+              items:
+                type: string
+            lore:
+              type: array
+              items:
+                type: string
+            contributor:
+              type: array
+              items:
+                type: string
+        locked_tags:
+          type: array
+          nullable: true
+          items:
+            type: string
+        change_seq:
+          type: integer
+        flags:
+          type: object
+          required:
+            - pending
+            - flagged
+            - note_locked
+            - status_locked
+            - rating_locked
+            - deleted
+          properties:
+            pending:
+              type: boolean
+            flagged:
+              type: boolean
+            note_locked:
+              type: boolean
+            status_locked:
+              type: boolean
+            rating_locked:
+              type: boolean
+            deleted:
+              type: boolean
+        rating:
+          $ref: '#/components/schemas/Ratings'
+        fav_count:
+          type: integer
+        sources:
+          type: array
+          items:
+            type: string
+        pools:
+          type: array
+          items:
+            type: integer
+        relationships:
+          type: object
+          required:
+            - parent_id
+            - has_children
+            - has_active_children
+            - children
+          properties:
+            parent_id:
+              type: integer
+              nullable: true
+            has_children:
+              type: boolean
+            has_active_children:
+              type: boolean
+            children:
+              type: array
+              items:
+                type: integer
+        approver_id:
+          type: integer
+          nullable: true
+        uploader_id:
+          type: integer
+        description:
+          type: string
+        comment_count:
+          type: integer
+        is_favorited:
+          type: boolean
+        has_notes:
+          type: boolean
+        duration:
+          type: number
+          format: float
+          nullable: true
+        uploader_name:
+          type: string
+    BasicPost:
+      allOf:
+        - $ref: '#/components/schemas/Post'
+        - type: object
+          required:
+            - tags
+          properties:
+            tags:
+              type: array
+              items:
+                type: string
+    ExtendedPost:
+      allOf:
+        - $ref: '#/components/schemas/Post'
+        - type: object
+          required:
+            - tags
+          properties:
+            tags:
+              type: object
+              required:
+                - general
+                - artist
+                - contributor
+                - copyright
+                - character
+                - species
+                - invalid
+                - meta
+                - lore
+              properties:
+                general:
+                  type: array
+                  items:
+                    type: string
+                artist:
+                  type: array
+                  items:
+                    type: string
+                contributor:
+                  type: array
+                  items:
+                    type: string
+                copyright:
+                  type: array
+                  items:
+                    type: string
+                character:
+                  type: array
+                  items:
+                    type: string
+                species:
+                  type: array
+                  items:
+                    type: string
+                invalid:
+                  type: array
+                  items:
+                    type: string
+                meta:
+                  type: array
+                  items:
+                    type: string
+                lore:
+                  type: array
+                  items:
+                    type: string
+    ExceptionLog:
+      type: object
+      required:
+        - id
+        - created_at
+        - updated_at
+        - class_name
+        - version
+        - extra_params
+        - message
+        - trace
+        - code
+        - user_id
+      properties:
+        id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        class_name:
+          type: string
+        version:
+          type: string
+        extra_params:
+          type: object
+        message:
+          type: string
+        trace:
+          type: string
+        code:
+          type: string
+          format: uuid
+        user_id:
+          type: integer
+    Appeal:
+      type: object
+      required:
+        - id
+        - disp_id
+        - qtype
+        - status
+        - handler_id
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+        creator_id:
+          type: integer
+        disp_id:
+          type: string
+        qtype:
+          type: string
+          enum:
+            - flag
+        status:
+          type: string
+          enum:
+            - pending
+            - partial
+            - approved
+        reason:
+          type: string
+        response:
+          type: string
+        claimant_id:
+          type: integer
+          nullable: true
+        handler_id:
+          type: integer
+          nullable: true
+        accused_id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
   responses:
     NotFound:
       description: Not Found
@@ -3196,6 +3725,59 @@ components:
             oneOf:
               - $ref: '#/components/schemas/FullUser'
               - $ref: '#/components/schemas/FullCurrentUser'
+    PostResponse:
+      description: |
+        Success
+        if `v2=true`, open the schema and find the schema for the mode being used.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - type: object
+                description: 'The legacy format, returned by default. This format is deprecated.'
+                required:
+                  - post
+                properties:
+                  post:
+                    $ref: '#/components/schemas/LegacyPost'
+              - allOf:
+                  - $ref: '#/components/schemas/BasicPost'
+                  - description: 'The basic format, returned with `v2=true` and mode is not set.'
+              - allOf:
+                  - $ref: '#/components/schemas/ExtendedPost'
+                  - description: 'The extended format, returned with `v2=true` and `mode=extended`.'
+              - allOf:
+                  - $ref: '#/components/schemas/ThumbnailPost'
+                  - description: 'The thumbnail format, returned with `v2=true` and `mode=thumbnail`.'
+    PostsResponse:
+      description: |
+        Success
+        if `v2=true`, open the schema and find the schema for the mode being used.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - type: object
+                description: 'The legacy format, returned by default. This format is deprecated.'
+                required:
+                  - posts
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LegacyPost'
+              - type: array
+                description: 'The basic format, returned with `v2=true` and mode is not set.'
+                items:
+                  $ref: '#/components/schemas/BasicPost'
+              - type: array
+                description: 'The extended format, returned with `v2=true` and `mode=extended`.'
+                items:
+                  $ref: '#/components/schemas/ExtendedPost'
+              - type: array
+                description: 'The thumbnail format, returned with `v2=true` and `mode=thumbnail`.'
+                items:
+                  $ref: '#/components/schemas/ThumbnailPost'
   requestBodies:
     warning:
       content:
@@ -3358,6 +3940,156 @@ paths:
           $ref: '#/components/responses/AccessDenied'
         '422':
           $ref: '#/components/responses/ExpectedError'
+  /appeals.json:
+    get:
+      summary: Search Appeals
+      operationId: searchAppeals
+      tags:
+        - Appeals
+      security:
+        - browserAuth: []
+      description: Requires Janitor+ to see appeals not created by you.
+      parameters:
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - $ref: '#/components/parameters/orderQuery'
+        - name: 'search[creator_id]'
+          in: query
+          description: Must be Janitor+ to use any id other than your own.
+          schema:
+            type: integer
+        - name: 'search[creator_name]'
+          in: query
+          description: Must be Janitor+.
+          schema:
+            type: string
+        - name: 'search[claimant_id]'
+          in: query
+          description: Must be Janitor+.
+          schema:
+            type: integer
+        - name: 'search[claimant_name]'
+          in: query
+          description: Must be Janitor+.
+          schema:
+            type: string
+        - name: 'search[accused_id]'
+          in: query
+          description: Must be Janitor+.
+          schema:
+            type: integer
+        - name: 'search[accused_name]'
+          in: query
+          description: Must be Janitor+.
+          schema:
+            type: string
+        - name: 'search[qtype]'
+          in: query
+          schema:
+            $ref: '#/components/schemas/Appeal/properties/qtype'
+        - name: 'search[status]'
+          in: query
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Appeal/properties/status'
+              - enum:
+                  - pending_claimed
+                  - pending_unclaimed
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApiKey'
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/appeals/{id}.json':
+    patch:
+      summary: Update Appeal
+      operationId: updateAppeal
+      tags:
+        - Appeals
+      description: You must be Janitor+.
+      security:
+        - basicAuth: []
+      parameters:
+        - $ref: '#/components/parameters/idPath'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - partial
+                    - approved
+                response:
+                  type: string
+                send_update_dmail:
+                  type: boolean
+                  description: An update dmail will always be sent when the status is changed.
+      responses:
+        '204':
+          description: Success
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/appeals/{id}/claim.json':
+    post:
+      summary: Claim Appeal
+      operationId: claimAppeal
+      tags:
+        - Appeals
+      description: You must be Janitor+
+      parameters:
+        - $ref: '#/components/parameters/idPath'
+      security:
+        - basicAuth: []
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appeal'
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/appeals/{id}/unclaim.json':
+    post:
+      summary: Unclaim Appeal
+      operationId: unclaimAppeal
+      tags:
+        - Appeals
+      description: You must be Janitor+
+      parameters:
+        - $ref: '#/components/parameters/idPath'
+      security:
+        - basicAuth: []
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appeal'
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/appeals/{id}/update.json':
+    post:
+      $ref: '#/paths/~1appeals~1%7Bid%7D.json/patch'
   /artists.json:
     get:
       summary: Search Artists
@@ -4283,12 +5015,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/idPath'
       responses:
-        '201':
+        '302':
           description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Blip'
         '403':
           $ref: '#/components/responses/AccessDenied'
         '404':
@@ -4306,12 +5034,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/idPath'
       responses:
-        '201':
+        '302':
           description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Blip'
         '403':
           $ref: '#/components/responses/AccessDenied'
         '404':
@@ -4851,6 +5575,74 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ExpectedError'
+  /comment_votes.json:
+    get:
+      summary: Search Comment Votes
+      operationId: searchCommentVotes
+      tags:
+        - Comment Votes
+      security:
+        - basicAuth: []
+      description: You must be Moderator+.
+      parameters:
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - name: 'search[order]'
+          in: query
+          description: The order of the results. You must be Admin+.
+          schema:
+            type: string
+            enum:
+              - id_asc
+              - id_desc
+              - ip_addr
+        - in: query
+          name: 'search[post_id]'
+          schema:
+            type: integer
+        - in: query
+          name: 'search[user_name]'
+          schema:
+            type: string
+        - in: query
+          name: 'search[user_id]'
+          schema:
+            type: integer
+        - in: query
+          name: 'search[comment_creator_name]'
+          description: 'Only usable if one of `comment_id`, `user_name`, or `user_id` is also provided.'
+          schema:
+            type: string
+        - in: query
+          name: 'search[comment_creator_id]'
+          description: 'Only usable if one of `comment_id`, `user_name`, or `user_id` is also provided.'
+          schema:
+            type: integer
+        - in: query
+          name: 'search[user_ip_addr]'
+          description: 'You must be Admin+. Only usable if one of `comment_id`, `user_name`, or `user_id` is also provided. See [the PostgreSQL documentation](https://www.postgresql.org/docs/9.3/functions-net.html) for information on how this is parsed. Specifically, "is contained within or equals" (`<<=`).'
+          schema:
+            type: string
+        - in: query
+          name: 'search[score]'
+          description: 'Only usable if one of `comment_id`, `user_name`, or `user_id` is also provided.'
+          schema:
+            $ref: '#/components/schemas/UpDownVote'
+        - in: query
+          name: 'search[duplicates_only]'
+          description: 'You must be Admin+. Only usable if one of `comment_id`, `user_name`, or `user_id` is also provided.'
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommentVote'
   /comment_votes/lock.json:
     post:
       summary: Lock Comment Votes
@@ -4905,6 +5697,8 @@ paths:
       operationId: searchDMails
       tags:
         - DMails
+      security:
+        - basicAuth: []
       parameters:
         - $ref: '#/components/parameters/limitQuery'
         - $ref: '#/components/parameters/pageQuery'
@@ -4960,6 +5754,8 @@ paths:
       operationId: getDMail
       tags:
         - DMails
+      security:
+        - basicAuth: []
       description: Fetching a dmail will not mark it as read.
       parameters:
         - $ref: '#/components/parameters/idPath'
@@ -5246,25 +6042,11 @@ paths:
       parameters:
         - $ref: '#/components/parameters/limitQuery'
         - $ref: '#/components/parameters/pageQuery'
-        - in: query
-          name: user_id
-          description: You must be the user or Moderator+ if the user has their favorites hidden.
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/v2Query'
+        - $ref: '#/components/parameters/modeQuery'
       responses:
         '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - posts
-                properties:
-                  posts:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Post'
+          $ref: '#/components/responses/PostsResponse'
         '403':
           $ref: '#/components/responses/AccessDenied'
         '404':
@@ -7042,6 +7824,8 @@ paths:
         - Popular
       parameters:
         - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/v2Query'
+        - $ref: '#/components/parameters/modeQuery'
         - name: date
           in: query
           description: 'The date to list popular uploads for. Only The day, month, and year are considered.'
@@ -7059,18 +7843,7 @@ paths:
               - day
       responses:
         '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - posts
-                properties:
-                  posts:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Post'
+          $ref: '#/components/responses/PostsResponse'
   /posts.json:
     get:
       summary: Search Posts
@@ -7080,6 +7853,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/limitQuery'
         - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/v2Query'
+        - $ref: '#/components/parameters/modeQuery'
         - in: query
           name: tags
           schema:
@@ -7094,18 +7869,58 @@ paths:
             type: string
       responses:
         '200':
-          description: Success
+          description: |
+            Success
+            if `v2=true`, open the schema and find the schema for the mode being used.
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - posts
-                properties:
-                  posts:
-                    type: array
+                oneOf:
+                  - type: object
+                    description: 'The legacy format, returned by default. This format is deprecated.'
+                    required:
+                      - posts
+                    properties:
+                      posts:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/LegacyPost'
+                  - type: array
+                    description: 'The basic format, returned with `v2=true` and mode is not set.'
                     items:
-                      $ref: '#/components/schemas/Post'
+                      $ref: '#/components/schemas/BasicPost'
+                  - type: array
+                    description: 'The extended format, returned with `v2=true` and `mode=extended`.'
+                    items:
+                      $ref: '#/components/schemas/ExtendedPost'
+                  - type: array
+                    description: 'The thumbnail format, returned with `v2=true` and `mode=thumbnail`.'
+                    items:
+                      $ref: '#/components/schemas/ThumbnailPost'
+                  - type: object
+                    description: |
+                      When searching by md5.
+                      The legacy format, returned by default. This format is deprecated.
+                    required:
+                      - post
+                    properties:
+                      post:
+                        $ref: '#/components/schemas/LegacyPost'
+                  - allOf:
+                      - $ref: '#/components/schemas/BasicPost'
+                      - description: |
+                          When searching by md5.
+                          The basic format, returned with `v2=true` and mode is not set.
+                  - allOf:
+                      - $ref: '#/components/schemas/ExtendedPost'
+                      - description: |
+                          When searching by md5.
+                          The extended format, returned with `v2=true` and `mode=extended`.
+                  - allOf:
+                      - $ref: '#/components/schemas/ThumbnailPost'
+                      - description: |
+                          When searching by md5.
+                          The thumbnail format, returned with `v2=true` and `mode=thumbnail`.
   /posts/random.json:
     get:
       summary: Get Random Post
@@ -7113,22 +7928,15 @@ paths:
       tags:
         - Posts
       parameters:
+        - $ref: '#/components/parameters/v2Query'
+        - $ref: '#/components/parameters/modeQuery'
         - name: tags
           in: query
           schema:
             type: string
       responses:
         '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - post
-                properties:
-                  post:
-                    $ref: '#/components/schemas/Post'
+          $ref: '#/components/responses/PostResponse'
         '404':
           $ref: '#/components/responses/NotFound'
   '/posts/{id}.json':
@@ -7139,18 +7947,11 @@ paths:
         - Posts
       parameters:
         - $ref: '#/components/parameters/idPath'
+        - $ref: '#/components/parameters/v2Query'
+        - $ref: '#/components/parameters/modeQuery'
       responses:
         '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - post
-                properties:
-                  post:
-                    $ref: '#/components/schemas/Post'
+          $ref: '#/components/responses/PostResponse'
         '404':
           $ref: '#/components/responses/NotFound'
     patch:
@@ -7163,6 +7964,8 @@ paths:
       description: Most errors are silently swallowed.
       parameters:
         - $ref: '#/components/parameters/idPath'
+        - $ref: '#/components/parameters/v2Query'
+        - $ref: '#/components/parameters/modeQuery'
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -7230,11 +8033,7 @@ paths:
                   description: You must be Admin+.
       responses:
         '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Post'
+          $ref: '#/components/responses/PostResponse'
         '403':
           $ref: '#/components/responses/AccessDenied'
         '404':
@@ -7252,18 +8051,11 @@ paths:
       description: You must be Admin+.
       parameters:
         - $ref: '#/components/parameters/idPath'
+        - $ref: '#/components/parameters/v2Query'
+        - $ref: '#/components/parameters/modeQuery'
       responses:
         '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - post
-                properties:
-                  post:
-                    $ref: '#/components/schemas/Post'
+          $ref: '#/components/responses/PostResponse'
         '403':
           $ref: '#/components/responses/AccessDenied'
         '404':
@@ -7281,6 +8073,8 @@ paths:
       description: Will error if no body is provided.
       parameters:
         - $ref: '#/components/parameters/idPath'
+        - $ref: '#/components/parameters/v2Query'
+        - $ref: '#/components/parameters/modeQuery'
       requestBody:
         content:
           application/json:
@@ -7293,16 +8087,7 @@ paths:
                   type: boolean
       responses:
         '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - post
-                properties:
-                  post:
-                    $ref: '#/components/schemas/Post'
+          $ref: '#/components/responses/PostResponse'
         '403':
           $ref: '#/components/responses/AccessDenied'
         '404':
@@ -7371,6 +8156,8 @@ paths:
         - Posts
       parameters:
         - $ref: '#/components/parameters/idPath'
+        - $ref: '#/components/parameters/v2Query'
+        - $ref: '#/components/parameters/modeQuery'
         - name: seq
           in: query
           description: The direction to move in the sequence.
@@ -7381,16 +8168,7 @@ paths:
               - prev
       responses:
         '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - post
-                properties:
-                  post:
-                    $ref: '#/components/schemas/Post'
+          $ref: '#/components/responses/PostResponse'
         '403':
           $ref: '#/components/responses/AccessDenied'
         '404':
@@ -7449,7 +8227,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Post'
+                  $ref: '#/components/schemas/MinimalUser'
         '403':
           $ref: '#/components/responses/AccessDenied'
         '404':
@@ -7518,7 +8296,49 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/ExpectedError'
-  '/posts/{id}/recommended.json':
+  '/posts/{id}/similar/artist.json':
+    get:
+      summary: Get Recommended Posts For Artist
+      operationId: getRecommendedPostsArtist
+      tags:
+        - Posts
+      parameters:
+        - $ref: '#/components/parameters/idPath'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/RecommendedPosts'
+                  - $ref: '#/components/schemas/PostData'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/posts/{id}/similar/tags.json':
+    get:
+      summary: Get Recommended Posts For Tags
+      operationId: getRecommendedPostsTags
+      tags:
+        - Posts
+      parameters:
+        - $ref: '#/components/parameters/idPath'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/RecommendedPosts'
+                  - $ref: '#/components/schemas/PostData'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/posts/{id}/similar/remote.json':
     get:
       summary: Get Recommended Posts
       operationId: getRecommendedPosts
@@ -9681,47 +10501,47 @@ paths:
             type: string
         - in: query
           name: 'search[source]'
-          description: Must be Moderator+ to use.
+          description: Must be Moderator+ or Approver to use.
           schema:
             type: string
         - in: query
           name: 'search[reason]'
-          description: Must be Moderator+ to use.
+          description: Must be Moderator+ or Approver to use.
           schema:
             type: string
         - in: query
           name: 'search[creator_id]'
-          description: Must be Moderator+ to use.
+          description: Must be Moderator+ or Approver to use.
           schema:
             type: integer
         - in: query
           name: 'search[creator_name]'
-          description: Must be Moderator+ to use.
+          description: Must be Moderator+ or Approver to use.
           schema:
             type: string
         - in: query
           name: 'search[reason_hidden]'
-          description: Must be Moderator+ to use.
+          description: Must be Moderator+ or Approver to use.
           schema:
             type: boolean
         - in: query
           name: 'search[instructions]'
-          description: Must be Moderator+ to use.
+          description: Must be Moderator+ or Approver to use.
           schema:
             type: string
         - in: query
-          description: Must be Moderator+ to use.
+          description: Must be Moderator+ or Approver to use.
           name: 'search[post_id]'
           schema:
             type: integer
         - in: query
-          description: Must be Moderator+ to use.
+          description: Must be Moderator+ or Approver to use.
           name: 'search[notes]'
           schema:
             type: string
         - in: query
           name: 'search[creator_logged_in]'
-          description: Must be Moderator+ to use.
+          description: Must be Moderator+ or Approver to use.
           schema:
             type: boolean
         - in: query
@@ -10941,6 +11761,40 @@ paths:
           description: Success
         '403':
           $ref: '#/components/responses/AccessDenied'
+  /maintenance/user/avatar.json:
+    patch:
+      summary: Update Avatar Crop
+      operationId: updateAvatarCrop
+      tags:
+        - Users
+      security:
+        - basicAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - avatar_crop_x
+                - avatar_crop_y
+                - avatar_crop_w
+              properties:
+                avatar_crop_x:
+                  type: integer
+                  description: The x coordinate of the top left corner of the crop area.
+                avatar_crop_y:
+                  type: integer
+                  description: The y coordinate of the top left corner of the crop area.
+                avatar_crop_w:
+                  type: integer
+                  description: The width of the crop area. The height is always the same as the width.
+      responses:
+        '302':
+          description: |
+            Redirect
+            Success should be determined based on the html, any errors will be present in an alert.
+        '403':
+          $ref: '#/components/responses/AccessDenied'
   /user_feedbacks.json:
     get:
       summary: Search User Feedbacks
@@ -11608,6 +12462,8 @@ paths:
                   type: boolean
                 'user[replacements_beta]':
                   type: boolean
+                'user[custom_title]':
+                  type: string
       responses:
         '204':
           description: Success
@@ -11637,6 +12493,201 @@ paths:
             Success should be determined based on the html, any errors will be present in an alert.
         '404':
           $ref: '#/components/responses/NotFound'
+  '/admin/users/{id}/clear_avatar.json':
+    post:
+      summary: Admin Clear User Avatar
+      operationId: adminClearUserAvatar
+      tags:
+        - Admin Users
+      security:
+        - basicAuth: []
+      description: You must be Admin+.
+      parameters:
+        - $ref: '#/components/parameters/idPath'
+      responses:
+        '302':
+          description: Success
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /admin/automod_dmails.json:
+    get:
+      summary: Get Automod DMails
+      operationId: getAutomodDMails
+      tags:
+        - DMails
+      security:
+        - basicAuth: []
+      description: You must be Janitor+.
+      parameters:
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - in: query
+          name: 'search[title_matches]'
+          schema:
+            type: string
+        - in: query
+          name: 'search[message_matches]'
+          schema:
+            type: string
+        - in: query
+          name: 'search[to_name]'
+          schema:
+            type: string
+        - in: query
+          name: 'search[to_id]'
+          schema:
+            type: integer
+        - in: query
+          name: 'search[from_name]'
+          schema:
+            type: string
+        - in: query
+          name: 'search[from_id]'
+          schema:
+            type: integer
+        - in: query
+          name: 'search[is_read]'
+          schema:
+            type: boolean
+        - in: query
+          name: 'search[is_deleted]'
+          schema:
+            type: boolean
+        - in: query
+          name: 'search[read]'
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DMail'
+  '/admin/automod_dmails/{id}.json':
+    get:
+      summary: Get Automod DMail
+      operationId: getAutomodDMail
+      tags:
+        - DMails
+      security:
+        - basicAuth: []
+      description: You must be Janitor+.
+      parameters:
+        - $ref: '#/components/parameters/idPath'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DMail'
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/admin/automod_dmails/{id}/mark_as_read.json':
+    put:
+      summary: Mark Automod DMail As Read
+      operationId: markAutomodDMailAsRead
+      tags:
+        - DMails
+      security:
+        - basicAuth: []
+      description: You must be Janitor+.
+      parameters:
+        - $ref: '#/components/parameters/idPath'
+      responses:
+        '204':
+          description: Success
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  '/admin/automod_dmails/{id}/mark_as_unread.json':
+    put:
+      summary: Mark Automod DMail As Unread
+      operationId: markAutomodDMailAsUnread
+      tags:
+        - DMails
+      security:
+        - basicAuth: []
+      description: You must be Janitor+.
+      parameters:
+        - $ref: '#/components/parameters/idPath'
+      responses:
+        '204':
+          description: Success
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /admin/exceptions.json:
+    get:
+      summary: Get Exception Logs
+      operationId: getExceptionLogs
+      tags:
+        - Exception Logs
+      security:
+        - basicAuth: []
+      description: You must be Janitor+.
+      parameters:
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/pageQuery'
+        - $ref: '#/components/parameters/orderQuery'
+        - $ref: '#/components/parameters/idQuery'
+        - in: query
+          name: 'search[user_name]'
+          schema:
+            type: string
+        - in: query
+          name: 'search[code]'
+          schema:
+            type: string
+        - in: query
+          name: 'search[commit]'
+          schema:
+            type: string
+        - in: query
+          name: 'search[class_name]'
+          schema:
+            type: string
+        - in: query
+          name: 'search[without_class_name]'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExceptionLog'
+  '/admin/exceptions/{id}.json':
+    get:
+      summary: Get Exception Log
+      operationId: getExceptionLog
+      tags:
+        - Exception Logs
+      security:
+        - basicAuth: []
+      description: You must be Janitor+.
+      parameters:
+        - $ref: '#/components/parameters/idPath'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionLog'
   '/moderator/post/posts/{id}/delete.json':
     post:
       summary: Delete Post
@@ -11666,6 +12717,26 @@ paths:
                 copy_tags:
                   type: boolean
                   description: Copy tags to parent.
+                dmail:
+                  type: string
+                  description: |
+                    The content of the dmail to send to the uploader.
+                    Placeholders:
+                    - %REASON%
+                    - %POST_ID%
+                    - %STAFF_NAME%
+                    - %STAFF_ID%
+                    - %UPLOADER_ID%
+                dmail_title:
+                  type: string
+                  description: |
+                    The title of the dmail to send to the uploader.
+                      Placeholders:
+                      - %REASON%
+                      - %POST_ID%
+                      - %STAFF_NAME%
+                      - %STAFF_ID%
+                      - %UPLOADER_ID%
                 commit:
                   type: string
                   description: 'If not set, nothing will happen.'
