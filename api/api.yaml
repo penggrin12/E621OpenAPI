@@ -947,6 +947,9 @@ paths:
   /maintenance/user/dmail_filter.json:
     patch:
       $ref: "./paths/maintenance/user/dmail_filters/update.yaml"
+  /maintenance/user/avatar.json:
+    patch:
+      $ref: "./paths/maintenance/user/avatars/update.yaml"
 
   /user_feedbacks.json:
     get:
