@@ -242,6 +242,8 @@ components:
       $ref: "./components/schemas/basicPost.yaml"
     ExtendedPost:
       $ref: "./components/schemas/extendedPost.yaml"
+    ExceptionLog:
+      $ref: "./components/schemas/exceptionLog.yaml"
 
   responses:
     NotFound:
@@ -1034,6 +1036,13 @@ paths:
   /admin/automod_dmails/{id}.json:
     get:
       $ref: "./paths/admin/automod_dmails/show.yaml"
+
+  /admin/exceptions.json:
+    get:
+      $ref: "./paths/admin/exceptions/index.yaml"
+  /admin/exceptions/{id}.json:
+    get:
+      $ref: "./paths/admin/exceptions/show.yaml"
 
   /moderator/post/posts/{id}/delete.json:
     post:

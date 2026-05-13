@@ -1,0 +1,36 @@
+type: object
+required:
+  - id
+  - created_at
+  - updated_at
+  - class_name
+  - version
+  - extra_params
+  - message
+  - trace
+  - code
+  - user_id
+properties:
+  id:
+    type: integer
+  created_at:
+    type: string
+    format: date-time
+  updated_at:
+    type: string
+    format: date-time
+  class_name:
+    type: string
+  version:
+    type: string
+  extra_params:
+    type: object
+  message:
+    type: string
+  trace:
+    type: string
+  code:
+    type: string
+    format: uuid
+  user_id:
+    type: integer

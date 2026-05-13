@@ -1,0 +1,41 @@
+summary: Get Exception Logs
+operationId: getExceptionLogs
+tags:
+  - Exception Logs
+security:
+  - basicAuth: []
+description: You must be Janitor+.
+parameters:
+  - $ref: "../../../components/parameters/query/limit.yaml"
+  - $ref: "../../../components/parameters/query/page.yaml"
+  - $ref: "../../../components/parameters/query/order.yaml"
+  - $ref: "../../../components/parameters/query/id.yaml"
+  - in: query
+    name: search[user_name]
+    schema:
+      type: string
+  - in: query
+    name: search[code]
+    schema:
+      type: string
+  - in: query
+    name: search[commit]
+    schema:
+      type: string
+  - in: query
+    name: search[class_name]
+    schema:
+      type: string
+  - in: query
+    name: search[without_class_name]
+    schema:
+      type: string
+responses:
+  200:
+    description: Success
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: "../../../components/schemas/exceptionLog.yaml"
