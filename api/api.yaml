@@ -1006,6 +1006,13 @@ paths:
     post:
       $ref: "./paths/admin/users/confirm_anonymize.yaml"
 
+  /admin/automod_dmails.json:
+    get:
+      $ref: "./paths/admin/automod_dmails/index.yaml"
+  /admin/automod_dmails/{id}.json:
+    get:
+      $ref: "./paths/admin/automod_dmails/show.yaml"
+
   /moderator/post/posts/{id}/delete.json:
     post:
       $ref: "./paths/moderator/post/posts/delete.yaml"

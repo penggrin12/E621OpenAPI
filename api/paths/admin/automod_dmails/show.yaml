@@ -1,0 +1,20 @@
+summary: Get Automod DMail
+operationId: getAutomodDMail
+tags:
+  - DMails
+security:
+  - basicAuth: []
+description: You must be Janitor+.
+parameters:
+  - $ref: "../../../components/parameters/path/id.yaml"
+responses:
+  200:
+    description: Success
+    content:
+      application/json:
+        schema:
+          $ref: "../../../components/schemas/dMail.yaml"
+  403:
+    $ref: "../../../components/responses/accessDenied.yaml"
+  404:
+    $ref: "../../../components/responses/notFound.yaml"

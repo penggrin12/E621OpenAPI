@@ -2,6 +2,8 @@ summary: Get DMail
 operationId: getDMail
 tags:
   - DMails
+security:
+  - basicAuth: []
 description: Fetching a dmail will not mark it as read.
 parameters:
   - $ref: "../../components/parameters/path/id.yaml"

@@ -1,13 +1,14 @@
-summary: Search DMails
-operationId: searchDMails
+summary: Get Automod DMails
+operationId: getAutomodDMails
 tags:
   - DMails
 security:
   - basicAuth: []
+description: You must be Janitor+.
 parameters:
-  - $ref: "../../components/parameters/query/limit.yaml"
-  - $ref: "../../components/parameters/query/page.yaml"
-  - $ref: "../../components/parameters/query/id.yaml"
+  - $ref: "../../../components/parameters/query/limit.yaml"
+  - $ref: "../../../components/parameters/query/page.yaml"
+  - $ref: "../../../components/parameters/query/id.yaml"
   - in: query
     name: search[title_matches]
     schema:
@@ -52,4 +53,4 @@ responses:
         schema:
           type: array
           items:
-            $ref: "../../components/schemas/dMail.yaml"
+            $ref: "../../../components/schemas/dMail.yaml"
