@@ -7,12 +7,8 @@ properties:
   post_id:
     type: integer
   score:
-    description: |
-      Currently hardcoded as 1, https://github.com/e621ng/e621ng/blob/5f83e77329d4074c5462c7516c3850f33125f441/app/controllers/posts_controller.rb#L177
     type: number
     format: float
   explanation:
-    description: |
-      Currently hardcoded as null, https://github.com/e621ng/e621ng/blob/5f83e77329d4074c5462c7516c3850f33125f441/app/controllers/posts_controller.rb#L178
     type: string
     nullable: true

@@ -1,6 +1,6 @@
 name: search[id]
 in: query
-description: Search for a specific id. Multiple can be separated by commas, up to 100.
+description: Search for a specific id. Multiple can be separated by commas, up to 320.
 schema:
   oneOf:
     - type: integer

@@ -224,6 +224,12 @@ components:
       $ref: "./components/schemas/upDownVote.yaml"
     UpDownMehVote:
       $ref: "./components/schemas/upDownMehVote.yaml"
+    MinimalUser:
+      $ref: "./components/schemas/minimalUser.yaml"
+    PostThumbnail:
+      $ref: "./components/schemas/postThumbnail.yaml"
+    PostData:
+      $ref: "./components/schemas/postData.yaml"
 
   responses:
     NotFound:
@@ -626,9 +632,15 @@ paths:
       $ref: "./paths/posts/votes/create.yaml"
     delete:
       $ref: "./paths/posts/votes/destroy.yaml"
-  /posts/{id}/recommended.json:
+  /posts/{id}/similar/artist.json:
     get:
-      $ref: "./paths/posts/recommended.yaml"
+      $ref: "./paths/post_recommendations/artist.yaml"
+  /posts/{id}/similar/tags.json:
+    get:
+      $ref: "./paths/post_recommendations/tags.yaml"
+  /posts/{id}/similar/remote.json:
+    get:
+      $ref: "./paths/post_recommendations/remote.yaml"
 
   /post_sets.json:
     get:
