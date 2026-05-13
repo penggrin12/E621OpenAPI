@@ -244,6 +244,8 @@ components:
       $ref: "./components/schemas/extendedPost.yaml"
     ExceptionLog:
       $ref: "./components/schemas/exceptionLog.yaml"
+    Appeal:
+      $ref: "./components/schemas/appeal.yaml"
 
   responses:
     NotFound:
@@ -278,6 +280,22 @@ paths:
   /api_keys/{id}/regenerate.json:
     post:
       $ref: "./paths/api_keys/regenerate.yaml"
+
+  /appeals.json:
+    get:
+      $ref: "./paths/appeals/index.yaml"
+  /appeals/{id}.json:
+    patch:
+      $ref: "./paths/appeals/update.yaml"
+  /appeals/{id}/claim.json:
+    post:
+      $ref: "./paths/appeals/claim.yaml"
+  /appeals/{id}/unclaim.json:
+    post:
+      $ref: "./paths/appeals/unclaim.yaml"
+  /appeals/{id}/update.json:
+    post:
+      $ref: "./paths/appeals/update.yaml"
 
   /artists.json:
     get:

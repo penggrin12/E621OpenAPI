@@ -65,6 +65,9 @@ enum:
   - ticket_claim
   - ticket_unclaim
   - ticket_update
+  - appeal_claim
+  - appeal_unclaim
+  - appeal_update
   - upload_whitelist_create
   - upload_whitelist_update
   - upload_whitelist_delete

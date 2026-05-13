@@ -1,0 +1,32 @@
+summary: Update Appeal
+operationId: updateAppeal
+tags:
+  - Appeals
+description: You must be Janitor+.
+security:
+  - basicAuth: []
+parameters:
+  - $ref: "../../components/parameters/path/id.yaml"
+requestBody:
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: string
+            enum:
+              - partial
+              - approved
+          response:
+            type: string
+          send_update_dmail:
+            type: boolean
+            description: An update dmail will always be sent when the status is changed.
+responses:
+  204:
+    description: Success
+  403:
+    $ref: "../../components/responses/accessDenied.yaml"
+  404:
+    $ref: "../../components/responses/notFound.yaml"

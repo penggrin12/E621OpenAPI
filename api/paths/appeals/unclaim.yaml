@@ -1,0 +1,20 @@
+summary: Unclaim Appeal
+operationId: unclaimAppeal
+tags:
+  - Appeals
+description: You must be Janitor+
+parameters:
+  - $ref: "../../components/parameters/path/id.yaml"
+security:
+  - basicAuth: []
+responses:
+  201:
+    description: Success
+    content:
+      application/json:
+        schema:
+          $ref: "../../components/schemas/appeal.yaml"
+  403:
+    $ref: "../../components/responses/accessDenied.yaml"
+  404:
+    $ref: "../../components/responses/notFound.yaml"

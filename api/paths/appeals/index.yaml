@@ -1,0 +1,67 @@
+summary: Search Appeals
+operationId: searchAppeals
+tags:
+  - Appeals
+security:
+  - browserAuth: []
+description: Requires Janitor+ to see appeals not created by you.
+parameters:
+  - $ref: "../../components/parameters/query/limit.yaml"
+  - $ref: "../../components/parameters/query/page.yaml"
+  - $ref: "../../components/parameters/query/id.yaml"
+  - $ref: "../../components/parameters/query/order.yaml"
+  - name: search[creator_id]
+    in: query
+    description: Must be Janitor+ to use any id other than your own.
+    schema:
+      type: integer
+  - name: search[creator_name]
+    in: query
+    description: Must be Janitor+.
+    schema:
+      type: string
+  - name: search[claimant_id]
+    in: query
+    description: Must be Janitor+.
+    schema:
+      type: integer
+  - name: search[claimant_name]
+    in: query
+    description: Must be Janitor+.
+    schema:
+      type: string
+  - name: search[accused_id]
+    in: query
+    description: Must be Janitor+.
+    schema:
+      type: integer
+  - name: search[accused_name]
+    in: query
+    description: Must be Janitor+.
+    schema:
+      type: string
+  - name: search[qtype]
+    in: query
+    schema:
+      $ref: "../../components/schemas/appeal/qtype.yaml"
+  - name: search[status]
+    in: query
+    schema:
+      allOf:
+        - $ref: "../../components/schemas/appeal/status.yaml"
+        - enum:
+            - pending_claimed
+            - pending_unclaimed
+responses:
+  200:
+    description: Success
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            $ref: "../../components/schemas/apiKey.yaml"
+  403:
+    $ref: "../../components/responses/accessDenied.yaml"
+  404:
+    $ref: "../../components/responses/notFound.yaml"
