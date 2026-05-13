@@ -1,5 +1,6 @@
 type: string
 enum:
+  - admin_user_delete
   - artist_page_rename
   - artist_page_lock
   - artist_page_unlock
@@ -10,6 +11,10 @@ enum:
   - avoid_posting_delete
   - avoid_posting_undelete
   - avoid_posting_destroy
+  - staff_note_create
+  - staff_note_update
+  - staff_note_delete
+  - staff_note_undelete
   - blip_destroy
   - blip_delete
   - blip_undelete
@@ -38,6 +43,10 @@ enum:
   - help_update
   - ip_ban_create
   - ip_ban_delete
+  - search_trend_blacklist_create
+  - search_trend_blacklist_update
+  - search_trend_blacklist_delete
+  - search_trend_blacklist_purge
   - mascot_create
   - mascot_update
   - mascot_delete
@@ -48,6 +57,7 @@ enum:
   - set_update
   - set_delete
   - set_change_visibility
+  - tag_destroy
   - tag_alias_create
   - tag_alias_update
   - tag_implication_create
@@ -60,7 +70,9 @@ enum:
   - upload_whitelist_delete
   - user_blacklist_changed
   - user_text_change
+  - user_custom_title_change
   - user_upload_limit_change
+  - user_uploads_toggle
   - user_flags_change
   - user_level_change
   - user_name_change
@@ -73,6 +85,7 @@ enum:
   - user_feedback_delete
   - user_feedback_undelete
   - user_feedback_destroy
+  - user_flush_favorites
   - wiki_page_rename
   - wiki_page_delete
   - wiki_page_lock
@@ -81,15 +94,8 @@ enum:
   - nuke_tag
   - takedown_delete
   - takedown_process
-  - user_flush_favorites
   - post_version_hide
   - post_version_unhide
-  - user_uploads_toggle
-  - staff_note_create
-  - staff_note_update
-  - staff_note_delete
-  - staff_note_undelete
-  - search_trend_blacklist_purge
   # legacy
   - created_positive_record
   - created_neutral_record
