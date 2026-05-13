@@ -25,6 +25,26 @@ requestBody:
           copy_tags:
             type: boolean
             description: Copy tags to parent.
+          dmail:
+            type: string
+            description: |
+              The content of the dmail to send to the uploader.
+              Placeholders:
+              - %REASON%
+              - %POST_ID%
+              - %STAFF_NAME%
+              - %STAFF_ID%
+              - %UPLOADER_ID%
+          dmail_title:
+            type: string
+            description: |
+              The title of the dmail to send to the uploader.
+                Placeholders:
+                - %REASON%
+                - %POST_ID%
+                - %STAFF_NAME%
+                - %STAFF_ID%
+                - %UPLOADER_ID%
           commit:
             type: string
             description: If not set, nothing will happen.
