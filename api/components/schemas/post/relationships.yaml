@@ -1,0 +1,12 @@
+type: object
+required:
+  - parent_id
+  - children
+properties:
+  parent_id:
+    type: integer
+    nullable: true
+  children:
+    type: array
+    items:
+      type: integer

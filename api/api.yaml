@@ -53,6 +53,10 @@ components:
       $ref: "./components/parameters/query/ipAddr.yaml"
     orderQuery:
       $ref: "./components/parameters/query/order.yaml"
+    v2Query:
+      $ref: "./components/parameters/query/v2.yaml"
+    modeQuery:
+      $ref: "./components/parameters/query/mode.yaml"
     idPath:
       $ref: "./components/parameters/path/id.yaml"
     idOrNamePath:
@@ -226,12 +230,18 @@ components:
       $ref: "./components/schemas/upDownMehVote.yaml"
     MinimalUser:
       $ref: "./components/schemas/minimalUser.yaml"
-    PostThumbnail:
-      $ref: "./components/schemas/postThumbnail.yaml"
+    ThumbnailPost:
+      $ref: "./components/schemas/thumbnailPost.yaml"
     PostData:
       $ref: "./components/schemas/postData.yaml"
     CommentVote:
       $ref: "./components/schemas/commentVote.yaml"
+    LegacyPost:
+      $ref: "./components/schemas/legacyPost.yaml"
+    BasicPost:
+      $ref: "./components/schemas/basicPost.yaml"
+    ExtendedPost:
+      $ref: "./components/schemas/extendedPost.yaml"
 
   responses:
     NotFound:
@@ -246,6 +256,10 @@ components:
       $ref: "./components/responses/messageError.yaml"
     UserResponse:
       $ref: "./components/responses/user.yaml"
+    PostResponse:
+      $ref: "./components/responses/post.yaml"
+    PostsResponse:
+      $ref: "./components/responses/posts.yaml"
   requestBodies:
     warning:
       $ref: "./components/requestBodies/warning.yaml"

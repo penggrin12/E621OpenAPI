@@ -1,0 +1,23 @@
+description: |
+  Success
+  if `v2=true`, open the schema and find the schema for the mode being used.
+content:
+  application/json:
+    schema:
+      oneOf:
+        - type: object
+          description: The legacy format, returned by default. This format is deprecated.
+          required:
+            - post
+          properties:
+            post:
+              $ref: "../../components/schemas/legacyPost.yaml"
+        - allOf:
+            - $ref: "../../components/schemas/basicPost.yaml"
+            - description: The basic format, returned with `v2=true` and mode is not set.
+        - allOf:
+            - $ref: "../../components/schemas/extendedPost.yaml"
+            - description: The extended format, returned with `v2=true` and `mode=extended`.
+        - allOf:
+            - $ref: "../../components/schemas/thumbnailPost.yaml"
+            - description: The thumbnail format, returned with `v2=true` and `mode=thumbnail`.

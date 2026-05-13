@@ -1,0 +1,9 @@
+in: query
+name: mode
+description: Set the mode for the V2 format. Ignored if `v2` is not set or false. See the `v2=true` responses.
+schema:
+  type: string
+  enum:
+    - basic
+    - extended
+    - thumbnail

@@ -1,0 +1,12 @@
+type: object
+required:
+  - up
+  - down
+  - total
+properties:
+  up:
+    type: integer
+  down:
+    type: integer
+  total:
+    type: integer

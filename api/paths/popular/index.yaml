@@ -4,6 +4,8 @@ tags:
   - Popular
 parameters:
   - $ref: "../../components/parameters/query/limit.yaml"
+  - $ref: "../../components/parameters/query/v2.yaml"
+  - $ref: "../../components/parameters/query/mode.yaml"
   - name: date
     in: query
     description: The date to list popular uploads for. Only The day, month, and year are considered.
@@ -21,15 +23,4 @@ parameters:
         - day
 responses:
   200:
-    description: Success
-    content:
-      application/json:
-        schema:
-          type: object
-          required:
-            - posts
-          properties:
-            posts:
-              type: array
-              items:
-                $ref: "../../components/schemas/post.yaml"
+    $ref: "../../components/responses/posts.yaml"

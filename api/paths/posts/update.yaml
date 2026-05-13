@@ -7,6 +7,8 @@ security:
 description: Most errors are silently swallowed.
 parameters:
   - $ref: "../../components/parameters/path/id.yaml"
+  - $ref: "../../components/parameters/query/v2.yaml"
+  - $ref: "../../components/parameters/query/mode.yaml"
 requestBody:
   content:
     application/x-www-form-urlencoded:
@@ -74,11 +76,7 @@ requestBody:
             description: You must be Admin+.
 responses:
   200:
-    description: Success
-    content:
-      application/json:
-        schema:
-          $ref: "../../components/schemas/post.yaml"
+    $ref: "../../components/responses/post.yaml"
   403:
     $ref: "../../components/responses/accessDenied.yaml"
   404:

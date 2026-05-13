@@ -1,0 +1,14 @@
+type: object
+required:
+  - width
+  - height
+  - url
+properties:
+  width:
+    type: integer
+  height:
+    type: integer
+  url:
+    type: string
+    format: uri
+    nullable: true

@@ -3,21 +3,14 @@ operationId: getRandomPost
 tags:
   - Posts
 parameters:
+  - $ref: "../../components/parameters/query/v2.yaml"
+  - $ref: "../../components/parameters/query/mode.yaml"
   - name: tags
     in: query
     schema:
       type: string
 responses:
   200:
-    description: Success
-    content:
-      application/json:
-        schema:
-          type: object
-          required:
-            - post
-          properties:
-            post:
-              $ref: "../../components/schemas/post.yaml"
+    $ref: "../../components/responses/post.yaml"
   404:
     $ref: "../../components/responses/notFound.yaml"

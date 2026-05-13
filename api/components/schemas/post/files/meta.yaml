@@ -1,0 +1,21 @@
+type: object
+required:
+  - md5
+  - ext
+  - size
+  - duration
+  - has_sample
+properties:
+  md5:
+    type: string
+  ext:
+    type: string
+  size:
+    type: integer
+    format: int64
+  duration:
+    type: number
+    format: float
+    nullable: true
+  has_sample:
+    type: boolean

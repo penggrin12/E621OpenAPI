@@ -1,0 +1,21 @@
+type: object
+required:
+  - pending
+  - flagged
+  - note_locked
+  - status_locked
+  - rating_locked
+  - deleted
+properties:
+  pending:
+    type: boolean
+  flagged:
+    type: boolean
+  note_locked:
+    type: boolean
+  status_locked:
+    type: boolean
+  rating_locked:
+    type: boolean
+  deleted:
+    type: boolean

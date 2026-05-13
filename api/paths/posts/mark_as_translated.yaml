@@ -7,6 +7,8 @@ security:
 description: Will error if no body is provided.
 parameters:
   - $ref: "../../components/parameters/path/id.yaml"
+  - $ref: "../../components/parameters/query/v2.yaml"
+  - $ref: "../../components/parameters/query/mode.yaml"
 requestBody:
   content:
     application/json:
@@ -19,17 +21,7 @@ requestBody:
             type: boolean
 responses:
   200:
-    description: Success
-    content:
-      application/json:
-        schema:
-          type: object
-          required:
-            - post
-          properties:
-            post:
-              $ref: "../../components/schemas/post.yaml"
-
+    $ref: "../../components/responses/post.yaml"
   403:
     $ref: "../../components/responses/accessDenied.yaml"
   404:

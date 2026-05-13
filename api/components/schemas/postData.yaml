@@ -5,4 +5,4 @@ properties:
   post_data:
     type: array
     items:
-      $ref: "../../components/schemas/postThumbnail.yaml"
+      $ref: "../../components/schemas/thumbnailPost.yaml"

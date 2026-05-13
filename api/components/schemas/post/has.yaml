@@ -1,0 +1,18 @@
+type: object
+required:
+  - parent
+  - children
+  - active_children
+  - notes
+  - sample
+properties:
+  parent:
+    type: boolean
+  children:
+    type: boolean
+  active_children:
+    type: boolean
+  notes:
+    type: boolean
+  sample:
+    type: boolean

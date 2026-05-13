@@ -1,0 +1,19 @@
+type: object
+required:
+  - width
+  - height
+  - jpg
+  - webp
+properties:
+  width:
+    type: integer
+  height:
+    type: integer
+  jpg:
+    type: string
+    format: uri
+    nullable: true
+  webp:
+    type: string
+    format: uri
+    nullable: true
