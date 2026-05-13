@@ -1,8 +1,8 @@
 {
   "name": "e621-open-api",
   "version": "1.0.0",
-  "description": "This repository is the home of OpenAPI documentation for https://e621.net. It is maintained by [Donovan_DMC](https://e621.net/users/323290). ## You can find the rendered version [here](https://donovandmc.github.io/E621OpenAPI).",
-  "main": "index.js",
+  "description": "This repository is the home of OpenAPI documentation for https://e621.net. It is maintained by [Donovan_DMC](https://e621.net/users/323290). ## You can find the rendered version [here](https://e621.wiki).",
+  "packageManager": "pnpm@10.20.0",
   "scripts": {
     "build": "npm run build:openapi && npm run build:openapi:dereferenced && NODE_ENV=$NODE_ENV npm run build:webpack",
     "build:production": "NODE_ENV=production npm run build",

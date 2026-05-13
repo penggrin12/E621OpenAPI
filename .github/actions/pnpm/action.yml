@@ -7,7 +7,7 @@ runs:
     - uses: actions/checkout@v4
     - uses: pnpm/action-setup@v2
       with:
-        version: latest
+        version: 10.20.0
     - name: Get store directory
       shell: bash
       run: |
