@@ -13,7 +13,8 @@
     "start": "webpack-dev-server --open",
     "lint": "eslint src",
     "lint:api": "redocly lint openapi.yaml",
-    "lint:validate": "npm exec swagger-cli -- validate ./openapi.yaml"
+    "lint:validate": "npm exec swagger-cli -- validate ./openapi.yaml",
+    "validate": "scripts/validate.sh"
   },
   "repository": {
     "type": "git",
