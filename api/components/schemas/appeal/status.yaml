@@ -3,3 +3,4 @@ enum:
   - pending
   - partial
   - approved
+  - rejected

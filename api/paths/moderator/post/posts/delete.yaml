@@ -35,6 +35,7 @@ requestBody:
               - %STAFF_NAME%
               - %STAFF_ID%
               - %UPLOADER_ID%
+              - %FLAG_ID%
           dmail_title:
             type: string
             description: |
@@ -45,6 +46,7 @@ requestBody:
                 - %STAFF_NAME%
                 - %STAFF_ID%
                 - %UPLOADER_ID%
+                - %FLAG_ID%
           commit:
             type: string
             description: If not set, nothing will happen.
