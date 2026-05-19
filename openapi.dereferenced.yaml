@@ -12,10 +12,10 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: 5b01193
-  x-e621ng-commit: 35ab540404bf21d6ac0b4ba4b6220767fd417ddc
+  version: 68f2afc
+  x-e621ng-commit: 84fa982e9734aadc507b16c47fb6db872b03c1ec
   x-e621ng-master-behind-by: 0
-  x-e621ng-master-compare-url: https://github.com/e621ng/e621ng/compare/35ab540404bf21d6ac0b4ba4b6220767fd417ddc...master
+  x-e621ng-master-compare-url: https://github.com/e621ng/e621ng/compare/84fa982e9734aadc507b16c47fb6db872b03c1ec...master
 servers:
   - url: 'https://e621.net'
     description: E621 (Production)
@@ -5310,6 +5310,7 @@ components:
             - pending
             - partial
             - approved
+            - rejected
         reason:
           type: string
         response:
@@ -8315,6 +8316,7 @@ paths:
                   - pending
                   - partial
                   - approved
+                  - rejected
               - enum:
                   - pending_claimed
                   - pending_unclaimed
@@ -8524,6 +8526,7 @@ paths:
                       - pending
                       - partial
                       - approved
+                      - rejected
                   reason:
                     type: string
                   response:
@@ -8622,6 +8625,7 @@ paths:
                       - pending
                       - partial
                       - approved
+                      - rejected
                   reason:
                     type: string
                   response:
@@ -17496,6 +17500,11 @@ paths:
       tags:
         - IQDB
       parameters:
+        - in: query
+          name: v2
+          description: Use the new V2 format. See the `v2=true` responses.
+          schema:
+            type: boolean
         - name: 'search[score_cutoff]'
           in: query
           schema:
@@ -17518,225 +17527,480 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  required:
-                    - hash
-                    - post_id
-                    - score
-                    - post
-                  properties:
-                    hash:
-                      type: string
-                    post_id:
-                      type: integer
-                    score:
-                      type: number
-                      format: float
-                      minimum: 0
-                      maximum: 100
-                    post:
+                oneOf:
+                  - type: array
+                    description: 'The legacy format, returned by default. This format is deprecated.'
+                    items:
                       type: object
                       required:
-                        - posts
+                        - hash
+                        - post_id
+                        - score
+                        - post
                       properties:
-                        posts:
+                        hash:
+                          type: string
+                        post_id:
+                          type: integer
+                        score:
+                          type: number
+                          format: float
+                          minimum: 0
+                          maximum: 100
+                        post:
                           type: object
                           required:
-                            - id
-                            - created_at
-                            - updated_at
-                            - up_score
-                            - down_score
-                            - score
-                            - source
-                            - md5
-                            - rating
-                            - is_note_locked
-                            - is_rating_locked
-                            - is_status_locked
-                            - is_pending
-                            - is_flagged
-                            - is_deleted
-                            - uploader_id
-                            - approver_id
-                            - last_noted_at
-                            - last_comment_bumped_at
-                            - fav_count
-                            - tag_string
-                            - tag_count
-                            - tag_count_general
-                            - tag_count_artist
-                            - tag_count_character
-                            - tag_count_copyright
-                            - file_ext
-                            - file_size
-                            - image_width
-                            - image_height
-                            - parent_id
-                            - has_children
-                            - last_commented_at
-                            - has_active_children
-                            - bit_flags
-                            - tag_count_meta
-                            - locked_tags
-                            - tag_count_species
-                            - tag_count_invalid
-                            - description
-                            - comment_count
-                            - change_seq
-                            - tag_count_lore
-                            - bg_color
-                            - generated_samples
-                            - duration
-                            - is_comment_disabled
-                            - is_comment_locked
-                            - has_large
-                            - has_visible_children
-                            - children_ids
-                            - pool_ids
-                            - is_favorited
+                            - posts
                           properties:
-                            id:
-                              type: integer
-                            created_at:
-                              type: string
-                              format: date-time
-                            updated_at:
-                              type: string
-                              format: date-time
-                            up_score:
-                              type: integer
-                            down_score:
-                              type: integer
-                            score:
-                              type: integer
-                            source:
-                              type: string
-                            md5:
-                              type: string
-                            rating:
-                              type: string
-                              enum:
-                                - s
-                                - q
-                                - e
-                            is_note_locked:
-                              type: boolean
-                            is_rating_locked:
-                              type: boolean
-                            is_status_locked:
-                              type: boolean
-                            is_pending:
-                              type: boolean
-                            is_flagged:
-                              type: boolean
-                            is_deleted:
-                              type: boolean
-                            uploader_id:
-                              type: integer
-                            approver_id:
-                              type: integer
-                            last_noted_at:
-                              type: string
-                              format: date-time
-                              nullable: true
-                            last_comment_bumped_at:
-                              type: string
-                              format: date-time
-                              nullable: true
-                            fav_count:
-                              type: integer
-                            tag_string:
-                              type: string
-                            tag_count:
-                              type: integer
-                            tag_count_general:
-                              type: integer
-                            tag_count_artist:
-                              type: integer
-                            tag_count_character:
-                              type: integer
-                            tag_count_copyright:
-                              type: integer
-                            file_ext:
-                              type: string
-                            file_size:
-                              type: integer
-                              format: int64
-                            image_width:
-                              type: integer
-                            image_height:
-                              type: integer
-                            parent_id:
-                              type: integer
-                              nullable: true
-                            has_children:
-                              type: boolean
-                            last_commented_at:
-                              type: string
-                              format: date-time
-                              nullable: true
-                            has_active_children:
-                              type: boolean
-                            bit_flags:
-                              type: integer
-                            tag_count_meta:
-                              type: integer
-                            locked_tags:
-                              type: string
-                              nullable: true
-                            tag_count_species:
-                              type: integer
-                            tag_count_invalid:
-                              type: integer
-                            description:
-                              type: string
-                            comment_count:
-                              type: integer
-                            change_seq:
-                              type: integer
-                            tag_count_lore:
-                              type: integer
-                            bg_color:
-                              type: string
-                              nullable: true
-                            generated_samples:
-                              type: array
-                              nullable: true
-                              items:
-                                type: string
-                                enum:
-                                  - 720p
-                                  - 480p
-                                  - original
-                            duration:
-                              type: string
-                              nullable: true
-                            is_comment_disabled:
-                              type: boolean
-                            is_comment_locked:
-                              type: boolean
-                            has_large:
-                              type: boolean
-                            has_visible_children:
-                              type: boolean
-                            children_ids:
-                              type: string
-                              nullable: true
-                            pool_ids:
-                              type: array
-                              items:
-                                type: integer
-                            is_favorited:
-                              type: boolean
-                            file_url:
-                              type: string
-                            large_file_url:
-                              type: string
-                            preview_file_url:
-                              type: string
+                            posts:
+                              type: object
+                              required:
+                                - id
+                                - created_at
+                                - updated_at
+                                - up_score
+                                - down_score
+                                - score
+                                - source
+                                - md5
+                                - rating
+                                - is_note_locked
+                                - is_rating_locked
+                                - is_status_locked
+                                - is_pending
+                                - is_flagged
+                                - is_deleted
+                                - uploader_id
+                                - approver_id
+                                - last_noted_at
+                                - last_comment_bumped_at
+                                - fav_count
+                                - tag_string
+                                - tag_count
+                                - tag_count_general
+                                - tag_count_artist
+                                - tag_count_character
+                                - tag_count_copyright
+                                - file_ext
+                                - file_size
+                                - image_width
+                                - image_height
+                                - parent_id
+                                - has_children
+                                - last_commented_at
+                                - has_active_children
+                                - bit_flags
+                                - tag_count_meta
+                                - locked_tags
+                                - tag_count_species
+                                - tag_count_invalid
+                                - description
+                                - comment_count
+                                - change_seq
+                                - tag_count_lore
+                                - bg_color
+                                - generated_samples
+                                - duration
+                                - is_comment_disabled
+                                - is_comment_locked
+                                - has_large
+                                - has_visible_children
+                                - children_ids
+                                - pool_ids
+                                - is_favorited
+                              properties:
+                                id:
+                                  type: integer
+                                created_at:
+                                  type: string
+                                  format: date-time
+                                updated_at:
+                                  type: string
+                                  format: date-time
+                                up_score:
+                                  type: integer
+                                down_score:
+                                  type: integer
+                                score:
+                                  type: integer
+                                source:
+                                  type: string
+                                md5:
+                                  type: string
+                                rating:
+                                  type: string
+                                  enum:
+                                    - s
+                                    - q
+                                    - e
+                                is_note_locked:
+                                  type: boolean
+                                is_rating_locked:
+                                  type: boolean
+                                is_status_locked:
+                                  type: boolean
+                                is_pending:
+                                  type: boolean
+                                is_flagged:
+                                  type: boolean
+                                is_deleted:
+                                  type: boolean
+                                uploader_id:
+                                  type: integer
+                                approver_id:
+                                  type: integer
+                                last_noted_at:
+                                  type: string
+                                  format: date-time
+                                  nullable: true
+                                last_comment_bumped_at:
+                                  type: string
+                                  format: date-time
+                                  nullable: true
+                                fav_count:
+                                  type: integer
+                                tag_string:
+                                  type: string
+                                tag_count:
+                                  type: integer
+                                tag_count_general:
+                                  type: integer
+                                tag_count_artist:
+                                  type: integer
+                                tag_count_character:
+                                  type: integer
+                                tag_count_copyright:
+                                  type: integer
+                                file_ext:
+                                  type: string
+                                file_size:
+                                  type: integer
+                                  format: int64
+                                image_width:
+                                  type: integer
+                                image_height:
+                                  type: integer
+                                parent_id:
+                                  type: integer
+                                  nullable: true
+                                has_children:
+                                  type: boolean
+                                last_commented_at:
+                                  type: string
+                                  format: date-time
+                                  nullable: true
+                                has_active_children:
+                                  type: boolean
+                                bit_flags:
+                                  type: integer
+                                tag_count_meta:
+                                  type: integer
+                                locked_tags:
+                                  type: string
+                                  nullable: true
+                                tag_count_species:
+                                  type: integer
+                                tag_count_invalid:
+                                  type: integer
+                                description:
+                                  type: string
+                                comment_count:
+                                  type: integer
+                                change_seq:
+                                  type: integer
+                                tag_count_lore:
+                                  type: integer
+                                bg_color:
+                                  type: string
+                                  nullable: true
+                                generated_samples:
+                                  type: array
+                                  nullable: true
+                                  items:
+                                    type: string
+                                    enum:
+                                      - 720p
+                                      - 480p
+                                      - original
+                                duration:
+                                  type: string
+                                  nullable: true
+                                is_comment_disabled:
+                                  type: boolean
+                                is_comment_locked:
+                                  type: boolean
+                                has_large:
+                                  type: boolean
+                                has_visible_children:
+                                  type: boolean
+                                children_ids:
+                                  type: string
+                                  nullable: true
+                                pool_ids:
+                                  type: array
+                                  items:
+                                    type: integer
+                                is_favorited:
+                                  type: boolean
+                                file_url:
+                                  type: string
+                                large_file_url:
+                                  type: string
+                                preview_file_url:
+                                  type: string
+                  - type: array
+                    description: 'The new format, returned with `v2=true`.'
+                    items:
+                      type: object
+                      required:
+                        - hash
+                        - post_id
+                        - score
+                        - post
+                      properties:
+                        hash:
+                          type: string
+                        post_id:
+                          type: integer
+                        score:
+                          type: number
+                          format: float
+                          minimum: 0
+                          maximum: 100
+                        post:
+                          allOf:
+                            - type: object
+                              required:
+                                - id
+                                - created_at
+                                - updated_at
+                                - change_seq
+                                - files
+                                - uploader_id
+                                - uploader_name
+                                - approver_id
+                                - stats
+                                - flags
+                                - has
+                                - relationships
+                                - pools
+                                - rating
+                                - locked_tags
+                                - sources
+                                - description
+                                - tags
+                              properties:
+                                id:
+                                  type: integer
+                                created_at:
+                                  type: string
+                                  format: date-time
+                                updated_at:
+                                  type: string
+                                  format: date-time
+                                change_seq:
+                                  type: integer
+                                files:
+                                  type: object
+                                  required:
+                                    - meta
+                                    - original
+                                    - preview
+                                    - sample
+                                  properties:
+                                    meta:
+                                      type: object
+                                      required:
+                                        - md5
+                                        - ext
+                                        - size
+                                        - duration
+                                        - has_sample
+                                      properties:
+                                        md5:
+                                          type: string
+                                        ext:
+                                          type: string
+                                        size:
+                                          type: integer
+                                          format: int64
+                                        duration:
+                                          type: number
+                                          format: float
+                                          nullable: true
+                                        has_sample:
+                                          type: boolean
+                                    original:
+                                      type: object
+                                      required:
+                                        - width
+                                        - height
+                                        - url
+                                      properties:
+                                        width:
+                                          type: integer
+                                        height:
+                                          type: integer
+                                        url:
+                                          type: string
+                                          format: uri
+                                          nullable: true
+                                    preview:
+                                      type: object
+                                      required:
+                                        - width
+                                        - height
+                                        - jpg
+                                        - webp
+                                      properties:
+                                        width:
+                                          type: integer
+                                        height:
+                                          type: integer
+                                        jpg:
+                                          type: string
+                                          format: uri
+                                          nullable: true
+                                        webp:
+                                          type: string
+                                          format: uri
+                                          nullable: true
+                                    sample:
+                                      type: object
+                                      required:
+                                        - width
+                                        - height
+                                        - jpg
+                                        - webp
+                                      properties:
+                                        width:
+                                          type: integer
+                                        height:
+                                          type: integer
+                                        jpg:
+                                          type: string
+                                          format: uri
+                                          nullable: true
+                                        webp:
+                                          type: string
+                                          format: uri
+                                          nullable: true
+                                uploader_id:
+                                  type: integer
+                                uploader_name:
+                                  type: string
+                                approver_id:
+                                  type: integer
+                                  nullable: true
+                                stats:
+                                  type: object
+                                  required:
+                                    - score
+                                    - fav_count
+                                    - is_favorited
+                                    - comment_count
+                                  properties:
+                                    score:
+                                      type: object
+                                      required:
+                                        - up
+                                        - down
+                                        - total
+                                      properties:
+                                        up:
+                                          type: integer
+                                        down:
+                                          type: integer
+                                        total:
+                                          type: integer
+                                    fav_count:
+                                      type: integer
+                                    is_favorited:
+                                      type: boolean
+                                    comment_count:
+                                      type: integer
+                                flags:
+                                  type: object
+                                  required:
+                                    - pending
+                                    - flagged
+                                    - note_locked
+                                    - status_locked
+                                    - rating_locked
+                                    - deleted
+                                  properties:
+                                    pending:
+                                      type: boolean
+                                    flagged:
+                                      type: boolean
+                                    note_locked:
+                                      type: boolean
+                                    status_locked:
+                                      type: boolean
+                                    rating_locked:
+                                      type: boolean
+                                    deleted:
+                                      type: boolean
+                                has:
+                                  type: object
+                                  required:
+                                    - parent
+                                    - children
+                                    - active_children
+                                    - notes
+                                    - sample
+                                  properties:
+                                    parent:
+                                      type: boolean
+                                    children:
+                                      type: boolean
+                                    active_children:
+                                      type: boolean
+                                    notes:
+                                      type: boolean
+                                    sample:
+                                      type: boolean
+                                relationships:
+                                  type: object
+                                  required:
+                                    - parent_id
+                                    - children
+                                  properties:
+                                    parent_id:
+                                      type: integer
+                                      nullable: true
+                                    children:
+                                      type: array
+                                      items:
+                                        type: integer
+                                pools:
+                                  type: array
+                                  items:
+                                    type: integer
+                                rating:
+                                  type: string
+                                  enum:
+                                    - s
+                                    - q
+                                    - e
+                                locked_tags:
+                                  type: array
+                                  items:
+                                    type: string
+                                sources:
+                                  type: array
+                                  items:
+                                    type: string
+                                description:
+                                  type: string
+                            - type: object
+                              required:
+                                - tags
+                              properties:
+                                tags:
+                                  type: array
+                                  items:
+                                    type: string
         '403':
           description: Access Denied
           content:
@@ -17758,6 +18022,12 @@ paths:
       operationId: queryIqdbPost
       tags:
         - IQDB
+      parameters:
+        - in: query
+          name: v2
+          description: Use the new V2 format. See the `v2=true` responses.
+          schema:
+            type: boolean
       requestBody:
         content:
           multipart/form-data:
@@ -17793,225 +18063,480 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  required:
-                    - hash
-                    - post_id
-                    - score
-                    - post
-                  properties:
-                    hash:
-                      type: string
-                    post_id:
-                      type: integer
-                    score:
-                      type: number
-                      format: float
-                      minimum: 0
-                      maximum: 100
-                    post:
+                oneOf:
+                  - type: array
+                    description: 'The legacy format, returned by default. This format is deprecated.'
+                    items:
                       type: object
                       required:
-                        - posts
+                        - hash
+                        - post_id
+                        - score
+                        - post
                       properties:
-                        posts:
+                        hash:
+                          type: string
+                        post_id:
+                          type: integer
+                        score:
+                          type: number
+                          format: float
+                          minimum: 0
+                          maximum: 100
+                        post:
                           type: object
                           required:
-                            - id
-                            - created_at
-                            - updated_at
-                            - up_score
-                            - down_score
-                            - score
-                            - source
-                            - md5
-                            - rating
-                            - is_note_locked
-                            - is_rating_locked
-                            - is_status_locked
-                            - is_pending
-                            - is_flagged
-                            - is_deleted
-                            - uploader_id
-                            - approver_id
-                            - last_noted_at
-                            - last_comment_bumped_at
-                            - fav_count
-                            - tag_string
-                            - tag_count
-                            - tag_count_general
-                            - tag_count_artist
-                            - tag_count_character
-                            - tag_count_copyright
-                            - file_ext
-                            - file_size
-                            - image_width
-                            - image_height
-                            - parent_id
-                            - has_children
-                            - last_commented_at
-                            - has_active_children
-                            - bit_flags
-                            - tag_count_meta
-                            - locked_tags
-                            - tag_count_species
-                            - tag_count_invalid
-                            - description
-                            - comment_count
-                            - change_seq
-                            - tag_count_lore
-                            - bg_color
-                            - generated_samples
-                            - duration
-                            - is_comment_disabled
-                            - is_comment_locked
-                            - has_large
-                            - has_visible_children
-                            - children_ids
-                            - pool_ids
-                            - is_favorited
+                            - posts
                           properties:
-                            id:
-                              type: integer
-                            created_at:
-                              type: string
-                              format: date-time
-                            updated_at:
-                              type: string
-                              format: date-time
-                            up_score:
-                              type: integer
-                            down_score:
-                              type: integer
-                            score:
-                              type: integer
-                            source:
-                              type: string
-                            md5:
-                              type: string
-                            rating:
-                              type: string
-                              enum:
-                                - s
-                                - q
-                                - e
-                            is_note_locked:
-                              type: boolean
-                            is_rating_locked:
-                              type: boolean
-                            is_status_locked:
-                              type: boolean
-                            is_pending:
-                              type: boolean
-                            is_flagged:
-                              type: boolean
-                            is_deleted:
-                              type: boolean
-                            uploader_id:
-                              type: integer
-                            approver_id:
-                              type: integer
-                            last_noted_at:
-                              type: string
-                              format: date-time
-                              nullable: true
-                            last_comment_bumped_at:
-                              type: string
-                              format: date-time
-                              nullable: true
-                            fav_count:
-                              type: integer
-                            tag_string:
-                              type: string
-                            tag_count:
-                              type: integer
-                            tag_count_general:
-                              type: integer
-                            tag_count_artist:
-                              type: integer
-                            tag_count_character:
-                              type: integer
-                            tag_count_copyright:
-                              type: integer
-                            file_ext:
-                              type: string
-                            file_size:
-                              type: integer
-                              format: int64
-                            image_width:
-                              type: integer
-                            image_height:
-                              type: integer
-                            parent_id:
-                              type: integer
-                              nullable: true
-                            has_children:
-                              type: boolean
-                            last_commented_at:
-                              type: string
-                              format: date-time
-                              nullable: true
-                            has_active_children:
-                              type: boolean
-                            bit_flags:
-                              type: integer
-                            tag_count_meta:
-                              type: integer
-                            locked_tags:
-                              type: string
-                              nullable: true
-                            tag_count_species:
-                              type: integer
-                            tag_count_invalid:
-                              type: integer
-                            description:
-                              type: string
-                            comment_count:
-                              type: integer
-                            change_seq:
-                              type: integer
-                            tag_count_lore:
-                              type: integer
-                            bg_color:
-                              type: string
-                              nullable: true
-                            generated_samples:
-                              type: array
-                              nullable: true
-                              items:
-                                type: string
-                                enum:
-                                  - 720p
-                                  - 480p
-                                  - original
-                            duration:
-                              type: string
-                              nullable: true
-                            is_comment_disabled:
-                              type: boolean
-                            is_comment_locked:
-                              type: boolean
-                            has_large:
-                              type: boolean
-                            has_visible_children:
-                              type: boolean
-                            children_ids:
-                              type: string
-                              nullable: true
-                            pool_ids:
-                              type: array
-                              items:
-                                type: integer
-                            is_favorited:
-                              type: boolean
-                            file_url:
-                              type: string
-                            large_file_url:
-                              type: string
-                            preview_file_url:
-                              type: string
+                            posts:
+                              type: object
+                              required:
+                                - id
+                                - created_at
+                                - updated_at
+                                - up_score
+                                - down_score
+                                - score
+                                - source
+                                - md5
+                                - rating
+                                - is_note_locked
+                                - is_rating_locked
+                                - is_status_locked
+                                - is_pending
+                                - is_flagged
+                                - is_deleted
+                                - uploader_id
+                                - approver_id
+                                - last_noted_at
+                                - last_comment_bumped_at
+                                - fav_count
+                                - tag_string
+                                - tag_count
+                                - tag_count_general
+                                - tag_count_artist
+                                - tag_count_character
+                                - tag_count_copyright
+                                - file_ext
+                                - file_size
+                                - image_width
+                                - image_height
+                                - parent_id
+                                - has_children
+                                - last_commented_at
+                                - has_active_children
+                                - bit_flags
+                                - tag_count_meta
+                                - locked_tags
+                                - tag_count_species
+                                - tag_count_invalid
+                                - description
+                                - comment_count
+                                - change_seq
+                                - tag_count_lore
+                                - bg_color
+                                - generated_samples
+                                - duration
+                                - is_comment_disabled
+                                - is_comment_locked
+                                - has_large
+                                - has_visible_children
+                                - children_ids
+                                - pool_ids
+                                - is_favorited
+                              properties:
+                                id:
+                                  type: integer
+                                created_at:
+                                  type: string
+                                  format: date-time
+                                updated_at:
+                                  type: string
+                                  format: date-time
+                                up_score:
+                                  type: integer
+                                down_score:
+                                  type: integer
+                                score:
+                                  type: integer
+                                source:
+                                  type: string
+                                md5:
+                                  type: string
+                                rating:
+                                  type: string
+                                  enum:
+                                    - s
+                                    - q
+                                    - e
+                                is_note_locked:
+                                  type: boolean
+                                is_rating_locked:
+                                  type: boolean
+                                is_status_locked:
+                                  type: boolean
+                                is_pending:
+                                  type: boolean
+                                is_flagged:
+                                  type: boolean
+                                is_deleted:
+                                  type: boolean
+                                uploader_id:
+                                  type: integer
+                                approver_id:
+                                  type: integer
+                                last_noted_at:
+                                  type: string
+                                  format: date-time
+                                  nullable: true
+                                last_comment_bumped_at:
+                                  type: string
+                                  format: date-time
+                                  nullable: true
+                                fav_count:
+                                  type: integer
+                                tag_string:
+                                  type: string
+                                tag_count:
+                                  type: integer
+                                tag_count_general:
+                                  type: integer
+                                tag_count_artist:
+                                  type: integer
+                                tag_count_character:
+                                  type: integer
+                                tag_count_copyright:
+                                  type: integer
+                                file_ext:
+                                  type: string
+                                file_size:
+                                  type: integer
+                                  format: int64
+                                image_width:
+                                  type: integer
+                                image_height:
+                                  type: integer
+                                parent_id:
+                                  type: integer
+                                  nullable: true
+                                has_children:
+                                  type: boolean
+                                last_commented_at:
+                                  type: string
+                                  format: date-time
+                                  nullable: true
+                                has_active_children:
+                                  type: boolean
+                                bit_flags:
+                                  type: integer
+                                tag_count_meta:
+                                  type: integer
+                                locked_tags:
+                                  type: string
+                                  nullable: true
+                                tag_count_species:
+                                  type: integer
+                                tag_count_invalid:
+                                  type: integer
+                                description:
+                                  type: string
+                                comment_count:
+                                  type: integer
+                                change_seq:
+                                  type: integer
+                                tag_count_lore:
+                                  type: integer
+                                bg_color:
+                                  type: string
+                                  nullable: true
+                                generated_samples:
+                                  type: array
+                                  nullable: true
+                                  items:
+                                    type: string
+                                    enum:
+                                      - 720p
+                                      - 480p
+                                      - original
+                                duration:
+                                  type: string
+                                  nullable: true
+                                is_comment_disabled:
+                                  type: boolean
+                                is_comment_locked:
+                                  type: boolean
+                                has_large:
+                                  type: boolean
+                                has_visible_children:
+                                  type: boolean
+                                children_ids:
+                                  type: string
+                                  nullable: true
+                                pool_ids:
+                                  type: array
+                                  items:
+                                    type: integer
+                                is_favorited:
+                                  type: boolean
+                                file_url:
+                                  type: string
+                                large_file_url:
+                                  type: string
+                                preview_file_url:
+                                  type: string
+                  - type: array
+                    description: 'The new format, returned with `v2=true`.'
+                    items:
+                      type: object
+                      required:
+                        - hash
+                        - post_id
+                        - score
+                        - post
+                      properties:
+                        hash:
+                          type: string
+                        post_id:
+                          type: integer
+                        score:
+                          type: number
+                          format: float
+                          minimum: 0
+                          maximum: 100
+                        post:
+                          allOf:
+                            - type: object
+                              required:
+                                - id
+                                - created_at
+                                - updated_at
+                                - change_seq
+                                - files
+                                - uploader_id
+                                - uploader_name
+                                - approver_id
+                                - stats
+                                - flags
+                                - has
+                                - relationships
+                                - pools
+                                - rating
+                                - locked_tags
+                                - sources
+                                - description
+                                - tags
+                              properties:
+                                id:
+                                  type: integer
+                                created_at:
+                                  type: string
+                                  format: date-time
+                                updated_at:
+                                  type: string
+                                  format: date-time
+                                change_seq:
+                                  type: integer
+                                files:
+                                  type: object
+                                  required:
+                                    - meta
+                                    - original
+                                    - preview
+                                    - sample
+                                  properties:
+                                    meta:
+                                      type: object
+                                      required:
+                                        - md5
+                                        - ext
+                                        - size
+                                        - duration
+                                        - has_sample
+                                      properties:
+                                        md5:
+                                          type: string
+                                        ext:
+                                          type: string
+                                        size:
+                                          type: integer
+                                          format: int64
+                                        duration:
+                                          type: number
+                                          format: float
+                                          nullable: true
+                                        has_sample:
+                                          type: boolean
+                                    original:
+                                      type: object
+                                      required:
+                                        - width
+                                        - height
+                                        - url
+                                      properties:
+                                        width:
+                                          type: integer
+                                        height:
+                                          type: integer
+                                        url:
+                                          type: string
+                                          format: uri
+                                          nullable: true
+                                    preview:
+                                      type: object
+                                      required:
+                                        - width
+                                        - height
+                                        - jpg
+                                        - webp
+                                      properties:
+                                        width:
+                                          type: integer
+                                        height:
+                                          type: integer
+                                        jpg:
+                                          type: string
+                                          format: uri
+                                          nullable: true
+                                        webp:
+                                          type: string
+                                          format: uri
+                                          nullable: true
+                                    sample:
+                                      type: object
+                                      required:
+                                        - width
+                                        - height
+                                        - jpg
+                                        - webp
+                                      properties:
+                                        width:
+                                          type: integer
+                                        height:
+                                          type: integer
+                                        jpg:
+                                          type: string
+                                          format: uri
+                                          nullable: true
+                                        webp:
+                                          type: string
+                                          format: uri
+                                          nullable: true
+                                uploader_id:
+                                  type: integer
+                                uploader_name:
+                                  type: string
+                                approver_id:
+                                  type: integer
+                                  nullable: true
+                                stats:
+                                  type: object
+                                  required:
+                                    - score
+                                    - fav_count
+                                    - is_favorited
+                                    - comment_count
+                                  properties:
+                                    score:
+                                      type: object
+                                      required:
+                                        - up
+                                        - down
+                                        - total
+                                      properties:
+                                        up:
+                                          type: integer
+                                        down:
+                                          type: integer
+                                        total:
+                                          type: integer
+                                    fav_count:
+                                      type: integer
+                                    is_favorited:
+                                      type: boolean
+                                    comment_count:
+                                      type: integer
+                                flags:
+                                  type: object
+                                  required:
+                                    - pending
+                                    - flagged
+                                    - note_locked
+                                    - status_locked
+                                    - rating_locked
+                                    - deleted
+                                  properties:
+                                    pending:
+                                      type: boolean
+                                    flagged:
+                                      type: boolean
+                                    note_locked:
+                                      type: boolean
+                                    status_locked:
+                                      type: boolean
+                                    rating_locked:
+                                      type: boolean
+                                    deleted:
+                                      type: boolean
+                                has:
+                                  type: object
+                                  required:
+                                    - parent
+                                    - children
+                                    - active_children
+                                    - notes
+                                    - sample
+                                  properties:
+                                    parent:
+                                      type: boolean
+                                    children:
+                                      type: boolean
+                                    active_children:
+                                      type: boolean
+                                    notes:
+                                      type: boolean
+                                    sample:
+                                      type: boolean
+                                relationships:
+                                  type: object
+                                  required:
+                                    - parent_id
+                                    - children
+                                  properties:
+                                    parent_id:
+                                      type: integer
+                                      nullable: true
+                                    children:
+                                      type: array
+                                      items:
+                                        type: integer
+                                pools:
+                                  type: array
+                                  items:
+                                    type: integer
+                                rating:
+                                  type: string
+                                  enum:
+                                    - s
+                                    - q
+                                    - e
+                                locked_tags:
+                                  type: array
+                                  items:
+                                    type: string
+                                sources:
+                                  type: array
+                                  items:
+                                    type: string
+                                description:
+                                  type: string
+                            - type: object
+                              required:
+                                - tags
+                              properties:
+                                tags:
+                                  type: array
+                                  items:
+                                    type: string
         '403':
           description: Access Denied
           content:
@@ -32065,6 +32590,11 @@ paths:
               - id_asc
               - id_desc
         - in: query
+          name: v2
+          description: Use the new V2 format. See the `v2=true` responses.
+          schema:
+            type: boolean
+        - in: query
           name: 'search[post_id]'
           schema:
             type: integer
@@ -32110,12 +32640,61 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - post_events
-                properties:
-                  post_events:
-                    type: array
+                oneOf:
+                  - type: object
+                    description: 'The legacy format, returned by default. This format is deprecated.'
+                    required:
+                      - post_events
+                    properties:
+                      post_events:
+                        type: array
+                        items:
+                          type: object
+                          required:
+                            - id
+                            - creator_id
+                            - post_id
+                            - action
+                            - created_at
+                          properties:
+                            id:
+                              type: integer
+                            creator_id:
+                              type: integer
+                              nullable: true
+                            post_id:
+                              type: integer
+                            action:
+                              type: string
+                              enum:
+                                - deleted
+                                - undeleted
+                                - approved
+                                - unapproved
+                                - flag_created
+                                - flag_removed
+                                - favorites_moved
+                                - favorites_received
+                                - rating_locked
+                                - rating_unlocked
+                                - status_locked
+                                - status_unlocked
+                                - note_locked
+                                - note_unlocked
+                                - comment_locked
+                                - comment_unlocked
+                                - replacement_accepted
+                                - replacement_rejected
+                                - replacement_promoted
+                                - replacement_deleted
+                                - expunged
+                                - changed_bg_color
+                                - replacement_penalty_changed
+                            created_at:
+                              type: string
+                              format: date-time
+                  - type: array
+                    description: 'The new format, returned with `v2=true`.'
                     items:
                       type: object
                       required:
@@ -43558,6 +44137,7 @@ paths:
                     - %STAFF_NAME%
                     - %STAFF_ID%
                     - %UPLOADER_ID%
+                    - %FLAG_ID%
                 dmail_title:
                   type: string
                   description: |
@@ -43568,6 +44148,7 @@ paths:
                       - %STAFF_NAME%
                       - %STAFF_ID%
                       - %UPLOADER_ID%
+                      - %FLAG_ID%
                 commit:
                   type: string
                   description: 'If not set, nothing will happen.'

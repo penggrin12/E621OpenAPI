@@ -12,10 +12,10 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: 5b01193
-  x-e621ng-commit: 35ab540404bf21d6ac0b4ba4b6220767fd417ddc
+  version: 68f2afc
+  x-e621ng-commit: 84fa982e9734aadc507b16c47fb6db872b03c1ec
   x-e621ng-master-behind-by: 0
-  x-e621ng-master-compare-url: https://github.com/e621ng/e621ng/compare/35ab540404bf21d6ac0b4ba4b6220767fd417ddc...master
+  x-e621ng-master-compare-url: https://github.com/e621ng/e621ng/compare/84fa982e9734aadc507b16c47fb6db872b03c1ec...master
 servers:
   - url: 'https://e621.net'
     description: E621 (Production)
@@ -3657,6 +3657,7 @@ components:
             - pending
             - partial
             - approved
+            - rejected
         reason:
           type: string
         response:
@@ -6885,6 +6886,7 @@ paths:
       tags:
         - IQDB
       parameters:
+        - $ref: '#/components/parameters/v2Query'
         - name: 'search[score_cutoff]'
           in: query
           schema:
@@ -6907,9 +6909,32 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/IqdbResponse'
+                oneOf:
+                  - type: array
+                    description: 'The legacy format, returned by default. This format is deprecated.'
+                    items:
+                      $ref: '#/components/schemas/IqdbResponse'
+                  - type: array
+                    description: 'The new format, returned with `v2=true`.'
+                    items:
+                      type: object
+                      required:
+                        - hash
+                        - post_id
+                        - score
+                        - post
+                      properties:
+                        hash:
+                          type: string
+                        post_id:
+                          type: integer
+                        score:
+                          type: number
+                          format: float
+                          minimum: 0
+                          maximum: 100
+                        post:
+                          $ref: '#/components/schemas/BasicPost'
         '403':
           $ref: '#/components/responses/AccessDenied'
     post:
@@ -6917,6 +6942,8 @@ paths:
       operationId: queryIqdbPost
       tags:
         - IQDB
+      parameters:
+        - $ref: '#/components/parameters/v2Query'
       requestBody:
         content:
           multipart/form-data:
@@ -6952,9 +6979,15 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/IqdbResponse'
+                oneOf:
+                  - type: array
+                    description: 'The legacy format, returned by default. This format is deprecated.'
+                    items:
+                      $ref: '#/components/schemas/IqdbResponse'
+                  - type: array
+                    description: 'The new format, returned with `v2=true`.'
+                    items:
+                      $ref: '#/paths/~1iqdb_queries.json/get/responses/200/content/application~1json/schema/oneOf/1/items'
         '403':
           $ref: '#/components/responses/AccessDenied'
   /mascots.json:
@@ -8724,6 +8757,7 @@ paths:
         - $ref: '#/components/parameters/pageQuery'
         - $ref: '#/components/parameters/idQuery'
         - $ref: '#/components/parameters/orderQuery'
+        - $ref: '#/components/parameters/v2Query'
         - in: query
           name: 'search[post_id]'
           schema:
@@ -8746,12 +8780,18 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - post_events
-                properties:
-                  post_events:
-                    type: array
+                oneOf:
+                  - type: object
+                    description: 'The legacy format, returned by default. This format is deprecated.'
+                    required:
+                      - post_events
+                    properties:
+                      post_events:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PostEvent'
+                  - type: array
+                    description: 'The new format, returned with `v2=true`.'
                     items:
                       $ref: '#/components/schemas/PostEvent'
   /post_flags.json:
@@ -12727,6 +12767,7 @@ paths:
                     - %STAFF_NAME%
                     - %STAFF_ID%
                     - %UPLOADER_ID%
+                    - %FLAG_ID%
                 dmail_title:
                   type: string
                   description: |
@@ -12737,6 +12778,7 @@ paths:
                       - %STAFF_NAME%
                       - %STAFF_ID%
                       - %UPLOADER_ID%
+                      - %FLAG_ID%
                 commit:
                   type: string
                   description: 'If not set, nothing will happen.'
