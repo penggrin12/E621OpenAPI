@@ -2,6 +2,8 @@ summary: Query IQDB
 operationId: queryIqdbPost
 tags:
   - IQDB
+parameters:
+  - $ref: "../../../components/parameters/query/v2.yaml"
 requestBody:
   content:
     multipart/form-data:
@@ -37,8 +39,14 @@ responses:
     content:
       application/json:
         schema:
-          type: array
-          items:
-            $ref: "../../../components/schemas/iqdbResponse.yaml"
+          oneOf:
+            - type: array
+              description: The legacy format, returned by default. This format is deprecated.
+              items:
+                $ref: "../../../components/schemas/iqdbResponse.yaml"
+            - type: array
+              description: The new format, returned with `v2=true`.
+              items:
+                $ref: "../../../components/schemas/iqdbResponseV2.yaml"
   403:
     $ref: "../../../components/responses/accessDenied.yaml"
