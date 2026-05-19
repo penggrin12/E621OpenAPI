@@ -12,9 +12,9 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: 68f2afc
+  version: '4614e41'
   x-e621ng-commit: 84fa982e9734aadc507b16c47fb6db872b03c1ec
-  x-e621ng-master-behind-by: 0
+  x-e621ng-master-behind-by: 1
   x-e621ng-master-compare-url: https://github.com/e621ng/e621ng/compare/84fa982e9734aadc507b16c47fb6db872b03c1ec...master
 servers:
   - url: 'https://e621.net'
