@@ -22,6 +22,7 @@ requestBody:
             type: string
           forum_topic_id:
             type: integer
+            description: You must be able to reply to the topic.
           skip_forum:
             type: boolean
             description: Only usable for Admin+
