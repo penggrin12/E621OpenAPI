@@ -1,0 +1,12 @@
+summary: Get health
+operationId: getHealth
+tags:
+  - System
+responses:
+  200:
+    description: Success
+    content:
+      text/plain:
+        schema:
+          type: string
+          example: "OK | app3 | 26.06.10-fix.3"

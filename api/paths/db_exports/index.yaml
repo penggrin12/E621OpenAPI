@@ -1,7 +1,7 @@
 summary: Get DB Exports
 operationId: getDBExports
 tags:
-  - DB Exports
+  - System
 responses:
   200:
     description: Success

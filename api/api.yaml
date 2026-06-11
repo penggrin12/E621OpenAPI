@@ -431,6 +431,9 @@ paths:
   /db_exports.json:
     get:
       $ref: "./paths/db_exports/index.yaml"
+  /health:
+    get:
+      $ref: "./paths/health/index.yaml"
 
   /dmails.json:
     get:
