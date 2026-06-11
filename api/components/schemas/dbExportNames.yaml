@@ -1,0 +1,12 @@
+type: string
+enum:
+  - artists
+  - bulk_update_requests
+  - pools
+  - post_replacements
+  - posts
+  - post_versions
+  - tag_aliases
+  - tag_implications
+  - tags
+  - wiki_pages

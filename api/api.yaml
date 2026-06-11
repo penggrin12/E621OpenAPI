@@ -246,6 +246,10 @@ components:
       $ref: "./components/schemas/exceptionLog.yaml"
     Appeal:
       $ref: "./components/schemas/appeal.yaml"
+    DBExport:
+      $ref: "./components/schemas/dbExport.yaml"
+    DBExportNames:
+      $ref: "./components/schemas/dbExportNames.yaml"
 
   responses:
     NotFound:
@@ -423,6 +427,10 @@ paths:
   /comment_votes/delete.json:
     post:
       $ref: "./paths/comment_votes/delete.yaml"
+
+  /db_exports.json:
+    get:
+      $ref: "./paths/db_exports/index.yaml"
 
   /dmails.json:
     get:
