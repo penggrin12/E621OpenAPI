@@ -4,7 +4,12 @@ tags:
   - DMails
 security:
   - basicAuth: []
-description: Fetching a dmail will not mark it as read.
+description: |
+  Fetching a dmail will not mark it as read. 
+  Unless the dmail is owned:
+  - The current user must be Janitor+ and the dmail must be from the automod
+  - The current user must be Moderator+ and a ticket must exist for the dmail
+  - The current user must be Admin+ and the dmail must be to or from Admin+
 parameters:
   - $ref: "../../components/parameters/path/id.yaml"
 responses:
