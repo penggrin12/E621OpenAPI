@@ -24,3 +24,5 @@ parameters:
 responses:
   200:
     $ref: "../../components/responses/posts.yaml"
+  422:
+    $ref: "../../components/responses/expectedError.yaml"
