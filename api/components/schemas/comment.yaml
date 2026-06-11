@@ -15,6 +15,7 @@ required:
   - warning_user_id
   - creator_name
   - updater_name
+  - vote
 properties:
   id:
     type: integer
@@ -50,3 +51,5 @@ properties:
     type: string
   updater_name:
     type: string
+  vote:
+    $ref: "./vote.yaml"

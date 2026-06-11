@@ -72,7 +72,7 @@ properties:
   is_favorited:
     type: boolean
   vote:
-    $ref: "./post/vote.yaml"
+    $ref: "./vote.yaml"
   comment_count:
     type: integer
   flags:

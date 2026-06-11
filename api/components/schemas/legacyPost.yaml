@@ -255,4 +255,4 @@ properties:
   uploader_name:
     type: string
   vote:
-    $ref: "./post/vote.yaml"
+    $ref: "./vote.yaml"

@@ -13,6 +13,6 @@ properties:
   is_favorited:
     type: boolean
   vote:
-    $ref: "./vote.yaml"
+    $ref: "../vote.yaml"
   comment_count:
     type: integer
