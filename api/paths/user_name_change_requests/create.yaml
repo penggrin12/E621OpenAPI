@@ -6,15 +6,15 @@ security:
   - basicAuth: []
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         required:
-          - user_name_change_request[desired_name]
+          - desired_name
         properties:
-          user_name_change_request[desired_name]:
+          desired_name:
             type: string
-          user_name_change_request[change_reason]:
+          change_reason:
             type: string
 responses:
   302:

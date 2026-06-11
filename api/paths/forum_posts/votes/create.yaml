@@ -8,13 +8,13 @@ parameters:
   - $ref: "../../../components/parameters/path/id.yaml"
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         required:
-          - forum_post_vote[score]
+          - score
         properties:
-          forum_post_vote[score]:
+          score:
             $ref: "../../../components/schemas/upDownMehVote.yaml"
 responses:
   200:

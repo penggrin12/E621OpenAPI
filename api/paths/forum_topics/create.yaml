@@ -6,27 +6,27 @@ security:
   - basicAuth: []
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         required:
-          - forum_topic[title]
-          - forum_topic[category_id]
+          - title
+          - category_id
         properties:
-          forum_topic[title]:
+          title:
             type: string
-          forum_topic[category_id]:
+          category_id:
             type: integer
-          forum_topic[original_post_attributes][id]:
+          original_post_attributes][id:
             type: integer
             description: Forum post ID. Mutually exclusive with body, one must be provided.
-          forum_topic[original_post_attributes][body]:
+          original_post_attributes][body:
             type: string
             description: First forum post body. Mutually exclusive with id, one must be provided.
-          forum_topic[is_sticky]:
+          is_sticky:
             type: boolean
             description: You must be Moderator+.
-          forum_topic[is_locked]:
+          is_locked:
             type: boolean
             description: You must be Moderator+.
 responses:

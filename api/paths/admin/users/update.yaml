@@ -9,41 +9,41 @@ parameters:
   - $ref: "../../../components/parameters/path/id.yaml"
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         properties:
-          user[verified]:
+          verified:
             type: boolean
             description: Must have the bd staff user flag to use.
-          user[level]:
+          level:
             type: integer
             description: Must have the bd staff user flag to promote to Admin+.
-          user[name]:
+          name:
             type: string
-          user[profile_about]:
+          profile_about:
             type: string
-          user[profile_artinfo]:
+          profile_artinfo:
             type: string
-          user[base_upload_limit]:
+          base_upload_limit:
             type: integer
-          user[enable_privacy_mode]:
+          enable_privacy_mode:
             type: boolean
-          user[email]:
+          email:
             type: string
             description: Must have the bd staff user flag to use.
-          user[can_approve_posts]:
+          can_approve_posts:
             type: boolean
-          user[can_upload_free]:
+          can_upload_free:
             type: boolean
-          user[no_flagging]:
+          no_flagging:
             type: boolean
-          user[replacements_beta]:
+          replacements_beta:
             type: boolean
-          user[custom_title]:
+          custom_title:
             type: string
 responses:
-  204:
+  200:
     description: Success
   400:
     $ref: "../../../components/responses/messageError.yaml"

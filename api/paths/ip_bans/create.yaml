@@ -7,16 +7,16 @@ security:
 description: You must be Admin+.
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         required:
-          - ip_ban[ip_addr]
-          - ip_ban[reason]
+          - ip_addr
+          - reason
         properties:
-          ip_ban[ip_addr]:
+          ip_addr:
             type: string
-          ip_ban[reason]:
+          reason:
             type: string
 responses:
   201:

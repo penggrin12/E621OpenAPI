@@ -6,24 +6,24 @@ security:
   - basicAuth: []
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         required:
-          - pool[name]
+          - name
         properties:
-          pool[name]:
+          name:
             type: string
-          pool[description]:
+          description:
             type: string
-          pool[category]:
+          category:
             $ref: "../../components/schemas/poolCategories.yaml"
-          pool[is_active]:
+          is_active:
             type: boolean
-          pool[post_ids_string]:
+          post_ids_string:
             type: string
             description: Space separated list of post IDs. Mutually exclusive with post_ids.
-          pool[post_ids]:
+          post_ids:
             type: array
             description: Array of post IDs. Mutually exclusive with post_ids_string.
             items:

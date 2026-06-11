@@ -7,22 +7,22 @@ security:
 description: You must have the "Approve Posts" permission.
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         required:
-          - post_disapproval[post_id]
-          - post_disapproval[reason]
+          - post_id
+          - reason
         properties:
-          post_disapproval[post_id]:
+          post_id:
             type: integer
-          post_disapproval[reason]:
+          reason:
             type: string
             enum:
               - borderline_quality
               - borderline_relevancy
               - other
-          post_disapproval[message]:
+          message:
             type: string
 responses:
   201:

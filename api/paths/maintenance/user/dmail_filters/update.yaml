@@ -13,13 +13,13 @@ security:
   - basicAuth: []
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         required:
-          - dmail_filter[words]
+          - words
         properties:
-          dmail_filter[words]:
+          words:
             type: string
 responses:
   204:

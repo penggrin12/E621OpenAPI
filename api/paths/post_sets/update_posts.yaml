@@ -9,13 +9,13 @@ parameters:
   - $ref: "../../components/parameters/path/id.yaml"
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         required:
-          - post_set[post_ids_string]
+          - post_ids_string
         properties:
-          post_set[post_ids_string]:
+          post_ids_string:
             type: string
 responses:
   200:

@@ -9,28 +9,32 @@ parameters:
   - $ref: "../../components/parameters/path/idOrName.yaml"
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         properties:
-          avoid_posting[details]:
+          details:
             type: string
-          avoid_posting[staff_notes]:
+          staff_notes:
             type: string
-          avoid_posting[is_active]:
+          is_active:
             type: boolean
-          avoid_posting[artist_attributes][name]:
-            type: string
-          avoid_posting[artist_attributes][other_names_string]:
-            type: string
-          avoid_posting[artist_attributes][other_names]:
-            type: array
-            items:
-              type: string
-          avoid_posting[artist_attributes][group_name]:
-            type: string
-          avoid_posting[artist_attributes][linked_user_id]:
-            type: integer
+          artist_attributes:
+            type: object
+            properties:
+              name:
+                type: string
+                description: If provided and the artist does not exist, an artist will be created.
+              other_names_string:
+                type: string
+              other_names:
+                type: array
+                items:
+                  type: string
+              group_name:
+                type: string
+              linked_user_id:
+                type: integer
 responses:
   204:
     description: Success

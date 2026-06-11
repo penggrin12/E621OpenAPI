@@ -9,13 +9,13 @@ parameters:
   - $ref: "../../components/parameters/path/id.yaml"
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         properties:
-          takedown[notes]:
+          notes:
             type: string
-          takedown[reason_hidden]:
+          reason_hidden:
             type: boolean
           takedown_posts:
             type: string

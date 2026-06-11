@@ -9,15 +9,15 @@ parameters:
   - $ref: "../../components/parameters/path/id.yaml"
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         properties:
-          tag_alias[antecedent_name]:
+          antecedent_name:
             type: string
-          tag_alias[consequent_name]:
+          consequent_name:
             type: string
-          tag_alias[forum_topic_id]:
+          forum_topic_id:
             type: string
 responses:
   204:

@@ -7,16 +7,16 @@ security:
   - basicAuth: []
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         required:
-          - email_blacklist[domain]
-          - email_blacklist[reason]
+          - domain
+          - reason
         properties:
-          email_blacklist[domain]:
+          domain:
             type: string
-          email_blacklist[reason]:
+          reason:
             type: string
 responses:
   201:

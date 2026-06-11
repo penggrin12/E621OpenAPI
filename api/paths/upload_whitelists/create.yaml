@@ -7,25 +7,25 @@ security:
 description: You must be Admin+.
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         required:
-          - upload_whitelist[allowed]
-          - upload_whitelist[domain]
-          - upload_whitelist[path]
+          - allowed
+          - domain
+          - path
         properties:
-          upload_whitelist[allowed]:
+          allowed:
             type: string
-          upload_whitelist[domain]:
+          domain:
             type: string
-          upload_whitelist[path]:
+          path:
             type: string
-          upload_whitelist[reason]:
+          reason:
             type: string
-          upload_whitelist[note]:
+          note:
             type: string
-          upload_whitelist[hidden]:
+          hidden:
             type: boolean
 responses:
   201:

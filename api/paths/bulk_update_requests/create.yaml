@@ -6,23 +6,23 @@ security:
   - basicAuth: []
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         required:
-          - bulk_update_request[script]
-          - bulk_update_request[title]
-          - bulk_update_request[reason]
+          - script
+          - title
+          - reason
         properties:
-          bulk_update_request[script]:
+          script:
             type: string
-          bulk_update_request[title]:
+          title:
             type: string
-          bulk_update_request[reason]:
+          reason:
             type: string
-          bulk_update_request[forum_topic_id]:
+          forum_topic_id:
             type: integer
-          bulk_update_request[skip_forum]:
+          skip_forum:
             type: boolean
             description: Only usable for Admin+
 responses:

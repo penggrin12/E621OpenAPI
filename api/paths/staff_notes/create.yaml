@@ -6,13 +6,13 @@ security:
   - basicAuth: []
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         required:
-          - staff_note[body]
+          - body
         properties:
-          staff_note[body]:
+          body:
             type: string
 responses:
   201:

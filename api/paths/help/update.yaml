@@ -9,18 +9,18 @@ parameters:
   - $ref: "../../components/parameters/path/id.yaml"
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         properties:
-          help_page[name]:
+          name:
             type: string
-          help_page[wiki_page]:
+          wiki_page:
             type: string
-          help_page[related]:
+          related:
             type: string
             description: Separate with a comma followed by a space.
-          help_page[title]:
+          title:
             type: string
 responses:
   204:

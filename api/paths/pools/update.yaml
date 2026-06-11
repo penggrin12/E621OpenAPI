@@ -8,22 +8,22 @@ parameters:
   - $ref: "../../components/parameters/path/id.yaml"
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         properties:
-          pool[name]:
+          name:
             type: string
-          pool[description]:
+          description:
             type: string
-          pool[is_active]:
+          is_active:
             type: boolean
-          pool[category]:
+          category:
             $ref: "../../components/schemas/poolCategories.yaml"
-          pool[post_ids_string]:
+          post_ids_string:
             type: string
             description: Space separated list of post IDs. Mutually exclusive with post_ids.
-          pool[post_ids]:
+          post_ids:
             type: array
             description: Array of post IDs. Mutually exclusive with post_ids_string.
             items:

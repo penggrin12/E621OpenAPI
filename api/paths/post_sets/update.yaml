@@ -9,19 +9,19 @@ parameters:
   - $ref: "../../components/parameters/path/id.yaml"
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         properties:
-          post_set[name]:
+          name:
             type: string
-          post_set[shortname]:
+          shortname:
             type: string
-          post_set[description]:
+          description:
             type: string
-          post_set[is_public]:
+          is_public:
             type: boolean
-          post_set[transfer_on_delete]:
+          transfer_on_delete:
             type: boolean
 responses:
   204:

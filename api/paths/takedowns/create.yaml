@@ -6,39 +6,39 @@ security:
   - basicAuth: []
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         required:
-          - takedown[email]
-          - takedown[reason]
+          - email
+          - reason
         properties:
-          takedown[email]:
+          email:
             type: string
-          takedown[source]:
+          source:
             type: string
-          takedown[instructions]:
+          instructions:
             type: string
-          takedown[reason]:
+          reason:
             type: string
-          takedown[post_ids]:
+          post_ids:
             type: array
-            description: takedown[post_ids][]=1&takedown[post_ids][]=2
+            description: post_ids][]=1&takedown[post_ids][=2
             items:
               type: integer
-          takedown[reason_hidden]:
+          reason_hidden:
             type: boolean
-          takedown[notes]:
+          notes:
             type: string
             description: Must have the bd staff user flag to use.
-          takedown[del_post_ids]:
+          del_post_ids:
             type: array
             description: |
               Must have the bd staff user flag to use.
-              takedown[del_post_ids][]=1&takedown[del_post_ids][]=2
+              del_post_ids][]=1&takedown[del_post_ids][=2
             items:
               type: integer
-          takedown[status]:
+          status:
             type: string
             description: Must have the bd staff user flag to use.
 responses:

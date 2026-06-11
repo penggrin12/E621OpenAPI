@@ -8,19 +8,19 @@ parameters:
   - $ref: "../../components/parameters/path/id.yaml"
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         properties:
-          upload_whitelist[allowed]:
+          allowed:
             type: string
-          upload_whitelist[pattern]:
+          pattern:
             type: string
-          upload_whitelist[reason]:
+          reason:
             type: string
-          upload_whitelist[note]:
+          note:
             type: string
-          upload_whitelist[hidden]:
+          hidden:
             type: boolean
 responses:
   204:

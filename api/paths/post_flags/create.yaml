@@ -7,16 +7,16 @@ security:
 description: Will error if post_id is not provided.
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         required:
-          - post_flag[post_id]
-          - post_flag[reason_name]
+          - post_id
+          - reason_name
         properties:
-          post_flag[post_id]:
+          post_id:
             type: integer
-          post_flag[reason_name]:
+          reason_name:
             type: string
             enum:
               - uploading_guidelines
@@ -28,9 +28,9 @@ requestBody:
               - real_porn
               - corrupt
               - inferior
-          post_flag[parent_id]:
+          parent_id:
             type: integer
-          post_flag[note]:
+          note:
             type: string
 responses:
   201:

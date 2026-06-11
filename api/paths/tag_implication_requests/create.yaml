@@ -7,21 +7,21 @@ security:
 description: Errors will result in a 406 with no information.
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         required:
-          - tag_implication[antecedent_name]
-          - tag_implication[consequent_name]
-          - tag_implication[reason]
+          - antecedent_name
+          - consequent_name
+          - reason
         properties:
-          tag_implication[antecedent_name]:
+          antecedent_name:
             type: string
-          tag_implication[consequent_name]:
+          consequent_name:
             type: string
-          tag_implication[reason]:
+          reason:
             type: string
-          tag_implication[skip_forum]:
+          skip_forum:
             type: boolean
             description: Must be Admin+.
 responses:

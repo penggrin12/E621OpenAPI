@@ -6,23 +6,23 @@ security:
   - basicAuth: []
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         required:
-          - comment[body]
-          - comment[post_id]
+          - body
+          - post_id
         properties:
-          comment[body]:
+          body:
             type: string
-          comment[post_id]:
+          post_id:
             type: integer
-          comment[do_not_bump_post]:
+          do_not_bump_post:
             type: boolean
-          comment[is_sticky]:
+          is_sticky:
             type: boolean
             description: Only usable for Janitor+
-          comment[is_hidden]:
+          is_hidden:
             type: boolean
             description: Only usable for Moderator+
 responses:

@@ -9,13 +9,13 @@ parameters:
   - $ref: "../../components/parameters/path/id.yaml"
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         properties:
-          tag[category]:
+          category:
             $ref: "../../components/schemas/tagCategories.yaml"
-          tag[is_locked]:
+          is_locked:
             description: Must be Admin+.
             type: boolean
 responses:

@@ -9,22 +9,22 @@ parameters:
   - $ref: "../../components/parameters/path/id.yaml"
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         required:
-          - ticket[response]
+          - response
         properties:
-          ticket[status]:
+          status:
             type: string
             enum:
               - partial
               - approved
-          ticket[response]:
+          response:
             type: string
-          ticket[record_type]:
+          record_type:
             $ref: "../../components/schemas/warningTypes.yaml"
-          ticket[send_update_dmail]:
+          send_update_dmail:
             type: boolean
             description: An update dmail will always be sent when the status is changed.
 responses:

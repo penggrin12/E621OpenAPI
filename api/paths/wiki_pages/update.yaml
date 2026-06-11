@@ -13,32 +13,32 @@ parameters:
       type: integer
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         properties:
-          wiki_page[body]:
+          body:
             type: string
-          wiki_page[edit_reason]:
+          edit_reason:
             type: string
-          wiki_page[parent]:
+          parent:
             type: string
             description: Must be Privileged+ to use.
-          wiki_page[title]:
+          title:
             type: string
             description: Must be Janitor+ to use.
-          wiki_page[is_locked]:
+          is_locked:
             type: boolean
             description: Must be Janitor+ to use.
-          wiki_page[is_deleted]:
+          is_deleted:
             type: boolean
             description: Must be Janitor+ to use.
-          wiki_page[skip_secondary_validations]:
+          skip_secondary_validations:
             type: boolean
             description: Must be Janitor+ to use.
-          wiki_page[category_id]:
+          category_id:
             $ref: "../../components/schemas/tagCategories.yaml"
-          wiki_page[category_is_locked]:
+          category_is_locked:
             type: boolean
             description: Must be Admin+ to use.
 responses:

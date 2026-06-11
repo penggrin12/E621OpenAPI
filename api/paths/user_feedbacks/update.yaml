@@ -9,13 +9,13 @@ parameters:
   - $ref: "../../components/parameters/path/id.yaml"
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         properties:
-          user_feedback[body]:
+          body:
             type: string
-          user_feedback[category]:
+          category:
             $ref: "../../components/schemas/feedbackCategories.yaml"
 responses:
   204:

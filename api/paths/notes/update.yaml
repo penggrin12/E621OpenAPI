@@ -8,19 +8,19 @@ parameters:
   - $ref: "../../components/parameters/path/id.yaml"
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         properties:
-          note[x]:
+          x:
             type: integer
-          note[y]:
+          y:
             type: integer
-          note[width]:
+          width:
             type: integer
-          note[height]:
+          height:
             type: integer
-          note[body]:
+          body:
             type: string
 responses:
   204:

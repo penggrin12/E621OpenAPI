@@ -8,7 +8,7 @@ security:
 description: You must have the "Approve Posts" permission. The response does not differ for success or failure.
 requestBody:
   content:
-    application/x-www-form-urlencoded:
+    application/json:
       schema:
         type: object
         required:
