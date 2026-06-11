@@ -3,6 +3,7 @@ required:
   - score
   - fav_count
   - is_favorited
+  - vote
   - comment_count
 properties:
   score:
@@ -11,5 +12,7 @@ properties:
     type: integer
   is_favorited:
     type: boolean
+  vote:
+    $ref: "./vote.yaml"
   comment_count:
     type: integer

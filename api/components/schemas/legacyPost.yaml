@@ -24,6 +24,7 @@ required:
   - has_notes
   - duration
   - uploader_name
+  - vote
 properties:
   id:
     type: integer
@@ -253,3 +254,5 @@ properties:
     nullable: true
   uploader_name:
     type: string
+  vote:
+    $ref: "./post/vote.yaml"

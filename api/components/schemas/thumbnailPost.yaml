@@ -18,6 +18,7 @@ required:
   - score
   - fav_count
   - is_favorited
+  - vote
   - comment_count
   - flags
   - pools
@@ -70,6 +71,8 @@ properties:
     type: integer
   is_favorited:
     type: boolean
+  vote:
+    $ref: "./post/vote.yaml"
   comment_count:
     type: integer
   flags:
