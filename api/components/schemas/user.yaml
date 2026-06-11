@@ -13,6 +13,7 @@ required:
   - can_upload_free
   - level_string
   - avatar_id
+  - has_cropped_avatar
 properties:
   id:
     type: integer
@@ -43,4 +44,6 @@ properties:
     type: integer
     nullable: true
   is_verified:
+    type: boolean
+  has_cropped_avatar:
     type: boolean
