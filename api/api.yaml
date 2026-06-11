@@ -128,8 +128,8 @@ components:
       $ref: "./components/schemas/fullCurrentUser.yaml"
     FullUser:
       $ref: "./components/schemas/fullUser.yaml"
-    Help:
-      $ref: "./components/schemas/help.yaml"
+    HelpPage:
+      $ref: "./components/schemas/helpPage.yaml"
     IpBan:
       $ref: "./components/schemas/ipBan.yaml"
     IqdbPost:
@@ -543,6 +543,9 @@ paths:
       $ref: "./paths/help/index.yaml"
     post:
       $ref: "./paths/help/create.yaml"
+  /help/list.json:
+    get:
+      $ref: "./paths/help/list.yaml"
   /help/{id}.json:
     get:
       $ref: "./paths/help/show.yaml"
