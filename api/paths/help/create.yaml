@@ -29,7 +29,7 @@ responses:
     content:
       application/json:
         schema:
-          $ref: "../../components/schemas/help.yaml"
+          $ref: "../../components/schemas/helpPage.yaml"
   403:
     $ref: "../../components/responses/accessDenied.yaml"
   422:

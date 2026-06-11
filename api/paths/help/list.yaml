@@ -17,4 +17,4 @@ responses:
         schema:
           type: array
           items:
-            $ref: "../../components/schemas/help.yaml"
+            $ref: "../../components/schemas/helpPage.yaml"
