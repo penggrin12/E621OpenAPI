@@ -7,11 +7,16 @@ security:
 description: |
   Fetching a dmail will not mark it as read. 
   Unless the dmail is owned:
-  - The current user must be Janitor+ and the dmail must be from the automod
+  - The current user must be staff and the dmail must be to or from the automod
   - The current user must be Moderator+ and a ticket must exist for the dmail
   - The current user must be Admin+ and the dmail must be to or from Admin+
+  - The current user must be Staff and have a share key for the dmail
 parameters:
   - $ref: "../../components/parameters/path/id.yaml"
+  - in: query
+    name: key
+    schema:
+      type: string
 responses:
   200:
     description: Success
