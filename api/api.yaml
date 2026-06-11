@@ -685,9 +685,6 @@ paths:
   /posts/{id}/similar/tags.json:
     get:
       $ref: "./paths/post_recommendations/tags.yaml"
-  /posts/{id}/similar/remote.json:
-    get:
-      $ref: "./paths/post_recommendations/remote.yaml"
 
   /post_sets.json:
     get:
