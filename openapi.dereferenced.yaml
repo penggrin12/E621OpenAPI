@@ -12,9 +12,9 @@ info:
   contact:
     name: Donovan_DMC
     url: 'https://e621.net/forum_topics/46279'
-  version: 0c3ab7a
+  version: 12b2374
   x-e621ng-commit: 0772f94b6b2e0e00e40dd74e34fbf5c56a00a219
-  x-e621ng-master-behind-by: 0
+  x-e621ng-master-behind-by: 116
   x-e621ng-master-compare-url: https://github.com/e621ng/e621ng/compare/0772f94b6b2e0e00e40dd74e34fbf5c56a00a219...master
 servers:
   - url: 'https://e621.net'
@@ -301,6 +301,7 @@ components:
       enum:
         - 0
         - 1
+        - 2
         - 3
         - 4
         - 5
@@ -611,6 +612,7 @@ components:
               enum:
                 - 0
                 - 1
+                - 2
                 - 3
                 - 4
                 - 5
@@ -3079,6 +3081,7 @@ components:
           enum:
             - 0
             - 1
+            - 2
             - 3
             - 4
             - 5
@@ -3147,6 +3150,7 @@ components:
           enum:
             - 0
             - 1
+            - 2
             - 3
             - 4
             - 5
@@ -3287,6 +3291,7 @@ components:
           enum:
             - 0
             - 1
+            - 2
             - 3
             - 4
             - 5
@@ -3326,6 +3331,7 @@ components:
           enum:
             - 0
             - 1
+            - 2
             - 3
             - 4
             - 5
@@ -3337,6 +3343,7 @@ components:
           enum:
             - 0
             - 1
+            - 2
             - 3
             - 4
             - 5
@@ -3739,6 +3746,7 @@ components:
           enum:
             - 0
             - 1
+            - 2
             - 3
             - 4
             - 5
@@ -3918,6 +3926,7 @@ components:
           enum:
             - 0
             - 1
+            - 2
             - 3
             - 4
             - 5
@@ -3929,6 +3938,7 @@ components:
           enum:
             - 0
             - 1
+            - 2
             - 3
             - 4
             - 5
@@ -3967,6 +3977,7 @@ components:
               enum:
                 - 0
                 - 1
+                - 2
                 - 3
                 - 4
                 - 5
@@ -4014,6 +4025,7 @@ components:
           enum:
             - 0
             - 1
+            - 2
             - 3
             - 4
             - 5
@@ -35192,6 +35204,7 @@ paths:
             enum:
               - 0
               - 1
+              - 2
               - 3
               - 4
               - 5
@@ -35249,6 +35262,7 @@ paths:
                       enum:
                         - 0
                         - 1
+                        - 2
                         - 3
                         - 4
                         - 5
@@ -35313,6 +35327,7 @@ paths:
                     enum:
                       - 0
                       - 1
+                      - 2
                       - 3
                       - 4
                       - 5
@@ -35369,6 +35384,7 @@ paths:
                   enum:
                     - 0
                     - 1
+                    - 2
                     - 3
                     - 4
                     - 5
@@ -35518,6 +35534,7 @@ paths:
                     enum:
                       - 0
                       - 1
+                      - 2
                       - 3
                       - 4
                       - 5
@@ -35529,6 +35546,7 @@ paths:
                     enum:
                       - 0
                       - 1
+                      - 2
                       - 3
                       - 4
                       - 5
@@ -35567,6 +35585,7 @@ paths:
                         enum:
                           - 0
                           - 1
+                          - 2
                           - 3
                           - 4
                           - 5
@@ -35702,6 +35721,7 @@ paths:
                       enum:
                         - 0
                         - 1
+                        - 2
                         - 3
                         - 4
                         - 5
@@ -35804,6 +35824,7 @@ paths:
                       enum:
                         - 0
                         - 1
+                        - 2
                         - 3
                         - 4
                         - 5
@@ -35815,6 +35836,7 @@ paths:
                       enum:
                         - 0
                         - 1
+                        - 2
                         - 3
                         - 4
                         - 5
@@ -35897,6 +35919,7 @@ paths:
             enum:
               - 0
               - 1
+              - 2
               - 3
               - 4
               - 5
@@ -35910,6 +35933,7 @@ paths:
             enum:
               - 0
               - 1
+              - 2
               - 3
               - 4
               - 5
@@ -36399,6 +36423,7 @@ paths:
             enum:
               - 0
               - 1
+              - 2
               - 3
               - 4
               - 5
@@ -36412,6 +36437,7 @@ paths:
             enum:
               - 0
               - 1
+              - 2
               - 3
               - 4
               - 5
@@ -36852,6 +36878,7 @@ paths:
                   enum:
                     - 0
                     - 1
+                    - 2
                     - 3
                     - 4
                     - 5
@@ -36877,6 +36904,7 @@ paths:
                         enum:
                           - 0
                           - 1
+                          - 2
                           - 3
                           - 4
                           - 5
@@ -36989,6 +37017,7 @@ paths:
                       enum:
                         - 0
                         - 1
+                        - 2
                         - 3
                         - 4
                         - 5
@@ -43354,6 +43383,7 @@ paths:
                       enum:
                         - 0
                         - 1
+                        - 2
                         - 3
                         - 4
                         - 5
@@ -43450,6 +43480,7 @@ paths:
                     enum:
                       - 0
                       - 1
+                      - 2
                       - 3
                       - 4
                       - 5
@@ -43560,6 +43591,7 @@ paths:
                     enum:
                       - 0
                       - 1
+                      - 2
                       - 3
                       - 4
                       - 5
@@ -43627,6 +43659,7 @@ paths:
                   enum:
                     - 0
                     - 1
+                    - 2
                     - 3
                     - 4
                     - 5
